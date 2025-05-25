@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MeditationApp.Controls"
+             x:Class="MeditationApp.Views.LoginPage"
+             Shell.NavBarIsVisible="False"
+             Title="Login">
+    <ContentPage.Background>
+        <SolidColorBrush Color="{StaticResource BackgroundColor}"/>
+    </ContentPage.Background>
+
+    <Grid RowDefinitions="*,Auto">
+        <VerticalStackLayout
+            Grid.Row="0"
+            Spacing="10"
+            Padding="30,0"
+            VerticalOptions="Start">
+
+            <!-- Consider adding a logo here -->
+
+            <Label
+                Text="Welcome"
+                TextColor="{StaticResource PrimaryDarkText}"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="42"
+                FontAttributes="Bold"
+                HorizontalOptions="Start"
+                Margin="0,100,0,-10"/>
+            <Label
+                Text="Please log in to continue"
+                FontSize="16"
+                TextColor="{StaticResource SecondaryDarkText}"
+                HorizontalOptions="Start"
+                HorizontalTextAlignment="Start"
+                Margin="0,0,0,50"/>
+
+            <!-- Offline Mode Indicator -->
+            <Frame BackgroundColor="Orange"
+                   BorderColor="DarkOrange"
+                   CornerRadius="5"
+                   Padding="10,5"
+                   HorizontalOptions="Center"
+                   IsVisible="{Binding IsOfflineMode}"
+                   Margin="0,0,0,10">
+                <Label Text="📱 Offline Mode Available"
+                       TextColor="White"
+                       FontSize="12"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"/>
+            </Frame>
+
+            <!-- Email Entry -->
+            <controls:CustomEntry
+                Style="{StaticResource ModernCustomEntryStyle}"
+                Text="{Binding Email}"
+                Placeholder="Email"
+                Keyboard="Email"
+                SemanticProperties.Hint="Enter your email address"/>
+
+            <!-- Password Entry -->
+            <controls:CustomEntry
+                Style="{StaticResource ModernCustomEntryStyle}"
+                Text="{Binding Password}"
+                Placeholder="Password"
+                IsPassword="True"
+                SemanticProperties.Hint="Enter your password"/>
+
+            <!-- Status and Loading Indicator -->
+            <Grid Margin="0,-5,0,0" HorizontalOptions="Center">
+                <Label
+                    Text="{Binding Status}"
+                    TextColor="Red"
+                    FontSize="14"
+                    HorizontalOptions="Center"
+                    HorizontalTextAlignment="Center"
+                    IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"/>
+                <controls:LoadingIndicator
+                    IsLoading="{Binding IsBusy}"
+                    LoadingText="{Binding LoadingText}"
+                    IsVisible="{Binding IsBusy}"/>
+            </Grid>
+
+
+            <!-- Forgot Password positioned right-aligned below password field -->
+            <Label
+                Text="Forgot Password?"
+                HorizontalOptions="End"
+                FontSize="14"
+                TextColor="#FF949494"
+                Margin="0,-10,5,0"
+                SemanticProperties.Description="Tap to reset your password">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}"/>
+                </Label.GestureRecognizers>
+            </Label>
+
+            <Button
+                Text="Login"
+                Command="{Binding LoginCommand}"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                SemanticProperties.Hint="Logs into your account"
+                HorizontalOptions="Fill"
+                BackgroundColor="#FF71BEF1"
+                TextColor="Black"
+                BorderWidth="0"
+                FontAttributes="Bold"
+                FontSize="20"
+                Style="{StaticResource ButtonStyle}"
+                Margin="0,10"/>
+
+        </VerticalStackLayout>
+
+        <!-- Sign up text anchored to bottom -->
+        <StackLayout Grid.Row="1"
+                     Orientation="Horizontal"
+                     HorizontalOptions="Center"
+                     Margin="0,0,0,30">
+            <Label Text="Don't have an account? "
+                   TextColor="{StaticResource SecondaryDarkText}"
+                   FontSize="14"/>
+            <Label Text="Sign up"
+                   TextColor="#FF71BEF1"
+                   FontSize="14"
+                   FontAttributes="Bold"
+                   SemanticProperties.Description="Tap to create a new account">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding SignUpCommand}"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </StackLayout>
+
+    </Grid>
+</ContentPage>

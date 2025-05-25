@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MeditationApp.Controls.LoadingIndicator"
+             x:Name="LoadingIndicatorView">
+
+    <StackLayout
+        Orientation="Horizontal"
+        HorizontalOptions="Center"
+        VerticalOptions="Center"
+        Spacing="10"
+        IsVisible="{Binding Source={x:Reference LoadingIndicatorView}, Path=IsLoading}">
+
+        <ActivityIndicator
+            IsRunning="{Binding Source={x:Reference LoadingIndicatorView}, Path=IsLoading}"
+            IsVisible="{Binding Source={x:Reference LoadingIndicatorView}, Path=IsLoading}"
+            Color="#FF71BEF1"
+            WidthRequest="24"
+            HeightRequest="24"/>
+
+        <Label
+            Text="{Binding Source={x:Reference LoadingIndicatorView}, Path=LoadingText}"
+            TextColor="#FF949494"
+            FontSize="14"
+            VerticalOptions="Center"/>
+    </StackLayout>
+
+</ContentView>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MeditationApp.Views.SettingsPage"
+             Title="Settings">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20"
+                             Spacing="20">
+
+            <!-- Header -->
+            <VerticalStackLayout Spacing="10">
+                <Label Text="Settings"
+                       Style="{StaticResource Headline}"
+                       HorizontalOptions="Center"/>
+                <Label Text="Customize your meditation experience"
+                       Style="{StaticResource BodyText}"
+                       HorizontalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}"/>
+            </VerticalStackLayout>
+
+            
+
+            <!-- Notification Settings -->
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                   CornerRadius="15"
+                   Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Notifications"
+                           Style="{StaticResource SubHeadline}"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                               Text="Enable Notifications"
+                               VerticalOptions="Center"
+                               FontSize="16"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding NotificationsEnabled}"
+                                OnColor="{StaticResource Primary}"/>
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="10"
+                                         IsVisible="{Binding NotificationsEnabled}">
+                        <Label Text="Daily Reminder Time"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}"/>
+                        <TimePicker Time="{Binding ReminderTime}"
+                                    FontSize="16"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Meditation Settings -->
+            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                   CornerRadius="15"
+                   Padding="20">
+                <VerticalStackLayout Spacing="15">
+                    <Label Text="Meditation Preferences"
+                           Style="{StaticResource SubHeadline}"/>
+
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Default Session Duration (minutes)"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}"/>
+                        <Stepper Value="{Binding DefaultSessionDuration}"
+                                 Minimum="5"
+                                 Maximum="60"
+                                 Increment="5"/>
+                        <Label Text="{Binding DefaultSessionDuration, StringFormat='{0} minutes'}"
+                               FontSize="16"
+                               HorizontalOptions="Center"
+                               TextColor="{StaticResource Primary}"/>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Action Buttons -->
+            <VerticalStackLayout Spacing="15"
+                                 Margin="0,20,0,0">
+                <Button Text="View Profile"
+                        Clicked="OnViewProfileClicked"
+                        Style="{StaticResource ButtonOutline}"
+                        HeightRequest="50"/>
+
+                <Button Text="Save Settings"
+                        Command="{Binding SaveSettingsCommand}"
+                        Style="{StaticResource ButtonOutline}"
+                        HeightRequest="50"/>
+
+                <Button Text="Logout"
+                        Command="{Binding LogoutCommand}"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Danger}, Dark={StaticResource DangerDark}}"
+                        TextColor="White"
+                        HeightRequest="50"
+                        CornerRadius="25"/>
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

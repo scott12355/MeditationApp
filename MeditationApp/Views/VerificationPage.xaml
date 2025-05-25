@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MeditationApp.Controls"
+             x:Class="MeditationApp.Views.VerificationPage"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             Title="Verify Account">
+
+    <ContentPage.Background>
+        <SolidColorBrush Color="{StaticResource BackgroundColor}"/>
+    </ContentPage.Background>
+
+    <Grid RowDefinitions="*,Auto">
+        <VerticalStackLayout
+            Grid.Row="0"
+            Spacing="10"
+            Padding="30,20"
+            VerticalOptions="Start">
+
+            <Label
+                Text="Verify Your Account"
+                TextColor="{StaticResource PrimaryDarkText}"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="32"
+                FontAttributes="Bold"
+                HorizontalOptions="Start"
+                Margin="0,0,0,10"/>
+
+            <Label
+                Text="Please check your email for a verification code and enter it below"
+                FontSize="16"
+                TextColor="{StaticResource SecondaryDarkText}"
+                HorizontalOptions="Start"
+                HorizontalTextAlignment="Start"
+                Margin="0,0,0,30"/>
+
+            <!-- Loading Indicator -->
+            <controls:LoadingIndicator
+                IsLoading="{Binding IsBusy}"
+                LoadingText="{Binding LoadingText}"
+                Margin="0,0,0,10"/>
+
+            <!-- Username field (disabled) -->
+            <controls:CustomEntry
+                Style="{StaticResource ModernCustomEntryStyle}"
+                Text="{Binding Username}"
+                Placeholder="Username"
+                IsEnabled="False"
+                SemanticProperties.Hint="Your username for verification"/>
+
+            <!-- Verification Code -->
+            <controls:CustomEntry
+                Style="{StaticResource ModernCustomEntryStyle}"
+                Text="{Binding Code}"
+                Placeholder="Verification Code"
+                Keyboard="Numeric"
+                MaxLength="6"
+                SemanticProperties.Hint="Enter the 6-digit verification code"/>
+
+            <Button
+                Text="Verify Account"
+                Command="{Binding VerifyCommand}"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                SemanticProperties.Hint="Verify your account"
+                HorizontalOptions="Fill"
+                BackgroundColor="#FF71BEF1"
+                TextColor="Black"
+                BorderWidth="0"
+                FontAttributes="Bold"
+                FontSize="20"
+                Style="{StaticResource ButtonStyle}"
+                Margin="0,20,0,10"/>
+
+            <Button
+                Text="Resend Code"
+                Command="{Binding ResendCodeCommand}"
+                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                SemanticProperties.Hint="Request a new verification code"
+                HorizontalOptions="Fill"
+                BackgroundColor="Transparent"
+                TextColor="#FF71BEF1"
+                BorderColor="#FF71BEF1"
+                BorderWidth="2"
+                FontAttributes="Bold"
+                FontSize="16"
+                CornerRadius="20"
+                Margin="0,5"/>
+
+        </VerticalStackLayout>
+
+        <!-- Back to login text anchored to bottom -->
+        <StackLayout Grid.Row="1"
+                     Orientation="Horizontal"
+                     HorizontalOptions="Center"
+                     Margin="0,0,0,30">
+            <Label Text="Need to go back? "
+                   TextColor="{StaticResource SecondaryDarkText}"
+                   FontSize="14"/>
+            <Label Text="Back to Login"
+                   TextColor="#FF71BEF1"
+                   FontSize="14"
+                   FontAttributes="Bold"
+                   SemanticProperties.Description="Tap to go back to login">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding BackToLoginCommand}"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </StackLayout>
+
+    </Grid>
+</ContentPage>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MeditationApp.Views.ProfilePage"
+             Title="My Profile">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Spacing="25"
+            Padding="30,0"
+            VerticalOptions="Center">
+
+            <Image
+                Source="dotnet_bot.png"
+                HeightRequest="150"
+                HorizontalOptions="Center"/>
+
+            <Label
+                Text="My Profile"
+                SemanticProperties.HeadingLevel="Level1"
+                FontSize="32"
+                HorizontalOptions="Center"/>
+
+            <!-- Offline Mode Indicator -->
+            <Frame x:Name="OfflineIndicator"
+                   BackgroundColor="Orange"
+                   BorderColor="DarkOrange"
+                   CornerRadius="5"
+                   Padding="10,5"
+                   HorizontalOptions="Center"
+                   IsVisible="False">
+                <Label Text="📱 Offline Mode - Limited functionality"
+                       TextColor="White"
+                       FontSize="12"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"/>
+            </Frame>
+
+            <Border Stroke="LightGray"
+                    StrokeThickness="1"
+                    Padding="15">
+                <VerticalStackLayout Spacing="15">
+                    <HorizontalStackLayout>
+                        <Label Text="Username: "
+                               FontAttributes="Bold"
+                               WidthRequest="100"/>
+                        <Label x:Name="UsernameLabel"
+                               Text="Loading..."/>
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout>
+                        <Label Text="Email: "
+                               FontAttributes="Bold"
+                               WidthRequest="100"/>
+                        <Label x:Name="EmailLabel"
+                               Text="Loading..."/>
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout>
+                        <Label Text="First Name: "
+                               FontAttributes="Bold"
+                               WidthRequest="100"/>
+                        <Label x:Name="FirstNameLabel"
+                               Text="Loading..."/>
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout>
+                        <Label Text="Last Name: "
+                               FontAttributes="Bold"
+                               WidthRequest="100"/>
+                        <Label x:Name="LastNameLabel"
+                               Text="Loading..."/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <Button
+                x:Name="SignOutButton"
+                Text="Sign Out"
+                SemanticProperties.Hint="Signs out of your account"
+                Clicked="OnSignOutClicked"
+                HorizontalOptions="Fill"/>
+
+            <Label
+                x:Name="StatusLabel"
+                Text=""
+                HorizontalOptions="Center"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

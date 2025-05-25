@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="MeditationApp.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:MeditationApp"
+    xmlns:views="clr-namespace:MeditationApp.Views"
+    Shell.FlyoutBehavior="Disabled"
+    Title="MeditationApp">
+
+    <!-- Login and other standalone pages -->
+    <ShellContent
+        Title="Login"
+        ContentTemplate="{DataTemplate views:LoginPage}"
+        Route="LoginPage"/>
+
+    <ShellContent
+        Title="Profile"
+        ContentTemplate="{DataTemplate views:ProfilePage}"
+        Route="ProfilePage"/>
+
+    <!-- Main tabbed interface -->
+    <TabBar Route="MainTabs" 
+            Shell.TabBarTitleColor="{StaticResource Secondary}" 
+            >
+        <Tab Title="Today">
+            <ShellContent ContentTemplate="{DataTemplate views:TodayPage}"/>
+        </Tab>
+        <Tab Title="Calendar">
+            <ShellContent ContentTemplate="{DataTemplate views:CalendarPage}"/>
+        </Tab>
+    </TabBar>
+
+</Shell>

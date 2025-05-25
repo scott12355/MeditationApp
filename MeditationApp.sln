@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# 
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeditationApp", "MeditationApp\MeditationApp.csproj", "{6FD51BB9-DCA5-47B3-A382-8DDD1A7DF1A4}"
+EndProject
+
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6FD51BB9-DCA5-47B3-A382-8DDD1A7DF1A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FD51BB9-DCA5-47B3-A382-8DDD1A7DF1A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FD51BB9-DCA5-47B3-A382-8DDD1A7DF1A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FD51BB9-DCA5-47B3-A382-8DDD1A7DF1A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{927487A8-98F1-4846-B2ED-5D83D5F3C5BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{927487A8-98F1-4846-B2ED-5D83D5F3C5BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{927487A8-98F1-4846-B2ED-5D83D5F3C5BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{927487A8-98F1-4846-B2ED-5D83D5F3C5BC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

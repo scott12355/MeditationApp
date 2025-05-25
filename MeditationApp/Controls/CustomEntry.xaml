@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MeditationApp.Controls.CustomEntry"
+             x:Name="RootView">
+
+    <Border StrokeThickness="1"
+            Stroke="{Binding Source={x:Reference RootView}, Path=BorderColor}"
+            Background="{Binding Source={x:Reference RootView}, Path=CustomBackgroundColor}"
+            StrokeShape="RoundRectangle 12"
+            Padding="0">
+
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              RowDefinitions="*"
+              Padding="16,0">
+
+            <!-- Left Icon -->
+            <Label Grid.Column="0"
+                   Text="{Binding Source={x:Reference RootView}, Path=LeftIcon}"
+                   FontSize="20"
+                   TextColor="{Binding Source={x:Reference RootView}, Path=IconColor}"
+                   VerticalOptions="Center"
+                   IsVisible="{Binding Source={x:Reference RootView}, Path=HasLeftIcon}"
+                   Margin="0,0,-12,0"/>
+
+            <!-- Entry Field -->
+            <Entry Grid.Column="1"
+                   x:Name="EntryField"
+                   Text="{Binding Source={x:Reference RootView}, Path=Text, Mode=TwoWay}"
+                   Placeholder="{Binding Source={x:Reference RootView}, Path=Placeholder}"
+                   PlaceholderColor="{Binding Source={x:Reference RootView}, Path=PlaceholderColor}"
+                   TextColor="{Binding Source={x:Reference RootView}, Path=TextColor}"
+                   FontSize="{Binding Source={x:Reference RootView}, Path=FontSize}"
+                   FontFamily="{Binding Source={x:Reference RootView}, Path=FontFamily}"
+                   IsPassword="{Binding Source={x:Reference RootView}, Path=IsPassword}"
+                   IsSpellCheckEnabled="{Binding Source={x:Reference RootView}, Path=IsSpellCheckEnabled}"
+                   Keyboard="{Binding Source={x:Reference RootView}, Path=Keyboard}"
+                   ReturnType="{Binding Source={x:Reference RootView}, Path=ReturnType}"
+                   MaxLength="{Binding Source={x:Reference RootView}, Path=MaxLength}"
+                   BackgroundColor="Transparent"
+                   VerticalOptions="Center"
+                   HorizontalOptions="FillAndExpand"
+                   Focused="OnEntryFocused"
+                   Unfocused="OnEntryUnfocused"
+                   TextChanged="OnTextChanged"
+                   Completed="OnCompleted"/>
+
+            <!-- Right Icon -->
+            <Label Grid.Column="2"
+                   Text="{Binding Source={x:Reference RootView}, Path=RightIcon}"
+                   FontSize="20"
+                   TextColor="{Binding Source={x:Reference RootView}, Path=IconColor}"
+                   VerticalOptions="Center"
+                   IsVisible="{Binding Source={x:Reference RootView}, Path=HasRightIcon}"
+                   Margin="12,0,0,0">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnRightIconTapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+
+        </Grid>
+
+        <!-- Focus Animation -->
+        <Border.Triggers>
+            <DataTrigger TargetType="Border"
+                         Binding="{Binding Source={x:Reference RootView}, Path=IsFieldFocused}"
+                         Value="True">
+                <Setter Property="Stroke"
+                        Value="{Binding Source={x:Reference RootView}, Path=FocusedBorderColor}"/>
+            </DataTrigger>
+        </Border.Triggers>
+
+    </Border>
+
+</ContentView>

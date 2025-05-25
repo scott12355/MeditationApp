@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MeditationApp.Controls"
+             x:Class="MeditationApp.Views.CalendarPage"
+             Title="Calendar">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Settings"
+                     Clicked="OnSettingsClicked"/>
+    </ContentPage.ToolbarItems>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Calendar Header -->
+        <VerticalStackLayout Grid.Row="0"
+                             Padding="20,20,20,10"
+                             Spacing="10">
+            <Label Text="Meditation Calendar"
+                   Style="{StaticResource Headline}"
+                   HorizontalOptions="Center"/>
+            <Label Text="Track your meditation journey"
+                   Style="{StaticResource BodyText}"
+                   HorizontalOptions="Center"
+                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}"/>
+        </VerticalStackLayout>
+
+        <!-- Apple-style Calendar -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="20,0,20,20"
+                                 Spacing="20">
+
+                <!-- Calendar Control -->
+                <controls:CalendarView HeightRequest="400"/>
+
+                <!-- Quick Stats -->
+                <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                       CornerRadius="15"
+                       Padding="20">
+                    <VerticalStackLayout Spacing="15">
+                        <Label Text="This Month"
+                               Style="{StaticResource SubHeadline}"/>
+
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="15">
+                            <Frame Grid.Column="0"
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
+                                   CornerRadius="10"
+                                   Padding="15">
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="Total Sessions"
+                                           FontSize="14"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
+                                    <Label Text="12"
+                                           FontSize="24"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                                </VerticalStackLayout>
+                            </Frame>
+
+                            <Frame Grid.Column="1"
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
+                                   CornerRadius="10"
+                                   Padding="15">
+                                <VerticalStackLayout Spacing="5">
+                                    <Label Text="Total Time"
+                                           FontSize="14"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
+                                    <Label Text="240 min"
+                                           FontSize="24"
+                                           FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                                </VerticalStackLayout>
+                            </Frame>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>

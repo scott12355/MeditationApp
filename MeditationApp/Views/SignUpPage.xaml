@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MeditationApp.Controls"
+             x:Class="MeditationApp.Views.SignUpPage"
+             NavigationPage.HasNavigationBar="True"
+             NavigationPage.HasBackButton="True"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             Title="Sign Up">
+
+    <ContentPage.Background>
+        <SolidColorBrush Color="{StaticResource BackgroundColor}"/>
+    </ContentPage.Background>
+
+    <Grid RowDefinitions="*,Auto">
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout
+                Spacing="10"
+                Padding="30,20"
+                VerticalOptions="Start"
+                HorizontalOptions="Fill">
+
+                <Label
+                    Text="Create Your Account"
+                    TextColor="{StaticResource PrimaryDarkText}"
+                    SemanticProperties.HeadingLevel="Level1"
+                    FontSize="32"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Start"
+                    Margin="0,0,0,10"/>
+
+                <Label
+                    Text="Please fill in your details"
+                    FontSize="16"
+                    TextColor="{StaticResource SecondaryDarkText}"
+                    HorizontalOptions="Start"
+                    Margin="0,0,0,30"/>
+
+                <!-- Loading Indicator -->
+                <controls:LoadingIndicator
+                    IsLoading="{Binding IsBusy}"
+                    LoadingText="{Binding LoadingText}"
+                    Margin="0,0,0,10"/>
+
+                <!-- Name fields in a horizontal layout -->
+                <Grid ColumnDefinitions="*,10,*"
+                      RowDefinitions="Auto"
+                      HorizontalOptions="Fill">
+                    <controls:CustomEntry
+                        Grid.Column="0"
+                        Style="{StaticResource ModernCustomEntryStyle}"
+                        Text="{Binding FirstName}"
+                        Placeholder="First Name"
+                        SemanticProperties.Hint="Enter your first name"/>
+
+                    <controls:CustomEntry
+                        Grid.Column="2"
+                        Style="{StaticResource ModernCustomEntryStyle}"
+                        Text="{Binding SecondName}"
+                        Placeholder="Last Name"
+                        SemanticProperties.Hint="Enter your last name"/>
+                </Grid>
+
+                <!-- Email -->
+                <controls:CustomEntry
+                    Style="{StaticResource ModernCustomEntryStyle}"
+                    Text="{Binding Email}"
+                    Placeholder="Email"
+                    Keyboard="Email"
+                    SemanticProperties.Hint="Enter your email address"/>
+
+                <!-- Password -->
+                <controls:CustomEntry
+                    Style="{StaticResource ModernCustomEntryStyle}"
+                    Text="{Binding Password}"
+                    Placeholder="Password"
+                    IsPassword="True"
+                    SemanticProperties.Hint="Enter your password"/>
+
+                <!-- Confirm Password -->
+                <controls:CustomEntry
+                    Style="{StaticResource ModernCustomEntryStyle}"
+                    Text="{Binding ConfirmPassword}"
+                    Placeholder="Confirm Password"
+                    IsPassword="True"
+                    SemanticProperties.Hint="Confirm your password"/>
+
+                <Button
+                    Text="Create Account"
+                    Command="{Binding SignUpCommand}"
+                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                    SemanticProperties.Hint="Creates your account"
+                    HorizontalOptions="Fill"
+                    BackgroundColor="#FF71BEF1"
+                    TextColor="Black"
+                    BorderWidth="0"
+                    FontAttributes="Bold"
+                    FontSize="20"
+                    Style="{StaticResource ButtonStyle}"
+                    Margin="0,20,0,10"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Back to login text anchored to bottom -->
+        <StackLayout Grid.Row="1"
+                     Orientation="Horizontal"
+                     HorizontalOptions="Center"
+                     Margin="0,0,0,30">
+            <Label Text="Already have an account? "
+                   TextColor="{StaticResource SecondaryDarkText}"
+                   FontSize="14"/>
+            <Label Text="Sign in"
+                   TextColor="#FF71BEF1"
+                   FontSize="14"
+                   FontAttributes="Bold"
+                   SemanticProperties.Description="Tap to go back to login">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding BackToLoginCommand}"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </StackLayout>
+
+    </Grid>
+</ContentPage>

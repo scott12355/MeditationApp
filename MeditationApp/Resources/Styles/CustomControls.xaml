@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                    xmlns:local="clr-namespace:MeditationApp.Controls">
+
+        <!-- Modern 2025 Style for Entry -->
+        <Style x:Key="CustomEntryStyle"
+               TargetType="Entry">
+                <Setter Property="BackgroundColor"
+                        Value="#F7F7FA"/>
+                <Setter Property="TextColor"
+                        Value="#222"/>
+                <Setter Property="PlaceholderColor"
+                        Value="#A0A0B0"/>
+                <Setter Property="FontSize"
+                        Value="18"/>
+                <!-- <Setter Property="FontFamily"
+                Value="OpenSans-Semibold"/> -->
+                <Setter Property="Margin"
+                        Value="0,0,0,0"/>
+                <Setter Property="HeightRequest"
+                        Value="54"/>
+                <Setter Property="VerticalOptions"
+                        Value="Center"/>
+                <Setter Property="CharacterSpacing"
+                        Value="0.5"/>
+        </Style>
+
+        <Style x:Key="ButtonStyle"
+               TargetType="Button">
+                <Setter Property="BackgroundColor"
+                        Value="#50B948"/>
+                <Setter Property="TextColor"
+                        Value="White"/>
+                <Setter Property="CornerRadius"
+                        Value="20"/>
+                <Setter Property="FontAttributes"
+                        Value="Bold"/>
+                <Setter Property="FontSize"
+                        Value="16"/>
+                <Setter Property="Padding"
+                        Value="10,5"/>
+                <Setter Property="BorderColor"
+                        Value="{StaticResource EarthBrown}"/>
+                <Setter Property="BorderWidth"
+                        Value="1"/>
+        </Style>
+
+        <!-- Outline Button Style -->
+        <Style x:Key="ButtonOutline"
+               TargetType="Button">
+                <Setter Property="BackgroundColor"
+                        Value="Transparent"/>
+                <Setter Property="TextColor"
+                        Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                <Setter Property="BorderColor"
+                        Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                <Setter Property="BorderWidth"
+                        Value="2"/>
+                <Setter Property="CornerRadius"
+                        Value="25"/>
+                <Setter Property="FontAttributes"
+                        Value="Bold"/>
+                <Setter Property="FontSize"
+                        Value="16"/>
+                <Setter Property="Padding"
+                        Value="20,10"/>
+                <Setter Property="MinimumHeightRequest"
+                        Value="44"/>
+                <Setter Property="MinimumWidthRequest"
+                        Value="44"/>
+        </Style>
+
+        <!-- Custom Entry Style -->
+        <Style x:Key="ModernCustomEntryStyle"
+               TargetType="local:CustomEntry">
+                <Setter Property="HeightRequest"
+                        Value="56"/>
+                <Setter Property="FontSize"
+                        Value="16"/>
+                <Setter Property="TextColor"
+                        Value="{StaticResource PrimaryDarkText}"/>
+                <Setter Property="PlaceholderColor"
+                        Value="{StaticResource Gray400}"/>
+                <Setter Property="CustomBackgroundColor"
+                        Value="#FFFFFF"/>
+                <Setter Property="BorderColor"
+                        Value="{StaticResource Gray200}"/>
+                <Setter Property="FocusedBorderColor"
+                        Value="#71BEF1"/>
+                <Setter Property="IconColor"
+                        Value="{StaticResource Gray400}"/>
+                <Setter Property="Margin"
+                        Value="0,8"/>
+        </Style>
+
+</ResourceDictionary>

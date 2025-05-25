@@ -1,0 +1,52 @@
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Rider project files
+.idea/
+*.sln.iml
+
+# VS Code settings
+.vscode/
+
+# Mac system files
+.DS_Store
+
+# Maui specific
+Platforms/**/bin/
+Platforms/**/obj/
+Resources/Raw/*.db
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+*.nuspec
+
+# Logs
+*.log
+
+# Others
+*.apk
+*.aab
+*.app
+*.ipa
+*.pdb
+*.mdb
+*.cache
+*.db
+*.sqlite
+*.bak
+*.swp
+*.tmp
+*.userprefs
+
+# Test results
+TestResults/
+*.TestResults/
