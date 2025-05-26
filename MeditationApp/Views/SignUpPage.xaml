@@ -16,7 +16,7 @@
     <Grid RowDefinitions="*,Auto">
         <ScrollView Grid.Row="0">
             <VerticalStackLayout
-                Spacing="10"
+                Spacing="-10"
                 Padding="30,20"
                 VerticalOptions="Start"
                 HorizontalOptions="Fill">
@@ -68,7 +68,17 @@
                     Text="{Binding Email}"
                     Placeholder="Email"
                     Keyboard="Email"
+                    HasError="{Binding HasEmailError}"
                     SemanticProperties.Hint="Enter your email address"/>
+
+                <!-- Email Error Message -->
+                <Label
+                    Text="Please enter a valid email address"
+                    FontSize="12"
+                    TextColor="Red"
+                    HorizontalOptions="Start"
+                    Margin="5,2,0,0"
+                    IsVisible="{Binding HasEmailError}"/>
 
                 <!-- Password -->
                 <controls:CustomEntry
@@ -76,7 +86,18 @@
                     Text="{Binding Password}"
                     Placeholder="Password"
                     IsPassword="True"
+                    HasError="{Binding HasPasswordError}"
                     SemanticProperties.Hint="Enter your password"/>
+
+                <!-- Password Error Message -->
+                <Label
+                    Text="{Binding PasswordErrorMessage}"
+                    FontSize="12"
+                    TextColor="Red"
+                    HorizontalOptions="Start"
+                    Margin="5,2,0,0"
+                    IsVisible="{Binding HasPasswordError}"/>
+
 
                 <!-- Confirm Password -->
                 <controls:CustomEntry
@@ -84,7 +105,27 @@
                     Text="{Binding ConfirmPassword}"
                     Placeholder="Confirm Password"
                     IsPassword="True"
+                    HasError="{Binding HasConfirmPasswordError}"
                     SemanticProperties.Hint="Confirm your password"/>
+
+                <!-- Confirm Password Error Message -->
+                <Label
+                    Text="Passwords do not match"
+                    FontSize="12"
+                    TextColor="Red"
+                    HorizontalOptions="Start"
+                    Margin="5,2,0,0"
+                    IsVisible="{Binding HasConfirmPasswordError}"/>
+                <!-- Password Requirements -->
+                <!-- <Label -->
+                <!--     Text="Password must be at least 8 characters long and contain at least one special character" -->
+                <!--     FontSize="13" -->
+                <!--     TextColor="{StaticResource SecondaryDarkText}" -->
+                <!--     HorizontalOptions="Start" -->
+                <!--     Margin="5,5,0,0" -->
+                <!--     LineBreakMode="WordWrap" -->
+                <!--     SemanticProperties.Description="Password requirements information"/> -->
+
 
                 <Button
                     Text="Create Account"
@@ -98,7 +139,7 @@
                     FontAttributes="Bold"
                     FontSize="20"
                     Style="{StaticResource ButtonStyle}"
-                    Margin="0,20,0,10"/>
+                    Margin="0,70,0,10"/>
 
             </VerticalStackLayout>
         </ScrollView>

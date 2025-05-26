@@ -13,6 +13,8 @@ public class VerificationViewModel : BindableObject
     private string _loadingText = string.Empty;
     private bool _isBusy;
     private string _password = string.Empty;
+    private string _email = string.Empty;
+    private string _firstName = string.Empty;
 
     public string Username { get => _username; set { _username = value; OnPropertyChanged(); } }
     public string Code { get => _code; set { _code = value; OnPropertyChanged(); } }
@@ -20,6 +22,11 @@ public class VerificationViewModel : BindableObject
     public string LoadingText { get => _loadingText; set { _loadingText = value; OnPropertyChanged(); } }
     public bool IsBusy { get => _isBusy; set { _isBusy = value; OnPropertyChanged(); } }
     public string Password { get => _password; set { _password = value; OnPropertyChanged(); } }
+    public string Email { get => _email; set { _email = value; OnPropertyChanged(); OnPropertyChanged(nameof(EmailMessage)); } }
+    public string FirstName { get => _firstName; set { _firstName = value; OnPropertyChanged(); OnPropertyChanged(nameof(WelcomeMessage)); } }
+
+    public string WelcomeMessage => string.IsNullOrEmpty(FirstName) ? "Verify Your Account" : $"Welcome, {FirstName}!";
+    public string EmailMessage => string.IsNullOrEmpty(Email) ? "" : $"We've sent a verification code to {Email}";
 
     public ICommand VerifyCommand { get; }
     public ICommand ResendCodeCommand { get; }

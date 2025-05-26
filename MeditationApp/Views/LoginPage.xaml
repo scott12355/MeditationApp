@@ -12,11 +12,16 @@
     <Grid RowDefinitions="*,Auto">
         <VerticalStackLayout
             Grid.Row="0"
-            Spacing="10"
+            Spacing="0"
             Padding="30,0"
             VerticalOptions="Start">
 
-            <!-- Consider adding a logo here -->
+            <!-- Logo Image -->
+            <Image Source="logo.png"
+                   HeightRequest="120"
+                   WidthRequest="120"
+                   HorizontalOptions="Center"
+                   Margin="0,10,0,0"/>
 
             <Label
                 Text="Welcome"
@@ -25,14 +30,14 @@
                 FontSize="42"
                 FontAttributes="Bold"
                 HorizontalOptions="Start"
-                Margin="0,100,0,-10"/>
+                Margin="0,-25,0,-10"/>
             <Label
                 Text="Please log in to continue"
                 FontSize="16"
                 TextColor="{StaticResource SecondaryDarkText}"
                 HorizontalOptions="Start"
                 HorizontalTextAlignment="Start"
-                Margin="0,0,0,50"/>
+                Margin="0,0,0,30"/>
 
             <!-- Offline Mode Indicator -->
             <Frame BackgroundColor="Orange"
@@ -55,7 +60,8 @@
                 Text="{Binding Email}"
                 Placeholder="Email"
                 Keyboard="Email"
-                SemanticProperties.Hint="Enter your email address"/>
+                SemanticProperties.Hint="Enter your email address"
+                Margin="0,0,0,-2"/>
 
             <!-- Password Entry -->
             <controls:CustomEntry
@@ -66,7 +72,8 @@
                 SemanticProperties.Hint="Enter your password"/>
 
             <!-- Status and Loading Indicator -->
-            <Grid Margin="0,-5,0,0" HorizontalOptions="Center">
+            <Grid Margin="0,-5,0,0"
+                  HorizontalOptions="Center">
                 <Label
                     Text="{Binding Status}"
                     TextColor="Red"
@@ -87,7 +94,7 @@
                 HorizontalOptions="End"
                 FontSize="14"
                 TextColor="#FF949494"
-                Margin="0,-10,5,0"
+                Margin="0,0,5,0"
                 SemanticProperties.Description="Tap to reset your password">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}"/>
@@ -105,8 +112,9 @@
                 BorderWidth="0"
                 FontAttributes="Bold"
                 FontSize="20"
+                Margin="0,50,0,0"
                 Style="{StaticResource ButtonStyle}"
-                Margin="0,10"/>
+                />
 
         </VerticalStackLayout>
 

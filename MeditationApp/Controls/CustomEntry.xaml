@@ -39,7 +39,7 @@
                    MaxLength="{Binding Source={x:Reference RootView}, Path=MaxLength}"
                    BackgroundColor="Transparent"
                    VerticalOptions="Center"
-                   HorizontalOptions="FillAndExpand"
+                   HorizontalOptions="Fill"
                    Focused="OnEntryFocused"
                    Unfocused="OnEntryUnfocused"
                    TextChanged="OnTextChanged"
@@ -60,8 +60,14 @@
 
         </Grid>
 
-        <!-- Focus Animation -->
+        <!-- Focus Animation and Error State -->
         <Border.Triggers>
+            <DataTrigger TargetType="Border"
+                         Binding="{Binding Source={x:Reference RootView}, Path=HasError}"
+                         Value="True">
+                <Setter Property="Stroke"
+                        Value="{Binding Source={x:Reference RootView}, Path=ErrorBorderColor}"/>
+            </DataTrigger>
             <DataTrigger TargetType="Border"
                          Binding="{Binding Source={x:Reference RootView}, Path=IsFieldFocused}"
                          Value="True">

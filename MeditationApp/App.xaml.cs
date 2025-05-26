@@ -11,45 +11,15 @@ public partial class App : Application
 
         MainPage = new AppShell();
 
-        // Set the initial route to the login page
+        // Register routes
         Routing.RegisterRoute("LoginPage", typeof(LoginPage));
+        Routing.RegisterRoute("SplashPage", typeof(SplashPage));
     }
 
-    protected override async void OnStart()
+    protected override void OnStart()
     {
         base.OnStart();
-
-        // Check if the user is already logged in using hybrid authentication
-        var hybridAuthService = Handler?.MauiContext?.Services.GetService<HybridAuthService>();
-        if (hybridAuthService != null)
-        {
-            try
-            {
-                bool isLoggedIn = await hybridAuthService.IsUserLoggedInAsync();
-                if (isLoggedIn)
-                {
-                    // User is logged in (either online or offline), go to main tabs
-                    System.Diagnostics.Debug.WriteLine("User is already logged in, navigating to MainTabs");
-                    await Shell.Current.GoToAsync("//MainTabs");
-                }
-                else
-                {
-                    // User is not logged in, go to login page
-                    System.Diagnostics.Debug.WriteLine("User is not logged in, navigating to LoginPage");
-                    await Shell.Current.GoToAsync("///LoginPage");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error during startup authentication check: {ex.Message}");
-                // Fallback to login page
-                await Shell.Current.GoToAsync("///LoginPage");
-            }
-        }
-        else
-        {
-            // Fallback if service is not available
-            await Shell.Current.GoToAsync("///LoginPage");
-        }
+        // Authentication check is now handled by SplashPage
+        // No need to navigate here - Shell will start with SplashPage by default
     }
 }

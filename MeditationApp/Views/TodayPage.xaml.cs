@@ -9,6 +9,4 @@ public partial class TodayPage : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
-
-
 }

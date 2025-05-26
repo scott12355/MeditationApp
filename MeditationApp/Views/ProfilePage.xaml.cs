@@ -173,6 +173,23 @@ public partial class ProfilePage : ContentPage
                     await LoadOnlineUserProfile(refreshResult.AccessToken ?? string.Empty);
                     return;
                 }
+                else
+                {
+                    // Check if refresh token is expired/invalid - if so, logout user
+                    if (IsRefreshTokenExpiredError(refreshResult.ErrorMessage))
+                    {
+                        await DisplayAlert("Session Expired", "Your session has expired. Please log in again.", "OK");
+                        await ClearTokensAndNavigateToLogin();
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                // No refresh token available - logout user
+                await DisplayAlert("Session Expired", "Your session has expired. Please log in again.", "OK");
+                await ClearTokensAndNavigateToLogin();
+                return;
             }
             
             // Refresh failed - show offline data if available
@@ -191,8 +208,16 @@ public partial class ProfilePage : ContentPage
                 await ClearTokensAndNavigateToLogin();
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            // Check if the exception indicates refresh token expiry
+            if (IsRefreshTokenExpiredError(ex.Message))
+            {
+                await DisplayAlert("Session Expired", "Your session has expired. Please log in again.", "OK");
+                await ClearTokensAndNavigateToLogin();
+                return;
+            }
+            
             // Show offline data if available
             var localProfile = await _hybridAuthService.GetUserProfileAsync();
             if (localProfile != null)
@@ -232,5 +257,22 @@ public partial class ProfilePage : ContentPage
             StatusLabel.Text = $"Error: {ex.Message}";
             SignOutButton.IsEnabled = true;
         }
+    }
+
+    /// <summary>
+    /// Helper method to determine if an error message indicates refresh token expiry
+    /// </summary>
+    private static bool IsRefreshTokenExpiredError(string? errorMessage)
+    {
+        if (string.IsNullOrEmpty(errorMessage))
+            return false;
+            
+        var message = errorMessage.ToLowerInvariant();
+        return message.Contains("refresh token") && message.Contains("expired") ||
+               message.Contains("refresh token") && message.Contains("invalid") ||
+               message.Contains("token_expired") ||
+               message.Contains("refresh_token_expired") ||
+               message.Contains("notauthorized") ||
+               message.Contains("invalid_grant");
     }
 }

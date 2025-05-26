@@ -12,6 +12,7 @@ public class CalendarViewModel : INotifyPropertyChanged
     private DateTime _selectedDate = DateTime.Now;
     private ObservableCollection<MeditationSessionDisplay> _sessions = new();
     private readonly MeditationSessionDatabase _database;
+    private readonly CalendarDataService? _calendarDataService;
     private int _totalSessions;
     private int _totalMinutes;
     private bool _isLoading;
@@ -80,9 +81,10 @@ public class CalendarViewModel : INotifyPropertyChanged
 
     public ICommand DateSelectedCommand { get; }
 
-    public CalendarViewModel(MeditationSessionDatabase database)
+    public CalendarViewModel(MeditationSessionDatabase database, CalendarDataService? calendarDataService = null)
     {
         _database = database;
+        _calendarDataService = calendarDataService;
         DateSelectedCommand = new Command<DateTime>(OnDateSelected);
         
         // Initialize with sample data and then load actual data
@@ -104,14 +106,25 @@ public class CalendarViewModel : INotifyPropertyChanged
     private async void LoadSessionsForDate()
     {
         IsLoading = true;
+        System.Diagnostics.Debug.WriteLine($"CalendarViewModel: Loading sessions for date {SelectedDate:yyyy-MM-dd}");
         try
         {
             Sessions.Clear();
             
-            // Add a small delay to show loading state (remove in production if not needed)
-            await Task.Delay(300);
+            // Use CalendarDataService if available for better performance
+            List<MeditationSession> sessionsForDate;
+            if (_calendarDataService != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"CalendarViewModel: Using CalendarDataService for date {SelectedDate:yyyy-MM-dd}");
+                sessionsForDate = await _calendarDataService.GetSessionsForDateAsync(SelectedDate);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"CalendarViewModel: Using database directly for date {SelectedDate:yyyy-MM-dd}");
+                sessionsForDate = await _database.GetSessionsForDateAsync(SelectedDate);
+            }
             
-            var sessionsForDate = await _database.GetSessionsForDateAsync(SelectedDate);
+            System.Diagnostics.Debug.WriteLine($"CalendarViewModel: Found {sessionsForDate.Count} sessions for date {SelectedDate:yyyy-MM-dd}");
             
             foreach (var session in sessionsForDate)
             {
@@ -138,13 +151,25 @@ public class CalendarViewModel : INotifyPropertyChanged
     private async void LoadMonthlyStats()
     {
         IsLoadingStats = true;
+        System.Diagnostics.Debug.WriteLine("CalendarViewModel: Loading monthly stats");
         try
         {
-            // Add a small delay to show loading state (remove in production if not needed)
-            await Task.Delay(500);
-            
             var currentMonth = DateTime.Now;
-            var monthSessions = await _database.GetSessionsForMonthAsync(currentMonth.Year, currentMonth.Month);
+            List<MeditationSession> monthSessions;
+            
+            // Use CalendarDataService if available for better performance
+            if (_calendarDataService != null)
+            {
+                System.Diagnostics.Debug.WriteLine("CalendarViewModel: Using CalendarDataService for monthly stats");
+                monthSessions = await _calendarDataService.GetSessionsForMonthAsync(currentMonth.Year, currentMonth.Month);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("CalendarViewModel: Using database directly for monthly stats");
+                monthSessions = await _database.GetSessionsForMonthAsync(currentMonth.Year, currentMonth.Month);
+            }
+            
+            System.Diagnostics.Debug.WriteLine($"CalendarViewModel: Found {monthSessions.Count} sessions for monthly stats");
             
             TotalSessions = monthSessions.Count;
             // For now, assume each session is about 15 minutes (you may want to add duration to the model)
@@ -152,7 +177,7 @@ public class CalendarViewModel : INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error loading monthly stats: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"CalendarViewModel: Error loading monthly stats: {ex.Message}");
             TotalSessions = 0;
             TotalMinutes = 0;
         }

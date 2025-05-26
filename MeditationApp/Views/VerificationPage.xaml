@@ -14,12 +14,12 @@
     <Grid RowDefinitions="*,Auto">
         <VerticalStackLayout
             Grid.Row="0"
-            Spacing="10"
+            Spacing="0"
             Padding="30,20"
             VerticalOptions="Start">
 
             <Label
-                Text="Verify Your Account"
+                Text="{Binding WelcomeMessage}"
                 TextColor="{StaticResource PrimaryDarkText}"
                 SemanticProperties.HeadingLevel="Level1"
                 FontSize="32"
@@ -28,8 +28,16 @@
                 Margin="0,0,0,10"/>
 
             <Label
-                Text="Please check your email for a verification code and enter it below"
+                Text="{Binding EmailMessage}"
                 FontSize="16"
+                TextColor="{StaticResource SecondaryDarkText}"
+                HorizontalOptions="Start"
+                HorizontalTextAlignment="Start"
+                Margin="0,0,0,10"/>
+
+            <Label
+                Text="Please check your email for a verification code and enter it below"
+                FontSize="14"
                 TextColor="{StaticResource SecondaryDarkText}"
                 HorizontalOptions="Start"
                 HorizontalTextAlignment="Start"
@@ -39,15 +47,8 @@
             <controls:LoadingIndicator
                 IsLoading="{Binding IsBusy}"
                 LoadingText="{Binding LoadingText}"
-                Margin="0,0,0,10"/>
+                Margin="0,0,0,0"/>
 
-            <!-- Username field (disabled) -->
-            <controls:CustomEntry
-                Style="{StaticResource ModernCustomEntryStyle}"
-                Text="{Binding Username}"
-                Placeholder="Username"
-                IsEnabled="False"
-                SemanticProperties.Hint="Your username for verification"/>
 
             <!-- Verification Code -->
             <controls:CustomEntry

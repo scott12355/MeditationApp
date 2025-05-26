@@ -5,9 +5,9 @@ namespace MeditationApp.Controls;
 
 public partial class CalendarView : ContentView
 {
-    public CalendarView(MeditationSessionDatabase? database = null)
+    public CalendarView(MeditationSessionDatabase? database = null, CalendarDataService? calendarDataService = null)
     {
         InitializeComponent();
-        BindingContext = new CalendarControlViewModel(database);
+        BindingContext = new CalendarControlViewModel(database, calendarDataService);
     }
 }

@@ -1,12 +1,94 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MeditationApp.Controls"
+             xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
              x:Class="MeditationApp.Views.TodayPage"
              Shell.NavBarIsVisible="False">
 
-    <Grid RowDefinitions="*,Auto">
-        <!-- Scrollable Content -->
-        <ScrollView Grid.Row="0">
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0"
+                             EndPoint="0,1">
+            <GradientStop Color="#F6F9FF"
+                          Offset="0.0"/>
+            <!-- Very soft light blue, calming -->
+            <GradientStop Color="#E2ECFF"
+                          Offset="0.4"/>
+            <!-- Soft light blue, peaceful -->
+            <GradientStop Color="#F7F0E9"
+                          Offset="1.0"/>
+            <!-- Warm peach, grounding -->
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <Grid>
+        <!-- Decorative abstract shapes for modern look -->
+        <Ellipse x:Name="Orb1"
+                 WidthRequest="300"
+                 HeightRequest="300"
+                 Fill="#15BBDEFB"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"
+                 Margin="-120,-120,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="25"
+                                                     FloatRangeY="20"
+                                                     Duration="10000"
+                                                     Delay="0"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <Ellipse x:Name="Orb2"
+                 WidthRequest="200"
+                 HeightRequest="200"
+                 Fill="#1BE1BEE7"
+                 HorizontalOptions="End"
+                 VerticalOptions="Start"
+                 Margin="0,-80,-80,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="30"
+                                                     FloatRangeY="25"
+                                                     Duration="12000"
+                                                     Delay="2000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <Ellipse x:Name="Orb3"
+                 WidthRequest="250"
+                 HeightRequest="250"
+                 Fill="#27FFCCBC"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"
+                 Margin="0,0,-100,-100"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="35"
+                                                     FloatRangeY="30"
+                                                     Duration="15000"
+                                                     Delay="4000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <Ellipse x:Name="Orb4"
+                 WidthRequest="150"
+                 HeightRequest="150"
+                 Fill="#19B3E5FC"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Margin="-200,200,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="20"
+                                                     FloatRangeY="15"
+                                                     Duration="8000"
+                                                     Delay="6000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <!-- Main content -->
+        <ScrollView>
             <VerticalStackLayout Padding="20"
                                  Spacing="20">
 
@@ -14,10 +96,11 @@
                 <VerticalStackLayout Spacing="10">
                     <Label Text="{Binding FormattedDate}"
                            Style="{StaticResource SubHeadline}"
-                           HorizontalOptions="Center"/>
-                    <Label Text="{Binding WelcomeMessage}"
-                           Style="{StaticResource Headline}"
-                           HorizontalOptions="Center"/>
+                           HorizontalOptions="Center"
+                           TextColor="Black"/>
+                    <!-- <Label Text="{Binding WelcomeMessage}" -->
+                    <!--        Style="{StaticResource Headline}" -->
+                    <!--        HorizontalOptions="Center"/> -->
                 </VerticalStackLayout>
 
                 <!-- Mood Selector -->
@@ -26,80 +109,400 @@
                     <Label Text="How are you feeling today?"
                            HorizontalOptions="Center"
                            FontAttributes="Bold"
-                           FontSize="16"/>
+                           FontSize="16"
+                           TextColor="Black"/>
                     <HorizontalStackLayout HorizontalOptions="Center"
                                            Spacing="15">
-                        <Button Text="😢"
-                                Command="{Binding SelectMoodCommand}"
-                                CommandParameter="1"
-                                Style="{StaticResource MoodButton}"
-                                BackgroundColor="{Binding SelectedMood, Converter={StaticResource EqualityToColorConverter}, ConverterParameter=1}"
-                                FontSize="Large"/>
-                        <Button Text="😟"
-                                Command="{Binding SelectMoodCommand}"
-                                CommandParameter="2"
-                                Style="{StaticResource MoodButton}"
-                                BackgroundColor="{Binding SelectedMood, Converter={StaticResource EqualityToColorConverter}, ConverterParameter=2}"
-                                FontSize="Large"/>
-                        <Button Text="😐"
-                                Command="{Binding SelectMoodCommand}"
-                                CommandParameter="3"
-                                Style="{StaticResource MoodButton}"
-                                BackgroundColor="{Binding SelectedMood, Converter={StaticResource EqualityToColorConverter}, ConverterParameter=3}"
-                                FontSize="Large"/>
-                        <Button Text="🙂"
-                                Command="{Binding SelectMoodCommand}"
-                                CommandParameter="4"
-                                Style="{StaticResource MoodButton}"
-                                BackgroundColor="{Binding SelectedMood, Converter={StaticResource EqualityToColorConverter}, ConverterParameter=4}"
-                                FontSize="Large"/>
-                        <Button Text="😊"
-                                Command="{Binding SelectMoodCommand}"
-                                CommandParameter="5"
-                                Style="{StaticResource MoodButton}"
-                                BackgroundColor="{Binding SelectedMood, Converter={StaticResource EqualityToColorConverter}, ConverterParameter=5}"
-                                FontSize="Large"/>
+                        <!-- Very Low -->
+                        <VerticalStackLayout Spacing="4"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="End">
+                            <Frame Padding="0"
+                                   WidthRequest="56"
+                                   HeightRequest="56"
+                                   CornerRadius="28"
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                                   HasShadow="False"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center"
+                                   BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
+                                <Frame.Triggers>
+                                    <DataTrigger TargetType="Frame"
+                                                 Binding="{Binding SelectedMood}"
+                                                 Value="1">
+                                        <Setter Property="BorderColor"
+                                                Value="#5B7FFF"/>
+                                    </DataTrigger>
+                                </Frame.Triggers>
+                                <Button Text="😞"
+                                        Command="{Binding SelectMoodCommand}"
+                                        CommandParameter="1"
+                                        BackgroundColor="Transparent"
+                                        FontSize="28"
+                                        WidthRequest="56"
+                                        HeightRequest="56"
+                                        Padding="0"
+                                        BorderColor="Transparent">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroupList>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal"/>
+                                                <VisualState x:Name="Pressed">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor"
+                                                                Value="Transparent"/>
+                                                        <Setter Property="BorderColor"
+                                                                Value="Transparent"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState x:Name="Disabled">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor"
+                                                                Value="Transparent"/>
+                                                        <Setter Property="BorderColor"
+                                                                Value="Transparent"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateGroupList>
+                                    </VisualStateManager.VisualStateGroups>
+                                </Button>
+                            </Frame>
+                            <Label Text="Very Low"
+                                   FontSize="11"
+                                   HorizontalOptions="Center"
+                                   TextColor="Gray"/>
+                        </VerticalStackLayout>
+                        <!-- Low -->
+                        <VerticalStackLayout Spacing="4"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="End">
+                            <Frame Padding="0"
+                                   WidthRequest="56"
+                                   HeightRequest="56"
+                                   CornerRadius="28"
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                                   HasShadow="False"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center"
+                                   BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
+                                <Frame.Triggers>
+                                    <DataTrigger TargetType="Frame"
+                                                 Binding="{Binding SelectedMood}"
+                                                 Value="2">
+                                        <Setter Property="BorderColor"
+                                                Value="#5B7FFF"/>
+                                    </DataTrigger>
+                                </Frame.Triggers>
+                                <Button Text="😕"
+                                        Command="{Binding SelectMoodCommand}"
+                                        CommandParameter="2"
+                                        BackgroundColor="Transparent"
+                                        FontSize="28"
+                                        WidthRequest="56"
+                                        HeightRequest="56"
+                                        Padding="0"
+                                        BorderColor="Transparent">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroupList>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal"/>
+                                                <VisualState x:Name="Pressed">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor"
+                                                                Value="Transparent"/>
+                                                        <Setter Property="BorderColor"
+                                                                Value="Transparent"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState x:Name="Disabled">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor"
+                                                                Value="Transparent"/>
+                                                        <Setter Property="BorderColor"
+                                                                Value="Transparent"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateGroupList>
+                                    </VisualStateManager.VisualStateGroups>
+                                </Button>
+                            </Frame>
+                            <Label Text="Low"
+                                   FontSize="11"
+                                   HorizontalOptions="Center"
+                                   TextColor="Gray"/>
+                        </VerticalStackLayout>
+                        <!-- Okay -->
+                        <VerticalStackLayout Spacing="4"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="End">
+                            <Frame Padding="0"
+                                   WidthRequest="56"
+                                   HeightRequest="56"
+                                   CornerRadius="28"
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                                   HasShadow="False"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center"
+                                   BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
+                                <Frame.Triggers>
+                                    <DataTrigger TargetType="Frame"
+                                                 Binding="{Binding SelectedMood}"
+                                                 Value="3">
+                                        <Setter Property="BorderColor"
+                                                Value="#5B7FFF"/>
+                                    </DataTrigger>
+                                </Frame.Triggers>
+                                <Button Text="😐"
+                                        Command="{Binding SelectMoodCommand}"
+                                        CommandParameter="3"
+                                        BackgroundColor="Transparent"
+                                        FontSize="28"
+                                        WidthRequest="56"
+                                        HeightRequest="56"
+                                        Padding="0"
+                                        BorderColor="Transparent">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroupList>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal"/>
+                                                <VisualState x:Name="Pressed">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor"
+                                                                Value="Transparent"/>
+                                                        <Setter Property="BorderColor"
+                                                                Value="Transparent"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState x:Name="Disabled">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor"
+                                                                Value="Transparent"/>
+                                                        <Setter Property="BorderColor"
+                                                                Value="Transparent"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateGroupList>
+                                    </VisualStateManager.VisualStateGroups>
+                                </Button>
+                            </Frame>
+                            <Label Text="Okay"
+                                   FontSize="11"
+                                   HorizontalOptions="Center"
+                                   TextColor="Gray"/>
+                        </VerticalStackLayout>
+                        <!-- Good -->
+                        <VerticalStackLayout Spacing="4"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="End">
+                            <Frame Padding="0"
+                                   WidthRequest="56"
+                                   HeightRequest="56"
+                                   CornerRadius="28"
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                                   HasShadow="False"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center"
+                                   BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
+                                <Frame.Triggers>
+                                    <DataTrigger TargetType="Frame"
+                                                 Binding="{Binding SelectedMood}"
+                                                 Value="4">
+                                        <Setter Property="BorderColor"
+                                                Value="#5B7FFF"/>
+                                    </DataTrigger>
+                                </Frame.Triggers>
+                                <Button Text="🙂"
+                                        Command="{Binding SelectMoodCommand}"
+                                        CommandParameter="4"
+                                        BackgroundColor="Transparent"
+                                        FontSize="28"
+                                        WidthRequest="56"
+                                        HeightRequest="56"
+                                        Padding="0"
+                                        BorderColor="Transparent">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroupList>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal"/>
+                                                <VisualState x:Name="Pressed">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor"
+                                                                Value="Transparent"/>
+                                                        <Setter Property="BorderColor"
+                                                                Value="Transparent"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState x:Name="Disabled">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor"
+                                                                Value="Transparent"/>
+                                                        <Setter Property="BorderColor"
+                                                                Value="Transparent"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateGroupList>
+                                    </VisualStateManager.VisualStateGroups>
+                                </Button>
+                            </Frame>
+                            <Label Text="Good"
+                                   FontSize="11"
+                                   HorizontalOptions="Center"
+                                   TextColor="Gray"/>
+                        </VerticalStackLayout>
+                        <!-- Great -->
+                        <VerticalStackLayout Spacing="4"
+                                             HorizontalOptions="Center"
+                                             VerticalOptions="End">
+                            <Frame Padding="0"
+                                   WidthRequest="56"
+                                   HeightRequest="56"
+                                   CornerRadius="28"
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                                   HasShadow="False"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center"
+                                   BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
+                                <Frame.Triggers>
+                                    <DataTrigger TargetType="Frame"
+                                                 Binding="{Binding SelectedMood}"
+                                                 Value="5">
+                                        <Setter Property="BorderColor"
+                                                Value="#5B7FFF"/>
+                                    </DataTrigger>
+                                </Frame.Triggers>
+                                <Button Text="😃"
+                                        Command="{Binding SelectMoodCommand}"
+                                        CommandParameter="5"
+                                        BackgroundColor="Transparent"
+                                        FontSize="28"
+                                        WidthRequest="56"
+                                        HeightRequest="56"
+                                        Padding="0"
+                                        BorderColor="Transparent">
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroupList>
+                                            <VisualStateGroup x:Name="CommonStates">
+                                                <VisualState x:Name="Normal"/>
+                                                <VisualState x:Name="Pressed">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor"
+                                                                Value="Transparent"/>
+                                                        <Setter Property="BorderColor"
+                                                                Value="Transparent"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                                <VisualState x:Name="Disabled">
+                                                    <VisualState.Setters>
+                                                        <Setter Property="BackgroundColor"
+                                                                Value="Transparent"/>
+                                                        <Setter Property="BorderColor"
+                                                                Value="Transparent"/>
+                                                    </VisualState.Setters>
+                                                </VisualState>
+                                            </VisualStateGroup>
+                                        </VisualStateGroupList>
+                                    </VisualStateManager.VisualStateGroups>
+                                </Button>
+                            </Frame>
+                            <Label Text="Great"
+                                   FontSize="11"
+                                   HorizontalOptions="Center"
+                                   TextColor="Gray"/>
+                        </VerticalStackLayout>
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
 
-                <!-- Today's Sessions List -->
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Today's Sessions"
-                            FontAttributes="Bold"
-                            FontSize="16"/>
-                    <CollectionView ItemsSource="{Binding TodaySessions}">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Frame Margin="0,5"
-                                        Padding="10"
-                                        BackgroundColor="#f0f0f0"
-                                        CornerRadius="8">
-                                    <VerticalStackLayout>
-                                        <Label Text="{Binding Timestamp, StringFormat='Session at {0:HH:mm}'}"
-                                                FontSize="14"/>
-                                        <Label Text="{Binding Status}"
-                                                FontSize="12"/>
-                                        <Label Text="{Binding AudioPath}"
-                                                FontSize="10"
-                                                TextColor="Gray"/>
-                                    </VerticalStackLayout>
+                <!-- Today's Session Content -->
+                <VerticalStackLayout Spacing="20">
+
+                    <!-- If there's a session for today -->
+                    <VerticalStackLayout Spacing="15"
+                                         IsVisible="{Binding HasTodaySession}">
+                        <Label Text="Today's Session"
+                               FontAttributes="Bold"
+                               FontSize="18"
+                               HorizontalOptions="Center"
+                               TextColor="Black"/>
+
+                        <Frame Padding="24"
+                               BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                               BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
+                               CornerRadius="16"
+                               HasShadow="False">
+                            <VerticalStackLayout Spacing="15">
+                                <Label Text="{Binding TodaySession.Timestamp, StringFormat='Created at {0:HH:mm}'}"
+                                       FontSize="14"
+                                       HorizontalOptions="Center"
+                                       TextColor="Gray"/>
+
+                                <Label Text="{Binding TodaySession.Status}"
+                                       FontSize="16"
+                                       FontAttributes="Bold"
+                                       HorizontalOptions="Center"/>
+
+                                <Button Text="▶ Play Session"
+                                        Command="{Binding PlayTodaySessionCommand}"
+                                        Style="{StaticResource ButtonOutline}"
+                                        BackgroundColor="#5B7FFF"
+                                        TextColor="White"
+                                        HeightRequest="50"
+                                        CornerRadius="25"
+                                        FontSize="16"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <!-- If there's no session for today -->
+                    <VerticalStackLayout Spacing="15"
+                                         IsVisible="{Binding HasTodaySession, Converter={StaticResource InverseBoolConverter}}">
+                        <Label Text="Ready for Today's Meditation?"
+                               FontAttributes="Bold"
+                               FontSize="18"
+                               HorizontalOptions="Center"
+                               TextColor="Black"/>
+
+                        <Frame Padding="20"
+                               BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColor}, Dark=#2A2A2A}"
+                               BorderColor="Transparent"
+                               CornerRadius="12"
+                               HasShadow="True">
+                            <VerticalStackLayout Spacing="15">
+                                <Label Text="Notes for your session (optional)"
+                                       FontSize="14"
+                                       FontAttributes="Bold"/>
+
+                                <Frame BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
+                                       BackgroundColor="{AppThemeBinding Light=#F8F8F8, Dark=#333333}"
+                                       CornerRadius="12"
+                                       HasShadow="False"
+                                       Padding="5">
+                                    <Editor Text="{Binding SessionNotes}"
+                                            Placeholder="How are you feeling? Any specific focus areas?"
+                                            PlaceholderColor="#A0A0A0"
+                                            HeightRequest="100"
+                                            BackgroundColor="Transparent"
+                                            VerticalOptions="Start"/>
                                 </Frame>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+
+                                <Button Text="Create Today's Meditation"
+                                        Command="{Binding RequestNewSessionCommand}"
+                                        Style="{StaticResource ButtonOutline}"
+                                        BackgroundColor="#5B7FFF"
+                                        TextColor="White"
+                                        HeightRequest="50"
+                                        CornerRadius="25"
+                                        FontSize="16"/>
+                            </VerticalStackLayout>
+                        </Frame>
+                    </VerticalStackLayout>
+
                 </VerticalStackLayout>
 
             </VerticalStackLayout>
         </ScrollView>
-
-        <!-- Anchored Button at Bottom -->
-        <VerticalStackLayout Grid.Row="1"
-                             Padding="20,0,20,20">
-            <Button Text="Create today's session"
-                    Command="{Binding StartMeditationCommand}"
-                    Style="{StaticResource ButtonOutline}"
-                    HeightRequest="60"
-                    FontSize="16"/>
-        </VerticalStackLayout>
     </Grid>
 </ContentPage>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MeditationApp.Views.SplashPage"
+             NavigationPage.HasNavigationBar="False"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             BackgroundColor="{DynamicResource Primary}">
+
+       <ContentPage.Background>
+              <SolidColorBrush Color="#EFEBD3"/>
+       </ContentPage.Background>
+
+       <Grid>
+              <!-- Decorative abstract shapes for modern look inspired by Headspace -->
+              <Ellipse WidthRequest="300"
+                       HeightRequest="300"
+                       Fill="#15BBDEFB"
+                       HorizontalOptions="Start"
+                       VerticalOptions="Start"
+                       Margin="-120,-120,0,0"
+                       InputTransparent="True"/>
+
+              <Ellipse WidthRequest="200"
+                       HeightRequest="200"
+                       Fill="#10E1BEE7"
+                       HorizontalOptions="End"
+                       VerticalOptions="Start"
+                       Margin="0,-80,-80,0"
+                       InputTransparent="True"/>
+
+              <Ellipse WidthRequest="250"
+                       HeightRequest="250"
+                       Fill="#15FFCCBC"
+                       HorizontalOptions="End"
+                       VerticalOptions="End"
+                       Margin="0,0,-100,-100"
+                       InputTransparent="True"/>
+
+              <Ellipse WidthRequest="150"
+                       HeightRequest="150"
+                       Fill="#10B3E5FC"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
+                       Margin="-200,200,0,0"
+                       InputTransparent="True"/>
+
+              <StackLayout x:Name="SplashContent"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"
+                           Spacing="30"
+                           Opacity="0">
+                     <!-- App Logo/Icon -->
+                     <Image Source="logo.png"
+                            WidthRequest="120"
+                            HeightRequest="120"
+                            Opacity="0.9"
+                            HorizontalOptions="Center"/>
+
+                     <!-- App Name -->
+                     <Label Text="Meditation App"
+                            FontSize="28"
+                            FontAttributes="Bold"
+                            TextColor="White"
+                            HorizontalOptions="Center"/>
+
+                     <!-- Loading Indicator -->
+                     <ActivityIndicator IsRunning="True"
+                                        Color="White"
+                                        VerticalOptions="Center"
+                                        HorizontalOptions="Center"
+                                        Scale="1.2"/>
+
+                     <!-- Loading Text -->
+                     <Label x:Name="LoadingLabel"
+                            Text="Loading..."
+                            FontSize="16"
+                            TextColor="White"
+                            Opacity="0.8"
+                            HorizontalOptions="Center"/>
+              </StackLayout>
+       </Grid>
+
+</ContentPage>

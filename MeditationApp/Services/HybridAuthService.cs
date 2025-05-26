@@ -128,6 +128,24 @@ public class HybridAuthService
 
     public async Task<bool> IsUserLoggedInAsync()
     {
+        // Quick check: if offline mode is enabled and we have recent auth, return true immediately
+        var isOfflineModeEnabled = await _localService.IsOfflineModeEnabledAsync();
+        if (isOfflineModeEnabled)
+        {
+            var lastOnlineAuth = await _localService.GetLastOnlineAuthAsync();
+            if (lastOnlineAuth.HasValue)
+            {
+                // Allow offline access for up to 30 days
+                var daysSinceLastOnlineAuth = (DateTime.UtcNow - lastOnlineAuth.Value).TotalDays;
+                if (daysSinceLastOnlineAuth <= 30)
+                {
+                    // We have valid offline access, no need for network check
+                    return true;
+                }
+            }
+        }
+
+        // If we reach here, check network and tokens
         var isNetworkAvailable = await _localService.IsNetworkAvailableAsync();
         var accessToken = await SecureStorage.Default.GetAsync("access_token");
 
@@ -164,19 +182,6 @@ public class HybridAuthService
             catch (Exception ex)
             {
                 Console.WriteLine($"Token validation error: {ex.Message}");
-            }
-        }
-
-        // Check if offline mode is available
-        var isOfflineModeEnabled = await _localService.IsOfflineModeEnabledAsync();
-        if (isOfflineModeEnabled)
-        {
-            var lastOnlineAuth = await _localService.GetLastOnlineAuthAsync();
-            if (lastOnlineAuth.HasValue)
-            {
-                // Allow offline access for up to 30 days
-                var daysSinceLastOnlineAuth = (DateTime.UtcNow - lastOnlineAuth.Value).TotalDays;
-                return daysSinceLastOnlineAuth <= 30;
             }
         }
 
@@ -217,6 +222,38 @@ public class HybridAuthService
     {
         var isNetworkAvailable = await _localService.IsNetworkAvailableAsync();
         return !isNetworkAvailable || !(await _localService.IsNetworkAvailableAsync());
+    }
+
+    /// <summary>
+    /// Quick authentication check that prioritizes local/offline data for faster startup
+    /// </summary>
+    public async Task<bool> QuickAuthCheckAsync()
+    {
+        try
+        {
+            // Check if offline mode is enabled first (fastest check)
+            var isOfflineModeEnabled = await _localService.IsOfflineModeEnabledAsync();
+            if (isOfflineModeEnabled)
+            {
+                var lastOnlineAuth = await _localService.GetLastOnlineAuthAsync();
+                if (lastOnlineAuth.HasValue)
+                {
+                    var daysSinceLastOnlineAuth = (DateTime.UtcNow - lastOnlineAuth.Value).TotalDays;
+                    if (daysSinceLastOnlineAuth <= 30)
+                    {
+                        return true; // Valid offline session
+                    }
+                }
+            }
+
+            // Quick token existence check (don't validate online yet)
+            var accessToken = await SecureStorage.Default.GetAsync("access_token");
+            return !string.IsNullOrEmpty(accessToken);
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
 

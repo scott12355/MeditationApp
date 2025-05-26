@@ -6,13 +6,22 @@ namespace MeditationApp.Views;
 
 public partial class CalendarPage : ContentPage
 {
-    public CalendarPage(MeditationSessionDatabase database)
+    private readonly PreloadService _preloadService;
+    private readonly MeditationSessionDatabase _database;
+    private readonly CalendarDataService _calendarDataService;
+
+    public CalendarPage(MeditationSessionDatabase database, PreloadService preloadService, CalendarDataService calendarDataService)
     {
         InitializeComponent();
-        BindingContext = new CalendarViewModel(database);
+        _database = database;
+        _preloadService = preloadService;
+        _calendarDataService = calendarDataService;
         
-        // Create and configure the CalendarView with database dependency
-        var calendarView = new CalendarView(database);
+        // Use preloaded calendar view model if available
+        BindingContext = _preloadService.GetOrCreateCalendarViewModel();
+        
+        // Create and configure the CalendarView with database and calendar data service dependencies
+        var calendarView = new CalendarView(database, calendarDataService);
         calendarView.HeightRequest = 400;
         
         // Find the placeholder in XAML and replace with our programmatically created control

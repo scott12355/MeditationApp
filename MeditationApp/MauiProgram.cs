@@ -69,11 +69,24 @@ public static class MauiProgram
         // Register hybrid authentication service
         builder.Services.AddSingleton<HybridAuthService>();
 
-        // Register GraphQL service
-        builder.Services.AddHttpClient<GraphQLService>();
+        // Register preload service
+        builder.Services.AddSingleton<PreloadService>();
+
+        // Register IHttpClientFactory for GraphQLService
+        builder.Services.AddHttpClient();
+
+        // Register GraphQL service with CognitoAuthService dependency
+        builder.Services.AddSingleton<GraphQLService>(provider =>
+        {
+            var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient();
+            var cognitoAuthService = provider.GetRequiredService<CognitoAuthService>();
+            return new GraphQLService(httpClient, cognitoAuthService);
+        });
         builder.Services.AddTransient<ViewModels.TodayViewModel>();
 
         // Register views
+        builder.Services.AddTransient<Views.SplashPage>();
         builder.Services.AddTransient<Views.LoginPage>();
         builder.Services.AddTransient<Views.SignUpPage>();
         builder.Services.AddTransient<Views.VerificationPage>();
@@ -94,6 +107,9 @@ public static class MauiProgram
         // Register MeditationSessionDatabase
         string dbPath = Path.Combine(FileSystem.AppDataDirectory, "meditation_sessions.db3");
         builder.Services.AddSingleton(new MeditationApp.Services.MeditationSessionDatabase(dbPath));
+
+        // Register CalendarDataService (shared service for calendar data)
+        builder.Services.AddSingleton<MeditationApp.Services.CalendarDataService>();
 
 #if DEBUG
         builder.Logging.AddDebug();

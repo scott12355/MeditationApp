@@ -25,7 +25,7 @@ public class CognitoAuthService
         _userPool = new CognitoUserPool(_userPoolId, _clientId, _provider);
     }
 
-    public async Task<bool> SignUpAsync(string username, string email, string password, string firstName, string secondName)
+    public async Task<SignUpResult> SignUpAsync(string username, string email, string password, string firstName, string secondName)
     {
         try
         {
@@ -44,12 +44,50 @@ public class CognitoAuthService
 
             // Sign up the user
             var response = await _provider.SignUpAsync(signUpRequest);
-            return response.HttpStatusCode == System.Net.HttpStatusCode.OK;
+            return new SignUpResult 
+            { 
+                IsSuccess = response.HttpStatusCode == System.Net.HttpStatusCode.OK 
+            };
+        }
+        catch (InvalidPasswordException ex)
+        {
+            Console.WriteLine($"Password policy error: {ex.Message}");
+            return new SignUpResult 
+            { 
+                IsSuccess = false, 
+                ErrorMessage = "Password does not meet requirements. Please ensure it's at least 8 characters long and contains at least one special character.",
+                ErrorCode = "InvalidPasswordException"
+            };
+        }
+        catch (UsernameExistsException ex)
+        {
+            Console.WriteLine($"Username exists error: {ex.Message}");
+            return new SignUpResult 
+            { 
+                IsSuccess = false, 
+                ErrorMessage = "An account with this email already exists. Please try signing in instead.",
+                ErrorCode = "UsernameExistsException"
+            };
+        }
+        catch (InvalidParameterException ex)
+        {
+            Console.WriteLine($"Invalid parameter error: {ex.Message}");
+            return new SignUpResult 
+            { 
+                IsSuccess = false, 
+                ErrorMessage = "Please check that your email address is valid.",
+                ErrorCode = "InvalidParameterException"
+            };
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error during sign up: {ex.Message}");
-            return false;
+            return new SignUpResult 
+            { 
+                IsSuccess = false, 
+                ErrorMessage = "Failed to create account. Please try again.",
+                ErrorCode = "GeneralException"
+            };
         }
     }
 
@@ -312,4 +350,11 @@ public class AuthenticationResponseType
     public string? RefreshToken { get; set; }
     public int ExpiresIn { get; set; }
     public string? ErrorMessage { get; set; }
+}
+
+public class SignUpResult
+{
+    public bool IsSuccess { get; set; }
+    public string ErrorMessage { get; set; } = string.Empty;
+    public string ErrorCode { get; set; } = string.Empty;
 }

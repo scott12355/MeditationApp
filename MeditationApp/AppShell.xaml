@@ -8,6 +8,12 @@
     Shell.FlyoutBehavior="Disabled"
     Title="MeditationApp">
 
+    <!-- Splash page as initial route -->
+    <ShellContent
+        Title="Splash"
+        ContentTemplate="{DataTemplate views:SplashPage}"
+        Route="SplashPage"/>
+
     <!-- Login and other standalone pages -->
     <ShellContent
         Title="Login"
@@ -20,9 +26,9 @@
         Route="ProfilePage"/>
 
     <!-- Main tabbed interface -->
-    <TabBar Route="MainTabs" 
-            Shell.TabBarTitleColor="{StaticResource Secondary}" 
-            >
+    <TabBar Route="MainTabs"
+            Shell.TabBarTitleColor="{StaticResource Secondary}"
+            Shell.TabBarBackgroundColor="{StaticResource BackgroundColor}">
         <Tab Title="Today">
             <ShellContent ContentTemplate="{DataTemplate views:TodayPage}"/>
         </Tab>

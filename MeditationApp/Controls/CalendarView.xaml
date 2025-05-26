@@ -112,55 +112,57 @@
                                      VerticalItemSpacing="1"
                                      HorizontalItemSpacing="1"/>
                 </CollectionView.ItemsLayout>
-
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Border BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
-                                StrokeThickness="0.5"
-                                Stroke="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray600}}">
+                        <!-- Simplified item template for better performance -->
+                        <Grid BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
+                              HeightRequest="45"
+                              WidthRequest="45">
 
-                            <Grid>
-                                <Button BackgroundColor="Transparent"
-                                        Text="{Binding Day}"
-                                        FontSize="14"
-                                        TextColor="{Binding TextColor}"
-                                        FontAttributes="{Binding FontWeight}"
-                                        HeightRequest="45"
-                                        WidthRequest="45"
-                                        CornerRadius="0"
-                                        Command="{Binding Source={x:Reference Name=CalendarViewRoot}, Path=BindingContext.DayTappedCommand}"
-                                        CommandParameter="{Binding}"
-                                        IsEnabled="{Binding IsCurrentMonth}">
+                            <!-- Day button with minimal styling -->
+                            <Button BackgroundColor="Transparent"
+                                    Text="{Binding Day}"
+                                    FontSize="14"
+                                    TextColor="{Binding TextColor}"
+                                    FontAttributes="{Binding FontWeight}"
+                                    CornerRadius="0"
+                                    BorderWidth="0"
+                                    Command="{Binding Source={x:Reference Name=CalendarViewRoot}, Path=BindingContext.DayTappedCommand}"
+                                    CommandParameter="{Binding}"
+                                    IsEnabled="{Binding IsCurrentMonth}">
 
-                                    <Button.Triggers>
-                                        <DataTrigger TargetType="Button"
-                                                     Binding="{Binding IsSelected}"
-                                                     Value="True">
-                                            <Setter Property="TextColor"
-                                                    Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
-                                        </DataTrigger>
+                                <!-- Simplified triggers for better performance -->
+                                <Button.Triggers>
+                                    <DataTrigger TargetType="Button"
+                                                 Binding="{Binding IsSelected}"
+                                                 Value="True">
+                                        <!-- Remove BackgroundColor fill, only set TextColor -->
+                                        <Setter Property="TextColor"
+                                                Value="White"/>
+                                    </DataTrigger>
 
-                                        <DataTrigger TargetType="Button"
-                                                     Binding="{Binding IsToday}"
-                                                     Value="True">
-                                            <Setter Property="BorderColor"
-                                                    Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
-                                            <Setter Property="BorderWidth"
-                                                    Value="2"/>
-                                        </DataTrigger>
-                                    </Button.Triggers>
-                                </Button>
+                                    <DataTrigger TargetType="Button"
+                                                 Binding="{Binding IsToday}"
+                                                 Value="True">
+                                        <Setter Property="BorderColor"
+                                                Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                                        <Setter Property="BorderWidth"
+                                                Value="2"/>
+                                    </DataTrigger>
+                                </Button.Triggers>
+                            </Button>
 
-                                <!-- Session Indicator Dot -->
-                                <Ellipse IsVisible="{Binding HasSession}"
-                                         Fill="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
-                                         WidthRequest="6"
-                                         HeightRequest="6"
-                                         HorizontalOptions="Center"
-                                         VerticalOptions="End"
-                                         Margin="0,0,0,5"/>
-                            </Grid>
-                        </Border>
+                            <!-- Session indicator - optimized positioning -->
+                            <Border IsVisible="{Binding HasSession}"
+                                    BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                                    WidthRequest="6"
+                                    HeightRequest="6"
+                                    StrokeShape="RoundRectangle 3"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="End"
+                                    Margin="0,0,0,8"
+                                    InputTransparent="True"/>
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>

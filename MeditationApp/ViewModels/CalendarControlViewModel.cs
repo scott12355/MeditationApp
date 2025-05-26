@@ -14,15 +14,17 @@ public class CalendarControlViewModel : INotifyPropertyChanged
     private bool _isNavigating;
     private bool _isLoadingCalendar;
     private readonly MeditationSessionDatabase? _database;
+    private readonly CalendarDataService? _calendarDataService;
     
     // Cached colors for performance
     private Color _currentMonthColor = Colors.Black;
     private Color _otherMonthColor = Colors.LightGray;
     private Color _todayColor = Colors.Black;
 
-    public CalendarControlViewModel(MeditationSessionDatabase? database = null)
+    public CalendarControlViewModel(MeditationSessionDatabase? database = null, CalendarDataService? calendarDataService = null)
     {
         _database = database;
+        _calendarDataService = calendarDataService;
         _currentDate = DateTime.Now;
         _isDarkTheme = Application.Current?.RequestedTheme == AppTheme.Dark;
         UpdateCachedColors();
@@ -89,7 +91,7 @@ public class CalendarControlViewModel : INotifyPropertyChanged
         }
     }
 
-    private async void OnPreviousMonth()
+    private void OnPreviousMonth()
     {
         if (_isNavigating) return;
         
@@ -99,14 +101,12 @@ public class CalendarControlViewModel : INotifyPropertyChanged
         
         CurrentDate = _currentDate.AddMonths(-1);
         
-        await Task.Delay(100); // Reduced delay due to performance improvements
-        
         _isNavigating = false;
         ((Command)PreviousMonthCommand).ChangeCanExecute();
         ((Command)NextMonthCommand).ChangeCanExecute();
     }
 
-    private async void OnNextMonth()
+    private void OnNextMonth()
     {
         if (_isNavigating) return;
         
@@ -115,8 +115,6 @@ public class CalendarControlViewModel : INotifyPropertyChanged
         ((Command)NextMonthCommand).ChangeCanExecute();
         
         CurrentDate = _currentDate.AddMonths(1);
-        
-        await Task.Delay(100); // Reduced delay due to performance improvements
         
         _isNavigating = false;
         ((Command)PreviousMonthCommand).ChangeCanExecute();
@@ -144,6 +142,7 @@ public class CalendarControlViewModel : INotifyPropertyChanged
     private async void LoadCalendarDays()
     {
         IsLoadingCalendar = true;
+        System.Diagnostics.Debug.WriteLine($"CalendarControlViewModel: Starting LoadCalendarDays for {_currentDate:yyyy-MM}");
         
         var firstDayOfMonth = new DateTime(_currentDate.Year, _currentDate.Month, 1);
         var startDate = firstDayOfMonth.AddDays(-(int)firstDayOfMonth.DayOfWeek);
@@ -163,19 +162,38 @@ public class CalendarControlViewModel : INotifyPropertyChanged
             CalendarDays.RemoveAt(CalendarDays.Count - 1);
         }
 
-        // Get sessions for the month if database is available
+        // Get sessions for the month - use CalendarDataService if available for better performance
         var sessionsThisMonth = new List<MeditationApp.Models.MeditationSession>();
-        if (_database != null)
+        if (_calendarDataService != null)
         {
             try
             {
-                sessionsThisMonth = await _database.GetSessionsForMonthAsync(_currentDate.Year, _currentDate.Month);
+                System.Diagnostics.Debug.WriteLine($"CalendarControlViewModel: Loading sessions via CalendarDataService for month {_currentDate.Year}-{_currentDate.Month}");
+                sessionsThisMonth = await _calendarDataService.GetSessionsForMonthAsync(_currentDate.Year, _currentDate.Month);
+                System.Diagnostics.Debug.WriteLine($"CalendarControlViewModel: Found {sessionsThisMonth.Count} sessions via CalendarDataService");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error loading sessions for calendar: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"CalendarControlViewModel: Error loading sessions via CalendarDataService: {ex.Message}");
             }
         }
+        else if (_database != null)
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine($"CalendarControlViewModel: Loading sessions directly from database for month {_currentDate.Year}-{_currentDate.Month}");
+                sessionsThisMonth = await _database.GetSessionsForMonthAsync(_currentDate.Year, _currentDate.Month);
+                System.Diagnostics.Debug.WriteLine($"CalendarControlViewModel: Found {sessionsThisMonth.Count} sessions from database");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"CalendarControlViewModel: Error loading sessions from database: {ex.Message}");
+            }
+        }
+
+        // Create a HashSet for faster session date lookups (O(1) instead of O(n))
+        var sessionDates = new HashSet<DateTime>(sessionsThisMonth.Select(s => s.Timestamp.Date));
+        System.Diagnostics.Debug.WriteLine($"CalendarControlViewModel: Created session date lookup with {sessionDates.Count} unique dates");
 
         // Update existing items in place with notifications enabled
         for (int i = 0; i < totalDays; i++)
@@ -183,7 +201,7 @@ public class CalendarControlViewModel : INotifyPropertyChanged
             var date = startDate.AddDays(i);
             var isCurrentMonth = date.Month == _currentDate.Month;
             var isToday = date.Date == DateTime.Today;
-            var hasSession = sessionsThisMonth.Any(s => s.Timestamp.Date == date.Date);
+            var hasSession = sessionDates.Contains(date.Date); // Much faster lookup
             var dayModel = CalendarDays[i];
 
             dayModel.UpdateDay(
@@ -198,6 +216,7 @@ public class CalendarControlViewModel : INotifyPropertyChanged
         }
         
         IsLoadingCalendar = false;
+        System.Diagnostics.Debug.WriteLine("CalendarControlViewModel: LoadCalendarDays completed");
     }
 
     private Color GetTextColor(bool isCurrentMonth, bool isToday)
@@ -280,15 +299,31 @@ public class CalendarDayModel : INotifyPropertyChanged
 
     public void UpdateDay(DateTime date, string day, bool isCurrentMonth, bool isToday, Color textColor, Microsoft.Maui.Controls.FontAttributes fontWeight, bool hasSession = false)
     {
-        // Update all properties using the SetProperty method which handles notifications
-        Date = date;
-        Day = day;
-        IsCurrentMonth = isCurrentMonth;
-        IsToday = isToday;
-        TextColor = textColor;
-        FontWeight = fontWeight;
-        HasSession = hasSession;
-        IsSelected = false; // Reset selection when updating
+        // Batch updates to minimize property change notifications
+        var hasChanges = false;
+        
+        // Only update if values have actually changed
+        if (_date != date) { _date = date; hasChanges = true; }
+        if (_day != day) { _day = day; hasChanges = true; }
+        if (_isCurrentMonth != isCurrentMonth) { _isCurrentMonth = isCurrentMonth; hasChanges = true; }
+        if (_isToday != isToday) { _isToday = isToday; hasChanges = true; }
+        if (_textColor != textColor) { _textColor = textColor; hasChanges = true; }
+        if (_fontWeight != fontWeight) { _fontWeight = fontWeight; hasChanges = true; }
+        if (_hasSession != hasSession) { _hasSession = hasSession; hasChanges = true; }
+        if (_isSelected) { _isSelected = false; hasChanges = true; } // Reset selection when updating
+        
+        // Fire notifications for all changed properties at once
+        if (hasChanges)
+        {
+            OnPropertyChanged(nameof(Date));
+            OnPropertyChanged(nameof(Day));
+            OnPropertyChanged(nameof(IsCurrentMonth));
+            OnPropertyChanged(nameof(IsToday));
+            OnPropertyChanged(nameof(TextColor));
+            OnPropertyChanged(nameof(FontWeight));
+            OnPropertyChanged(nameof(HasSession));
+            OnPropertyChanged(nameof(IsSelected));
+        }
     }
 
     private bool SetProperty<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)

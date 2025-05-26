@@ -24,5 +24,13 @@ public partial class VerificationPage : ContentPage, IQueryAttributable
         {
             _viewModel.Password = query["Password"].ToString() ?? string.Empty;
         }
+        if (query.ContainsKey("Email") && query["Email"] != null)
+        {
+            _viewModel.Email = query["Email"].ToString() ?? string.Empty;
+        }
+        if (query.ContainsKey("FirstName") && query["FirstName"] != null)
+        {
+            _viewModel.FirstName = query["FirstName"].ToString() ?? string.Empty;
+        }
     }
 }

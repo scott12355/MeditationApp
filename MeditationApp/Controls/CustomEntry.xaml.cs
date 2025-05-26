@@ -72,6 +72,13 @@ public partial class CustomEntry : ContentView
     public static readonly BindableProperty IsSpellCheckEnabledProperty =
         BindableProperty.Create(nameof(IsSpellCheckEnabled), typeof(bool), typeof(CustomEntry), true);
     
+    public static readonly BindableProperty HasErrorProperty =
+        BindableProperty.Create(nameof(HasError), typeof(bool), typeof(CustomEntry), false,
+            propertyChanged: OnHasErrorPropertyChanged);
+    
+    public static readonly BindableProperty ErrorBorderColorProperty =
+        BindableProperty.Create(nameof(ErrorBorderColor), typeof(Color), typeof(CustomEntry), Color.FromArgb("#FF6B46C1"));
+
     #endregion
     
     #region Properties
@@ -202,6 +209,18 @@ public partial class CustomEntry : ContentView
         set => SetValue(IsSpellCheckEnabledProperty, value);
     }
     
+    public bool HasError
+    {
+        get => (bool)GetValue(HasErrorProperty);
+        set => SetValue(HasErrorProperty, value);
+    }
+    
+    public Color ErrorBorderColor
+    {
+        get => (Color)GetValue(ErrorBorderColorProperty);
+        set => SetValue(ErrorBorderColorProperty, value);
+    }
+    
     #endregion
     
     #region Events
@@ -276,6 +295,14 @@ public partial class CustomEntry : ContentView
         {
             // Disable spell check for password fields
             customEntry.IsSpellCheckEnabled = !(bool)newValue;
+        }
+    }
+
+    private static void OnHasErrorPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is CustomEntry customEntry)
+        {
+            // Optionally, you can add logic here to handle changes to the HasError property
         }
     }
     

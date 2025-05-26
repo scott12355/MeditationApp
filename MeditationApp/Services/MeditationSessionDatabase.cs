@@ -9,6 +9,11 @@ namespace MeditationApp.Services
     public class MeditationSessionDatabase
     {
         private readonly SQLiteAsyncConnection _database;
+        
+        // Simple cache for frequently accessed data
+        private readonly Dictionary<string, (DateTime CacheTime, List<Models.MeditationSession> Data)> _monthlyCache = new();
+        private readonly Dictionary<string, (DateTime CacheTime, List<Models.MeditationSession> Data)> _dailyCache = new();
+        private readonly TimeSpan _cacheExpiry = TimeSpan.FromMinutes(5); // Cache for 5 minutes
 
         public MeditationSessionDatabase(string dbPath)
         {
@@ -21,22 +26,78 @@ namespace MeditationApp.Services
             return _database.Table<Models.MeditationSession>().ToListAsync();
         }
 
-        public Task<List<Models.MeditationSession>> GetSessionsForDateAsync(DateTime date)
+        public async Task<List<Models.MeditationSession>> GetSessionsForDateAsync(DateTime date)
         {
+            var cacheKey = date.ToString("yyyy-MM-dd");
+            
+            // Check cache first
+            if (_dailyCache.TryGetValue(cacheKey, out var cached))
+            {
+                if (DateTime.Now - cached.CacheTime < _cacheExpiry)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Database: Using cached data for date {cacheKey} - {cached.Data.Count} sessions");
+                    return new List<Models.MeditationSession>(cached.Data);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"Database: Cache expired for date {cacheKey}, reloading from database");
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Database: No cache found for date {cacheKey}, loading from database");
+            }
+            
+            // Load from database
             var startDate = date.Date;
             var endDate = startDate.AddDays(1);
-            return _database.Table<Models.MeditationSession>()
+            var sessions = await _database.Table<Models.MeditationSession>()
                 .Where(s => s.Timestamp >= startDate && s.Timestamp < endDate)
                 .ToListAsync();
+            
+            System.Diagnostics.Debug.WriteLine($"Database: Loaded {sessions.Count} sessions for date {cacheKey} from database");
+            
+            // Update cache
+            _dailyCache[cacheKey] = (DateTime.Now, new List<Models.MeditationSession>(sessions));
+            
+            return sessions;
         }
 
-        public Task<List<Models.MeditationSession>> GetSessionsForMonthAsync(int year, int month)
+        public async Task<List<Models.MeditationSession>> GetSessionsForMonthAsync(int year, int month)
         {
+            var cacheKey = $"{year}-{month:00}";
+            
+            // Check cache first
+            if (_monthlyCache.TryGetValue(cacheKey, out var cached))
+            {
+                if (DateTime.Now - cached.CacheTime < _cacheExpiry)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Database: Using cached data for month {cacheKey} - {cached.Data.Count} sessions");
+                    return new List<Models.MeditationSession>(cached.Data);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"Database: Cache expired for month {cacheKey}, reloading from database");
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Database: No cache found for month {cacheKey}, loading from database");
+            }
+            
+            // Load from database
             var startDate = new DateTime(year, month, 1);
             var endDate = startDate.AddMonths(1);
-            return _database.Table<Models.MeditationSession>()
+            var sessions = await _database.Table<Models.MeditationSession>()
                 .Where(s => s.Timestamp >= startDate && s.Timestamp < endDate)
                 .ToListAsync();
+            
+            System.Diagnostics.Debug.WriteLine($"Database: Loaded {sessions.Count} sessions for month {cacheKey} from database");
+            
+            // Update cache
+            _monthlyCache[cacheKey] = (DateTime.Now, new List<Models.MeditationSession>(sessions));
+            
+            return sessions;
         }
 
         public Task<Models.MeditationSession> GetSessionAsync(int id)
@@ -44,22 +105,47 @@ namespace MeditationApp.Services
             return _database.Table<Models.MeditationSession>().Where(i => i.SessionID == id).FirstOrDefaultAsync();
         }
 
-        public Task<int> SaveSessionAsync(Models.MeditationSession session)
+        public async Task<int> SaveSessionAsync(Models.MeditationSession session)
         {
+            int result;
             if (session.SessionID != 0)
-                return _database.UpdateAsync(session);
+                result = await _database.UpdateAsync(session);
             else
-                return _database.InsertAsync(session);
+                result = await _database.InsertAsync(session);
+            
+            // Clear cache to ensure fresh data on next load
+            ClearCache();
+            
+            return result;
         }
 
-        public Task<int> DeleteSessionAsync(Models.MeditationSession session)
+        public async Task<int> DeleteSessionAsync(Models.MeditationSession session)
         {
-            return _database.DeleteAsync(session);
+            var result = await _database.DeleteAsync(session);
+            
+            // Clear cache to ensure fresh data on next load
+            ClearCache();
+            
+            return result;
         }
 
-        public Task<int> ClearAllSessionsAsync()
+        public async Task<int> ClearAllSessionsAsync()
         {
-            return _database.DeleteAllAsync<Models.MeditationSession>();
+            var result = await _database.DeleteAllAsync<Models.MeditationSession>();
+            
+            // Clear cache
+            ClearCache();
+            
+            return result;
+        }
+
+        /// <summary>
+        /// Clear all cached data
+        /// </summary>
+        public void ClearCache()
+        {
+            _dailyCache.Clear();
+            _monthlyCache.Clear();
         }
 
         public async Task AddSampleDataAsync()
