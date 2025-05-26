@@ -71,6 +71,32 @@
                         Value="44"/>
         </Style>
 
+        <!-- Mood Button Style -->
+        <Style x:Key="MoodButton"
+               TargetType="Button">
+                <Setter Property="BorderWidth"
+                        Value="2"/>
+                <Setter Property="BorderColor"
+                        Value="LightGray"/>
+                <Setter Property="CornerRadius"
+                        Value="30"/>
+                <Setter Property="WidthRequest"
+                        Value="60"/>
+                <Setter Property="HeightRequest"
+                        Value="60"/>
+                <Setter Property="FontSize"
+                        Value="30"/>
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                        <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal"/>
+                                        <VisualState x:Name="Pressed"/>
+                                        <VisualState x:Name="PointerOver"/>
+                                </VisualStateGroup>
+                        </VisualStateGroupList>
+                </Setter>
+        </Style>
+
         <!-- Custom Entry Style -->
         <Style x:Key="ModernCustomEntryStyle"
                TargetType="local:CustomEntry">

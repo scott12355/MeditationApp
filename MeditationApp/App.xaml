@@ -13,9 +13,7 @@
                 <ResourceDictionary Source="Resources/Styles/CustomControls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
-            <converters:MoodFontSizeConverter x:Key="MoodFontSizeConverter"/>
-            <converters:MoodColorConverter x:Key="MoodColorConverter"/>
-            <converters:MoodFontAttributesConverter x:Key="MoodFontAttributesConverter"/>
+            <converters:EqualityToColorConverter x:Key="EqualityToColorConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

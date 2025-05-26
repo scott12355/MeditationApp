@@ -20,47 +20,6 @@
                            HorizontalOptions="Center"/>
                 </VerticalStackLayout>
 
-                <!-- Stats Cards -->
-                <Grid ColumnDefinitions="*,*"
-                      ColumnSpacing="15">
-
-                    <!-- Today's Sessions Card -->
-                    <Frame Grid.Column="0"
-                           BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
-                           CornerRadius="15"
-                           Padding="20">
-                        <VerticalStackLayout Spacing="10">
-                            <Label Text="Today's Sessions"
-                                   TextColor="White"
-                                   FontSize="14"
-                                   HorizontalOptions="Center"/>
-                            <Label Text="{Binding TodaySessionsCompleted}"
-                                   TextColor="White"
-                                   FontSize="32"
-                                   FontAttributes="Bold"
-                                   HorizontalOptions="Center"/>
-                        </VerticalStackLayout>
-                    </Frame>
-
-                    <!-- Streak Card -->
-                    <Frame Grid.Column="1"
-                           BackgroundColor="{AppThemeBinding Light={StaticResource Secondary}, Dark={StaticResource SecondaryDark}}"
-                           CornerRadius="15"
-                           Padding="20">
-                        <VerticalStackLayout Spacing="10">
-                            <Label Text="Streak Days"
-                                   TextColor="White"
-                                   FontSize="14"
-                                   HorizontalOptions="Center"/>
-                            <Label Text="{Binding StreakDays}"
-                                   TextColor="White"
-                                   FontSize="32"
-                                   FontAttributes="Bold"
-                                   HorizontalOptions="Center"/>
-                        </VerticalStackLayout>
-                    </Frame>
-                </Grid>
-
                 <!-- Mood Selector -->
                 <VerticalStackLayout Spacing="10"
                                      Padding="0,20,0,0">
@@ -68,59 +27,39 @@
                            HorizontalOptions="Center"
                            FontAttributes="Bold"
                            FontSize="16"/>
-                    <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto"
-                          HorizontalOptions="Center">
-                        <Label Text="😢"
-                               FontSize="{Binding SelectedMood, Converter={StaticResource MoodFontSizeConverter}, ConverterParameter=1}"
-                               TextColor="{Binding SelectedMood, Converter={StaticResource MoodColorConverter}, ConverterParameter=1}"
-                               FontAttributes="{Binding SelectedMood, Converter={StaticResource MoodFontAttributesConverter}, ConverterParameter=1}"
-                               Grid.Column="0">
-                            <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectMoodCommand}"
-                                                      CommandParameter="1"/>
-                            </Label.GestureRecognizers>
-                        </Label>
-                        <Label Text="🙁"
-                               FontSize="{Binding SelectedMood, Converter={StaticResource MoodFontSizeConverter}, ConverterParameter=2}"
-                               TextColor="{Binding SelectedMood, Converter={StaticResource MoodColorConverter}, ConverterParameter=2}"
-                               FontAttributes="{Binding SelectedMood, Converter={StaticResource MoodFontAttributesConverter}, ConverterParameter=2}"
-                               Grid.Column="1">
-                            <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectMoodCommand}"
-                                                      CommandParameter="2"/>
-                            </Label.GestureRecognizers>
-                        </Label>
-                        <Label Text="😐"
-                               FontSize="{Binding SelectedMood, Converter={StaticResource MoodFontSizeConverter}, ConverterParameter=3}"
-                               TextColor="{Binding SelectedMood, Converter={StaticResource MoodColorConverter}, ConverterParameter=3}"
-                               FontAttributes="{Binding SelectedMood, Converter={StaticResource MoodFontAttributesConverter}, ConverterParameter=3}"
-                               Grid.Column="2">
-                            <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectMoodCommand}"
-                                                      CommandParameter="3"/>
-                            </Label.GestureRecognizers>
-                        </Label>
-                        <Label Text="🙂"
-                               FontSize="{Binding SelectedMood, Converter={StaticResource MoodFontSizeConverter}, ConverterParameter=4}"
-                               TextColor="{Binding SelectedMood, Converter={StaticResource MoodColorConverter}, ConverterParameter=4}"
-                               FontAttributes="{Binding SelectedMood, Converter={StaticResource MoodFontAttributesConverter}, ConverterParameter=4}"
-                               Grid.Column="3">
-                            <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectMoodCommand}"
-                                                      CommandParameter="4"/>
-                            </Label.GestureRecognizers>
-                        </Label>
-                        <Label Text="😄"
-                               FontSize="{Binding SelectedMood, Converter={StaticResource MoodFontSizeConverter}, ConverterParameter=5}"
-                               TextColor="{Binding SelectedMood, Converter={StaticResource MoodColorConverter}, ConverterParameter=5}"
-                               FontAttributes="{Binding SelectedMood, Converter={StaticResource MoodFontAttributesConverter}, ConverterParameter=5}"
-                               Grid.Column="4">
-                            <Label.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding SelectMoodCommand}"
-                                                      CommandParameter="5"/>
-                            </Label.GestureRecognizers>
-                        </Label>
-                    </Grid>
+                    <HorizontalStackLayout HorizontalOptions="Center"
+                                           Spacing="15">
+                        <Button Text="😢"
+                                Command="{Binding SelectMoodCommand}"
+                                CommandParameter="1"
+                                Style="{StaticResource MoodButton}"
+                                BackgroundColor="{Binding SelectedMood, Converter={StaticResource EqualityToColorConverter}, ConverterParameter=1}"
+                                FontSize="Large"/>
+                        <Button Text="😟"
+                                Command="{Binding SelectMoodCommand}"
+                                CommandParameter="2"
+                                Style="{StaticResource MoodButton}"
+                                BackgroundColor="{Binding SelectedMood, Converter={StaticResource EqualityToColorConverter}, ConverterParameter=2}"
+                                FontSize="Large"/>
+                        <Button Text="😐"
+                                Command="{Binding SelectMoodCommand}"
+                                CommandParameter="3"
+                                Style="{StaticResource MoodButton}"
+                                BackgroundColor="{Binding SelectedMood, Converter={StaticResource EqualityToColorConverter}, ConverterParameter=3}"
+                                FontSize="Large"/>
+                        <Button Text="🙂"
+                                Command="{Binding SelectMoodCommand}"
+                                CommandParameter="4"
+                                Style="{StaticResource MoodButton}"
+                                BackgroundColor="{Binding SelectedMood, Converter={StaticResource EqualityToColorConverter}, ConverterParameter=4}"
+                                FontSize="Large"/>
+                        <Button Text="😊"
+                                Command="{Binding SelectMoodCommand}"
+                                CommandParameter="5"
+                                Style="{StaticResource MoodButton}"
+                                BackgroundColor="{Binding SelectedMood, Converter={StaticResource EqualityToColorConverter}, ConverterParameter=5}"
+                                FontSize="Large"/>
+                    </HorizontalStackLayout>
                 </VerticalStackLayout>
 
             </VerticalStackLayout>

@@ -10,8 +10,5 @@ public partial class TodayPage : ContentPage
         BindingContext = new TodayViewModel();
     }
 
-    private async void OnSettingsClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("SettingsPage");
-    }
+
 }

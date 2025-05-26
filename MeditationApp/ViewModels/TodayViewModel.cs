@@ -1,86 +1,64 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace MeditationApp.ViewModels;
 
-public class TodayViewModel : INotifyPropertyChanged
+public partial class TodayViewModel : ObservableObject
 {
+    [ObservableProperty]
     private string _welcomeMessage = "Today's Meditation";
+
+    [ObservableProperty]
     private DateTime _currentDate = DateTime.Now;
+
+    [ObservableProperty]
     private int _todaySessionsCompleted = 0;
-    private int _streakDays = 0;
 
-    public string WelcomeMessage
-    {
-        get => _welcomeMessage;
-        set
-        {
-            _welcomeMessage = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public DateTime CurrentDate
-    {
-        get => _currentDate;
-        set
-        {
-            _currentDate = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(FormattedDate));
-        }
-    }
+    [ObservableProperty]
+    private int _selectedMood = 3; // Default to neutral mood
 
     public string FormattedDate => CurrentDate.ToString("dddd, MMMM dd, yyyy");
 
-    private int _selectedMood = 3; // Default to neutral mood
-    public int SelectedMood
-    {
-        get => _selectedMood;
-        set
-        {
-            if (_selectedMood != value)
-            {
-                _selectedMood = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public ICommand StartMeditationCommand { get; }
-    public ICommand SelectMoodCommand { get; }
-
     public TodayViewModel()
     {
-        StartMeditationCommand = new Command(OnStartMeditation);
-        SelectMoodCommand = new Command<int>(OnSelectMood);
         LoadTodayData();
     }
 
-    private async void OnStartMeditation()
+    [RelayCommand]
+    private async Task StartMeditation()
     {
         // TODO: Navigate to meditation session
+        Console.WriteLine("Starting meditation session...");
         if (Application.Current?.MainPage != null)
             await Application.Current.MainPage.DisplayAlert("Meditation", "Starting your meditation session...", "OK");
     }
 
-    private void OnSelectMood(int mood)
+    [RelayCommand]
+    private async Task SelectMood(string mood)
     {
-        SelectedMood = mood;
-        // Optionally: Save mood to a service or database here
+        if (int.TryParse(mood, out int moodValue))
+        {
+            Console.WriteLine($"Selected mood: {moodValue}");
+            SelectedMood = moodValue;
+            await Application.Current.MainPage.DisplayAlert("Meditation", $"Selected mood: {moodValue}", "OK");
+        }
+        else
+        {
+            Console.WriteLine($"Invalid mood value: {mood}");
+        }
     }
 
     private void LoadTodayData()
     {
         // TODO: Load actual data from service
-
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    // You might need to add this property changed notification for FormattedDate
+    partial void OnCurrentDateChanged(DateTime value)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        OnPropertyChanged(nameof(FormattedDate));
     }
 }
