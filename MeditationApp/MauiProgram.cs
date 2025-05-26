@@ -2,6 +2,10 @@
 using MeditationApp.Services;
 using Amazon;
 using Amazon.CognitoIdentityProvider;
+using System.Net.Http;
+using Microsoft.Extensions.DependencyInjection;
+using System.IO;
+using MeditationApp.Models;
 #if IOS
 using Microsoft.Maui.Handlers;
 #endif
@@ -65,6 +69,10 @@ public static class MauiProgram
         // Register hybrid authentication service
         builder.Services.AddSingleton<HybridAuthService>();
 
+        // Register GraphQL service
+        builder.Services.AddHttpClient<GraphQLService>();
+        builder.Services.AddTransient<ViewModels.TodayViewModel>();
+
         // Register views
         builder.Services.AddTransient<Views.LoginPage>();
         builder.Services.AddTransient<Views.SignUpPage>();
@@ -80,10 +88,12 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewModels.SignUpViewModel>();
         builder.Services.AddTransient<ViewModels.VerificationViewModel>();
         builder.Services.AddTransient<ViewModels.TodayViewModel>();
-        builder.Services.AddTransient<ViewModels.CalendarViewModel>();
         builder.Services.AddTransient<ViewModels.SettingsViewModel>();
         builder.Services.AddTransient<ViewModels.CalendarControlViewModel>();
-        builder.Services.AddTransient<ViewModels.DayDetailViewModel>();
+
+        // Register MeditationSessionDatabase
+        string dbPath = Path.Combine(FileSystem.AppDataDirectory, "meditation_sessions.db3");
+        builder.Services.AddSingleton(new MeditationApp.Services.MeditationSessionDatabase(dbPath));
 
 #if DEBUG
         builder.Logging.AddDebug();

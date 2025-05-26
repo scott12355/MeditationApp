@@ -1,151 +1,164 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MeditationApp.Controls"
              x:Class="MeditationApp.Views.DayDetailPage"
              Title="{Binding PageTitle}">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="20"
-                             Spacing="20">
+       <ScrollView>
+              <VerticalStackLayout Padding="20"
+                                   Spacing="20">
 
-            <!-- Date Header -->
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
-                   CornerRadius="15"
-                   Padding="20">
-                <VerticalStackLayout Spacing="5">
-                    <Label Text="{Binding SelectedDate, StringFormat='{0:dddd}'}"
-                           FontSize="24"
-                           FontAttributes="Bold"
-                           TextColor="White"
-                           HorizontalOptions="Center"/>
-                    <Label Text="{Binding SelectedDate, StringFormat='{0:MMMM d, yyyy}'}"
-                           FontSize="18"
-                           TextColor="White"
-                           HorizontalOptions="Center"/>
-                </VerticalStackLayout>
-            </Frame>
-
-            <!-- Meditation Sessions for the Day -->
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                   CornerRadius="15"
-                   Padding="20">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="Meditation Sessions"
-                           Style="{StaticResource SubHeadline}"/>
-
-                    <CollectionView ItemsSource="{Binding MeditationSessions}"
-                                    BackgroundColor="Transparent">
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid ColumnDefinitions="*,Auto"
-                                      Padding="0,10"
-                                      BackgroundColor="Transparent">
-
-                                    <VerticalStackLayout Grid.Column="0"
-                                                         Spacing="5">
-                                        <Label Text="{Binding Type}"
-                                               FontSize="16"
-                                               FontAttributes="Bold"/>
-                                        <Label Text="{Binding Time, StringFormat='At {0:HH:mm}'}"
-                                               FontSize="14"
-                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
-                                        <Label Text="{Binding Duration, StringFormat='{0} minutes'}"
-                                               FontSize="14"
-                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
-                                    </VerticalStackLayout>
-
-                                    <Label Grid.Column="1"
-                                           Text="{Binding Status}"
-                                           FontSize="14"
-                                           TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
-                                           VerticalOptions="Center"/>
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-
-                        <CollectionView.EmptyView>
-                            <ContentView>
-                                <Label Text="No meditation sessions recorded for this day"
-                                       FontSize="16"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
-                                       HorizontalOptions="Center"
-                                       Margin="0,20"/>
-                            </ContentView>
-                        </CollectionView.EmptyView>
-                    </CollectionView>
-                </VerticalStackLayout>
-            </Frame>
-
-            <!-- Daily Stats -->
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                   CornerRadius="15"
-                   Padding="20">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="Daily Summary"
-                           Style="{StaticResource SubHeadline}"/>
-
-                    <Grid ColumnDefinitions="*,*"
-                          RowDefinitions="Auto,Auto"
-                          RowSpacing="15"
-                          ColumnSpacing="15">
-
-                        <Frame Grid.Row="0"
-                               Grid.Column="0"
-                               BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
-                               CornerRadius="10"
-                               Padding="15">
+                     <!-- Date Header -->
+                     <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                            CornerRadius="15"
+                            Padding="20">
                             <VerticalStackLayout Spacing="5">
-                                <Label Text="Total Time"
-                                       FontSize="14"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
-                                <Label Text="{Binding TotalMeditationTime, StringFormat='{0} min'}"
-                                       FontSize="20"
-                                       FontAttributes="Bold"
-                                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                                   <Label Text="{Binding SelectedDate, StringFormat='{0:dddd}'}"
+                                          FontSize="24"
+                                          FontAttributes="Bold"
+                                          TextColor="White"
+                                          HorizontalOptions="Center"/>
+                                   <Label Text="{Binding SelectedDate, StringFormat='{0:MMMM d, yyyy}'}"
+                                          FontSize="18"
+                                          TextColor="White"
+                                          HorizontalOptions="Center"/>
                             </VerticalStackLayout>
-                        </Frame>
+                     </Frame>
 
-                        <Frame Grid.Row="0"
-                               Grid.Column="1"
-                               BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
-                               CornerRadius="10"
-                               Padding="15">
-                            <VerticalStackLayout Spacing="5">
-                                <Label Text="Sessions"
-                                       FontSize="14"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
-                                <Label Text="{Binding SessionCount}"
-                                       FontSize="20"
-                                       FontAttributes="Bold"
-                                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                     <!-- Meditation Sessions for the Day -->
+                     <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                            CornerRadius="15"
+                            Padding="20">
+                            <VerticalStackLayout Spacing="15">
+                                   <Label Text="Meditation Sessions"
+                                          Style="{StaticResource SubHeadline}"/>
+
+                                   <!-- Skeleton loading for sessions -->
+                                   <VerticalStackLayout IsVisible="{Binding IsLoading}"
+                                                 Spacing="10">
+                                          <controls:SkeletonView IsLoading="{Binding IsLoading}"
+                                                                 HeightRequest="80"
+                                                                 CornerRadius="8"/>
+                                          <controls:SkeletonView IsLoading="{Binding IsLoading}"
+                                                                 HeightRequest="80"
+                                                                 CornerRadius="8"/>
+                                   </VerticalStackLayout>
+
+                                   <CollectionView ItemsSource="{Binding MeditationSessions}"
+                                                   BackgroundColor="Transparent"
+                                                   IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}">
+                                          <CollectionView.ItemTemplate>
+                                                 <DataTemplate>
+                                                        <Grid ColumnDefinitions="*,Auto"
+                                                              Padding="0,10"
+                                                              BackgroundColor="Transparent">
+
+                                                               <VerticalStackLayout Grid.Column="0"
+                                                                                    Spacing="5">
+                                                                      <Label Text="{Binding Type}"
+                                                                             FontSize="16"
+                                                                             FontAttributes="Bold"/>
+                                                                      <Label Text="{Binding Time, StringFormat='At {0:HH:mm}'}"
+                                                                             FontSize="14"
+                                                                             TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
+                                                                      <Label Text="{Binding Duration, StringFormat='{0} minutes'}"
+                                                                             FontSize="14"
+                                                                             TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
+                                                               </VerticalStackLayout>
+
+                                                               <Label Grid.Column="1"
+                                                                      Text="{Binding Status}"
+                                                                      FontSize="14"
+                                                                      TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                                                                      VerticalOptions="Center"/>
+                                                        </Grid>
+                                                 </DataTemplate>
+                                          </CollectionView.ItemTemplate>
+
+                                          <CollectionView.EmptyView>
+                                                 <ContentView>
+                                                        <Label Text="No meditation sessions recorded for this day"
+                                                               FontSize="16"
+                                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
+                                                               HorizontalOptions="Center"
+                                                               Margin="0,20"/>
+                                                 </ContentView>
+                                          </CollectionView.EmptyView>
+                                   </CollectionView>
                             </VerticalStackLayout>
-                        </Frame>
+                     </Frame>
 
-                        <Frame Grid.Row="1"
-                               Grid.ColumnSpan="2"
-                               BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
-                               CornerRadius="10"
-                               Padding="15">
-                            <VerticalStackLayout Spacing="5">
-                                <Label Text="Notes"
-                                       FontSize="14"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
-                                <Label Text="{Binding DayNotes}"
-                                       FontSize="16"
-                                       TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"/>
+                     <!-- Daily Stats -->
+                     <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                            CornerRadius="15"
+                            Padding="20">
+                            <VerticalStackLayout Spacing="15">
+                                   <Label Text="Daily Summary"
+                                          Style="{StaticResource SubHeadline}"/>
+
+                                   <Grid ColumnDefinitions="*,*"
+                                         RowDefinitions="Auto,Auto"
+                                         RowSpacing="15"
+                                         ColumnSpacing="15">
+
+                                          <Frame Grid.Row="0"
+                                                 Grid.Column="0"
+                                                 BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
+                                                 CornerRadius="10"
+                                                 Padding="15">
+                                                 <VerticalStackLayout Spacing="5">
+                                                        <Label Text="Total Time"
+                                                               FontSize="14"
+                                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
+                                                        <Label Text="{Binding TotalMeditationTime, StringFormat='{0} min'}"
+                                                               FontSize="20"
+                                                               FontAttributes="Bold"
+                                                               TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                                                 </VerticalStackLayout>
+                                          </Frame>
+
+                                          <Frame Grid.Row="0"
+                                                 Grid.Column="1"
+                                                 BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
+                                                 CornerRadius="10"
+                                                 Padding="15">
+                                                 <VerticalStackLayout Spacing="5">
+                                                        <Label Text="Sessions"
+                                                               FontSize="14"
+                                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
+                                                        <Label Text="{Binding SessionCount}"
+                                                               FontSize="20"
+                                                               FontAttributes="Bold"
+                                                               TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
+                                                 </VerticalStackLayout>
+                                          </Frame>
+
+                                          <Frame Grid.Row="1"
+                                                 Grid.ColumnSpan="2"
+                                                 BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
+                                                 CornerRadius="10"
+                                                 Padding="15">
+                                                 <VerticalStackLayout Spacing="5">
+                                                        <Label Text="Notes"
+                                                               FontSize="14"
+                                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
+                                                        <Label Text="{Binding DayNotes}"
+                                                               FontSize="16"
+                                                               TextColor="{AppThemeBinding Light={StaticResource Gray800}, Dark={StaticResource Gray200}}"/>
+                                                 </VerticalStackLayout>
+                                          </Frame>
+                                   </Grid>
                             </VerticalStackLayout>
-                        </Frame>
-                    </Grid>
-                </VerticalStackLayout>
-            </Frame>
+                     </Frame>
 
-            <!-- Add Session Button -->
-            <Button Text="Add Meditation Session"
-                    Command="{Binding AddSessionCommand}"
-                    Style="{StaticResource ButtonOutline}"
-                    HeightRequest="50"/>
+                     <!-- Add Session Button -->
+                     <Button Text="Add Meditation Session"
+                             Command="{Binding AddSessionCommand}"
+                             Style="{StaticResource ButtonOutline}"
+                             HeightRequest="50"/>
 
-        </VerticalStackLayout>
-    </ScrollView>
+              </VerticalStackLayout>
+       </ScrollView>
 
 </ContentPage>

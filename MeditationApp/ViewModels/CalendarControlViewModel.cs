@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using MeditationApp.Services;
 
 namespace MeditationApp.ViewModels;
 
@@ -11,14 +12,17 @@ public class CalendarControlViewModel : INotifyPropertyChanged
     private CalendarDayModel? _selectedDay;
     private bool _isDarkTheme;
     private bool _isNavigating;
+    private bool _isLoadingCalendar;
+    private readonly MeditationSessionDatabase? _database;
     
     // Cached colors for performance
     private Color _currentMonthColor = Colors.Black;
     private Color _otherMonthColor = Colors.LightGray;
     private Color _todayColor = Colors.Black;
 
-    public CalendarControlViewModel()
+    public CalendarControlViewModel(MeditationSessionDatabase? database = null)
     {
+        _database = database;
         _currentDate = DateTime.Now;
         _isDarkTheme = Application.Current?.RequestedTheme == AppTheme.Dark;
         UpdateCachedColors();
@@ -62,6 +66,16 @@ public class CalendarControlViewModel : INotifyPropertyChanged
     public ICommand PreviousMonthCommand { get; }
     public ICommand NextMonthCommand { get; }
     public ICommand DayTappedCommand { get; }
+
+    public bool IsLoadingCalendar
+    {
+        get => _isLoadingCalendar;
+        set
+        {
+            _isLoadingCalendar = value;
+            OnPropertyChanged();
+        }
+    }
 
     public DateTime CurrentDate
     {
@@ -127,8 +141,10 @@ public class CalendarControlViewModel : INotifyPropertyChanged
         await Shell.Current.GoToAsync($"DayDetailPage?date={day.Date:yyyy-MM-dd}");
     }
 
-    private void LoadCalendarDays()
+    private async void LoadCalendarDays()
     {
+        IsLoadingCalendar = true;
+        
         var firstDayOfMonth = new DateTime(_currentDate.Year, _currentDate.Month, 1);
         var startDate = firstDayOfMonth.AddDays(-(int)firstDayOfMonth.DayOfWeek);
         
@@ -147,12 +163,27 @@ public class CalendarControlViewModel : INotifyPropertyChanged
             CalendarDays.RemoveAt(CalendarDays.Count - 1);
         }
 
+        // Get sessions for the month if database is available
+        var sessionsThisMonth = new List<MeditationApp.Models.MeditationSession>();
+        if (_database != null)
+        {
+            try
+            {
+                sessionsThisMonth = await _database.GetSessionsForMonthAsync(_currentDate.Year, _currentDate.Month);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading sessions for calendar: {ex.Message}");
+            }
+        }
+
         // Update existing items in place with notifications enabled
         for (int i = 0; i < totalDays; i++)
         {
             var date = startDate.AddDays(i);
             var isCurrentMonth = date.Month == _currentDate.Month;
             var isToday = date.Date == DateTime.Today;
+            var hasSession = sessionsThisMonth.Any(s => s.Timestamp.Date == date.Date);
             var dayModel = CalendarDays[i];
 
             dayModel.UpdateDay(
@@ -161,9 +192,12 @@ public class CalendarControlViewModel : INotifyPropertyChanged
                 isCurrentMonth, 
                 isToday,
                 GetTextColor(isCurrentMonth, isToday),
-                isToday ? Microsoft.Maui.Controls.FontAttributes.Bold : Microsoft.Maui.Controls.FontAttributes.None
+                isToday ? Microsoft.Maui.Controls.FontAttributes.Bold : Microsoft.Maui.Controls.FontAttributes.None,
+                hasSession
             );
         }
+        
+        IsLoadingCalendar = false;
     }
 
     private Color GetTextColor(bool isCurrentMonth, bool isToday)
@@ -194,6 +228,7 @@ public class CalendarDayModel : INotifyPropertyChanged
     private bool _isToday;
     private Color _textColor = Colors.Black;
     private Microsoft.Maui.Controls.FontAttributes _fontWeight;
+    private bool _hasSession;
 
     public DateTime Date 
     { 
@@ -237,7 +272,13 @@ public class CalendarDayModel : INotifyPropertyChanged
         set => SetProperty(ref _isSelected, value);
     }
 
-    public void UpdateDay(DateTime date, string day, bool isCurrentMonth, bool isToday, Color textColor, Microsoft.Maui.Controls.FontAttributes fontWeight)
+    public bool HasSession
+    {
+        get => _hasSession;
+        set => SetProperty(ref _hasSession, value);
+    }
+
+    public void UpdateDay(DateTime date, string day, bool isCurrentMonth, bool isToday, Color textColor, Microsoft.Maui.Controls.FontAttributes fontWeight, bool hasSession = false)
     {
         // Update all properties using the SetProperty method which handles notifications
         Date = date;
@@ -246,6 +287,7 @@ public class CalendarDayModel : INotifyPropertyChanged
         IsToday = isToday;
         TextColor = textColor;
         FontWeight = fontWeight;
+        HasSession = hasSession;
         IsSelected = false; // Reset selection when updating
     }
 

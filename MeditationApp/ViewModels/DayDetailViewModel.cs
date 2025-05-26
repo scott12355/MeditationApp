@@ -2,16 +2,21 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using MeditationApp.Services;
+using MeditationApp.Models;
 
 namespace MeditationApp.ViewModels;
 
 public class DayDetailViewModel : INotifyPropertyChanged
 {
     private DateTime _selectedDate;
+    private readonly MeditationSessionDatabase _database;
+    private bool _isLoading;
 
-    public DayDetailViewModel(DateTime selectedDate)
+    public DayDetailViewModel(DateTime selectedDate, MeditationSessionDatabase database)
     {
         _selectedDate = selectedDate;
+        _database = database;
         AddSessionCommand = new Command(OnAddSession);
         LoadDayData();
     }
@@ -36,55 +41,58 @@ public class DayDetailViewModel : INotifyPropertyChanged
     public int SessionCount { get; private set; }
     public string DayNotes { get; private set; } = string.Empty;
 
+    public bool IsLoading
+    {
+        get => _isLoading;
+        set
+        {
+            _isLoading = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ICommand AddSessionCommand { get; }
 
-    private void LoadDayData()
+    private async void LoadDayData()
     {
-        // TODO: Load actual data from service
-        // For now, using sample data
-        MeditationSessions.Clear();
-
-        // Sample data - replace with actual data loading
-        if (_selectedDate.Date == DateTime.Today)
+        IsLoading = true;
+        try
         {
-            MeditationSessions.Add(new MeditationSessionModel
-            {
-                Type = "Morning Meditation",
-                Time = new TimeSpan(7, 30, 0),
-                Duration = 15,
-                Status = "Completed"
-            });
+            MeditationSessions.Clear();
             
-            MeditationSessions.Add(new MeditationSessionModel
-            {
-                Type = "Lunch Break Mindfulness",
-                Time = new TimeSpan(12, 15, 0),
-                Duration = 10,
-                Status = "Completed"
-            });
+            // Add a small delay to show loading state (remove in production if not needed)
+            await Task.Delay(400);
+            
+            var sessionsForDate = await _database.GetSessionsForDateAsync(_selectedDate);
 
-            DayNotes = "Felt very centered today. Morning session was particularly peaceful.";
+            foreach (var session in sessionsForDate)
+            {
+                MeditationSessions.Add(new MeditationSessionModel
+                {
+                    Type = !string.IsNullOrEmpty(session.AudioPath) ? Path.GetFileNameWithoutExtension(session.AudioPath) : "Meditation",
+                    Time = session.Timestamp.TimeOfDay,
+                    Duration = 15, // Default duration since it's not in the database model
+                    Status = session.Status == "completed" ? "Completed" : "Incomplete"
+                });
+            }
+
+            // Calculate totals
+            TotalMeditationTime = MeditationSessions.Sum(s => s.Duration);
+            SessionCount = MeditationSessions.Count;
+            DayNotes = ""; // You could add notes to the database model if needed
+
+            OnPropertyChanged(nameof(TotalMeditationTime));
+            OnPropertyChanged(nameof(SessionCount));
+            OnPropertyChanged(nameof(DayNotes));
         }
-        else if (_selectedDate.Date == DateTime.Today.AddDays(-1))
+        catch (Exception ex)
         {
-            MeditationSessions.Add(new MeditationSessionModel
-            {
-                Type = "Evening Relaxation",
-                Time = new TimeSpan(20, 0, 0),
-                Duration = 20,
-                Status = "Completed"
-            });
-
-            DayNotes = "Had a stressful day, evening meditation helped me unwind.";
+            System.Diagnostics.Debug.WriteLine($"Error loading day data: {ex.Message}");
         }
-
-        // Calculate totals
-        TotalMeditationTime = MeditationSessions.Sum(s => s.Duration);
-        SessionCount = MeditationSessions.Count;
-
-        OnPropertyChanged(nameof(TotalMeditationTime));
-        OnPropertyChanged(nameof(SessionCount));
-        OnPropertyChanged(nameof(DayNotes));
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     private async void OnAddSession()

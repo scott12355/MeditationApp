@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MeditationApp.Controls.SkeletonView"
+             x:Name="SkeletonRoot">
+
+    <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray700}}"
+           CornerRadius="{Binding Source={x:Reference SkeletonRoot}, Path=CornerRadius}"
+           HeightRequest="{Binding Source={x:Reference SkeletonRoot}, Path=HeightRequest}"
+           IsVisible="{Binding Source={x:Reference SkeletonRoot}, Path=IsLoading}"
+           HasShadow="False"
+           Padding="0">
+    </Frame>
+
+</ContentView>

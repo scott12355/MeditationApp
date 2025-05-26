@@ -31,7 +31,68 @@
                                  Spacing="20">
 
                 <!-- Calendar Control -->
-                <controls:CalendarView HeightRequest="400"/>
+                <ContentView x:Name="CalendarPlaceholder"
+                        HeightRequest="400"/>
+
+                <!-- Today's Sessions -->
+                <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
+                       CornerRadius="15"
+                       Padding="20">
+                    <VerticalStackLayout Spacing="15">
+                        <Label Text="Today's Sessions"
+                               Style="{StaticResource SubHeadline}"/>
+
+                        <!-- Skeleton loading for sessions -->
+                        <VerticalStackLayout IsVisible="{Binding IsLoading}"
+                                             Spacing="10">
+                            <controls:SkeletonView IsLoading="{Binding IsLoading}"
+                                                   HeightRequest="60"
+                                                   CornerRadius="8"/>
+                            <controls:SkeletonView IsLoading="{Binding IsLoading}"
+                                                   HeightRequest="60"
+                                                   CornerRadius="8"/>
+                        </VerticalStackLayout>
+
+                        <!-- Sessions List -->
+                        <CollectionView ItemsSource="{Binding Sessions}"
+                                        BackgroundColor="Transparent"
+                                        MaximumHeightRequest="200"
+                                        IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          Padding="0,5"
+                                          BackgroundColor="Transparent">
+                                        <VerticalStackLayout Grid.Column="0"
+                                                             Spacing="2">
+                                            <Label Text="{Binding Type}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"/>
+                                            <Label Text="{Binding Date, StringFormat='At {0:HH:mm}'}"
+                                                   FontSize="14"
+                                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="1"
+                                               Text="{Binding CompletedText}"
+                                               FontSize="14"
+                                               TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
+                                               VerticalOptions="Center"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+
+                            <CollectionView.EmptyView>
+                                <ContentView>
+                                    <Label Text="No meditation sessions for today"
+                                           FontSize="16"
+                                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
+                                           HorizontalOptions="Center"
+                                           Margin="0,20"/>
+                                </ContentView>
+                            </CollectionView.EmptyView>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Frame>
 
                 <!-- Quick Stats -->
                 <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
@@ -41,8 +102,42 @@
                         <Label Text="This Month"
                                Style="{StaticResource SubHeadline}"/>
 
+                        <!-- Skeleton loading for stats -->
                         <Grid ColumnDefinitions="*,*"
-                              ColumnSpacing="15">
+                              ColumnSpacing="15"
+                              IsVisible="{Binding IsLoadingStats}">
+                            <Frame Grid.Column="0"
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
+                                   CornerRadius="10"
+                                   Padding="15">
+                                <VerticalStackLayout Spacing="5">
+                                    <controls:SkeletonView IsLoading="{Binding IsLoadingStats}"
+                                                           HeightRequest="16"
+                                                           CornerRadius="4"/>
+                                    <controls:SkeletonView IsLoading="{Binding IsLoadingStats}"
+                                                           HeightRequest="24"
+                                                           CornerRadius="4"/>
+                                </VerticalStackLayout>
+                            </Frame>
+
+                            <Frame Grid.Column="1"
+                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
+                                   CornerRadius="10"
+                                   Padding="15">
+                                <VerticalStackLayout Spacing="5">
+                                    <controls:SkeletonView IsLoading="{Binding IsLoadingStats}"
+                                                           HeightRequest="16"
+                                                           CornerRadius="4"/>
+                                    <controls:SkeletonView IsLoading="{Binding IsLoadingStats}"
+                                                           HeightRequest="24"
+                                                           CornerRadius="4"/>
+                                </VerticalStackLayout>
+                            </Frame>
+                        </Grid>
+
+                        <Grid ColumnDefinitions="*,*"
+                              ColumnSpacing="15"
+                              IsVisible="{Binding IsLoadingStats, Converter={StaticResource InverseBoolConverter}}">
                             <Frame Grid.Column="0"
                                    BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
                                    CornerRadius="10"
@@ -51,7 +146,7 @@
                                     <Label Text="Total Sessions"
                                            FontSize="14"
                                            TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
-                                    <Label Text="12"
+                                    <Label Text="{Binding TotalSessions}"
                                            FontSize="24"
                                            FontAttributes="Bold"
                                            TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
@@ -66,7 +161,7 @@
                                     <Label Text="Total Time"
                                            FontSize="14"
                                            TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
-                                    <Label Text="240 min"
+                                    <Label Text="{Binding TotalMinutes, StringFormat='{0} min'}"
                                            FontSize="24"
                                            FontAttributes="Bold"
                                            TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>

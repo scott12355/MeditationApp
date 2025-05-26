@@ -14,6 +14,7 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <converters:EqualityToColorConverter x:Key="EqualityToColorConverter"/>
+            <converters:IntToBoolConverter x:Key="IntToBoolConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

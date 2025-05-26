@@ -1,12 +1,13 @@
 using MeditationApp.ViewModels;
+using MeditationApp.Services;
 
 namespace MeditationApp.Controls;
 
 public partial class CalendarView : ContentView
 {
-    public CalendarView()
+    public CalendarView(MeditationSessionDatabase? database = null)
     {
         InitializeComponent();
-        BindingContext = new CalendarControlViewModel();
+        BindingContext = new CalendarControlViewModel(database);
     }
 }

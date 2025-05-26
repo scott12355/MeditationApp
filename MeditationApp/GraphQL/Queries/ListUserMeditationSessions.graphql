@@ -1,0 +1,10 @@
+# ListUserMeditationSessions GraphQL Query
+query ListUserMeditationSessions($userID: ID!) {
+    listUserMeditationSessions(userID: $userID) {
+        sessionID
+        userID
+        timestamp
+        audioPath
+        status
+    }
+}

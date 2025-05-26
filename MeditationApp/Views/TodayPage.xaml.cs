@@ -4,10 +4,10 @@ namespace MeditationApp.Views;
 
 public partial class TodayPage : ContentPage
 {
-    public TodayPage()
+    public TodayPage(TodayViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = new TodayViewModel();
+        BindingContext = viewModel;
     }
 
 
