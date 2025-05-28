@@ -1,0 +1,6 @@
+# GetMeditationSessionPresignedUrl GraphQL Query
+query GetMeditationSessionPresignedUrl($sessionID: ID!) {
+    getMeditationSessionPresignedUrl(sessionID: $sessionID) {
+        presignedUrl
+    }
+}

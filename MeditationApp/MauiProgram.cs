@@ -6,6 +6,7 @@ using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using MeditationApp.Models;
+using CommunityToolkit.Maui;
 #if IOS
 using Microsoft.Maui.Handlers;
 #endif
@@ -24,6 +25,8 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .UseMauiCommunityToolkitMediaElement()
+            .UseMauiCommunityToolkit()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -83,6 +86,16 @@ public static class MauiProgram
             var cognitoAuthService = provider.GetRequiredService<CognitoAuthService>();
             return new GraphQLService(httpClient, cognitoAuthService);
         });
+
+        // Register AudioService
+        builder.Services.AddSingleton<IAudioService, AudioService>(provider =>
+        {
+            var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
+            var httpClient = httpClientFactory.CreateClient();
+            var graphQLService = provider.GetRequiredService<GraphQLService>();
+            return new AudioService(httpClient, graphQLService);
+        });
+
         builder.Services.AddTransient<ViewModels.TodayViewModel>();
 
         // Register views

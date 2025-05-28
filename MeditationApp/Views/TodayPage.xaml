@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:MeditationApp.Controls"
              xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="MeditationApp.Views.TodayPage"
              Shell.NavBarIsVisible="False">
 
@@ -20,6 +21,8 @@
             <!-- Warm peach, grounding -->
         </LinearGradientBrush>
     </ContentPage.Background>
+
+
 
     <Grid>
         <!-- Decorative abstract shapes for modern look -->
@@ -103,6 +106,8 @@
                     <!--        HorizontalOptions="Center"/> -->
                 </VerticalStackLayout>
 
+                
+                
                 <!-- Mood Selector -->
                 <VerticalStackLayout Spacing="10"
                                      Padding="0,20,0,0">
@@ -428,11 +433,10 @@
                                HorizontalOptions="Center"
                                TextColor="Black"/>
 
-                        <Frame Padding="24"
-                               BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
-                               BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
-                               CornerRadius="16"
-                               HasShadow="False">
+                        <Border Padding="24"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                                Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
+                                StrokeShape="RoundRectangle 16,16,16,16">
                             <VerticalStackLayout Spacing="15">
                                 <Label Text="{Binding TodaySession.Timestamp, StringFormat='Created at {0:HH:mm}'}"
                                        FontSize="14"
@@ -444,17 +448,72 @@
                                        FontAttributes="Bold"
                                        HorizontalOptions="Center"/>
 
-                                <Button Text="▶ Play Session"
-                                        Command="{Binding PlayTodaySessionCommand}"
-                                        Style="{StaticResource ButtonOutline}"
-                                        BackgroundColor="#5B7FFF"
-                                        TextColor="White"
-                                        HeightRequest="50"
-                                        CornerRadius="25"
-                                        FontSize="16"/>
+                                <!-- Downloading Indicator - Only shown while downloading -->
+                                <VerticalStackLayout Spacing="10"
+                                                     IsVisible="{Binding IsDownloading}">
+                                    <ActivityIndicator IsRunning="True"
+                                                       Color="#5B7FFF"
+                                                       HorizontalOptions="Center"/>
+                                    <Label Text="{Binding DownloadStatus}"
+                                           FontSize="14"
+                                           HorizontalOptions="Center"
+                                           TextColor="Gray"/>
+                                </VerticalStackLayout>
+
+                                <!-- Audio Player Section -->
+                                <VerticalStackLayout Spacing="15"
+                                                     IsVisible="{Binding TodaySession.IsDownloaded}">
+                                    <!-- MediaElement for audio playback -->
+                                    <toolkit:MediaElement x:Name="AudioPlayer"
+                                                          Source="{Binding TodaySession.LocalAudioPath}"
+                                                          ShouldAutoPlay="False"
+                                                          ShouldShowPlaybackControls="False"
+                                                          ShouldKeepScreenOn="True"
+                                                          ShouldMute="False"
+                                                          HeightRequest="1"
+                                                          WidthRequest="1"
+                                                          Opacity="0"/>
+
+                                    <!-- Playback Controls -->
+                                    <HorizontalStackLayout HorizontalOptions="Center"
+                                                           Spacing="20">
+                                        <Button Text="{Binding PlayPauseIcon}"
+                                                Command="{Binding TogglePlaybackCommand}"
+                                                BackgroundColor="#5B7FFF"
+                                                TextColor="White"
+                                                WidthRequest="60"
+                                                HeightRequest="60"
+                                                CornerRadius="30"
+                                                FontSize="20"/>
+                                    </HorizontalStackLayout>
+
+                                    <!-- Progress Display -->
+                                    <VerticalStackLayout Spacing="5">
+                                        <ProgressBar Progress="{Binding PlaybackProgress}"
+                                                     ProgressColor="#5B7FFF"
+                                                     BackgroundColor="#E0E0E0"
+                                                     MinimumWidthRequest="280"
+                                                     HeightRequest="4"/>
+                                        <HorizontalStackLayout HorizontalOptions="Center"
+                                                               Spacing="10">
+                                            <Label Text="{Binding CurrentPositionText}"
+                                                   FontSize="12"
+                                                   TextColor="Gray"/>
+                                            <Label Text="/"
+                                                   FontSize="12"
+                                                   TextColor="Gray"/>
+                                            <Label Text="{Binding TotalDurationText}"
+                                                   FontSize="12"
+                                                   TextColor="Gray"/>
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </VerticalStackLayout>
+
+
                             </VerticalStackLayout>
-                        </Frame>
+                        </Border>
                     </VerticalStackLayout>
+
 
                     <!-- If there's no session for today -->
                     <VerticalStackLayout Spacing="15"
@@ -465,28 +524,25 @@
                                HorizontalOptions="Center"
                                TextColor="Black"/>
 
-                        <Frame Padding="20"
-                               BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColor}, Dark=#2A2A2A}"
-                               BorderColor="Transparent"
-                               CornerRadius="12"
-                               HasShadow="True">
+                        <Border Padding="20"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColor}, Dark=#2A2A2A}"
+                                StrokeShape="RoundRectangle 12,12,12,12">
                             <VerticalStackLayout Spacing="15">
                                 <Label Text="Notes for your session (optional)"
                                        FontSize="14"
                                        FontAttributes="Bold"/>
 
-                                <Frame BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
-                                       BackgroundColor="{AppThemeBinding Light=#F8F8F8, Dark=#333333}"
-                                       CornerRadius="12"
-                                       HasShadow="False"
-                                       Padding="5">
+                                <Border Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
+                                        BackgroundColor="{AppThemeBinding Light=#F8F8F8, Dark=#333333}"
+                                        StrokeShape="RoundRectangle 12,12,12,12"
+                                        Padding="5">
                                     <Editor Text="{Binding SessionNotes}"
                                             Placeholder="How are you feeling? Any specific focus areas?"
                                             PlaceholderColor="#A0A0A0"
                                             HeightRequest="100"
                                             BackgroundColor="Transparent"
                                             VerticalOptions="Start"/>
-                                </Frame>
+                                </Border>
 
                                 <Button Text="Create Today's Meditation"
                                         Command="{Binding RequestNewSessionCommand}"
@@ -497,11 +553,10 @@
                                         CornerRadius="25"
                                         FontSize="16"/>
                             </VerticalStackLayout>
-                        </Frame>
+                        </Border>
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
-
             </VerticalStackLayout>
         </ScrollView>
     </Grid>

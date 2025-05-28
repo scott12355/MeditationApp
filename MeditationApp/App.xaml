@@ -13,6 +13,7 @@
                 <ResourceDictionary Source="Resources/Styles/CustomControls.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <converters:BoolToPlayPauseConverter x:Key="BoolToPlayPauseConverter"/>
             <converters:EqualityToColorConverter x:Key="EqualityToColorConverter"/>
             <converters:IntToBoolConverter x:Key="IntToBoolConverter"/>
         </ResourceDictionary>

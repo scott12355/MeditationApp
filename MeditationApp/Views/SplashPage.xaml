@@ -61,12 +61,12 @@
                      <Label Text="Meditation App"
                             FontSize="28"
                             FontAttributes="Bold"
-                            TextColor="White"
+                            TextColor="{StaticResource Primary}"
                             HorizontalOptions="Center"/>
 
                      <!-- Loading Indicator -->
                      <ActivityIndicator IsRunning="True"
-                                        Color="White"
+                                        Color="{StaticResource Primary}"
                                         VerticalOptions="Center"
                                         HorizontalOptions="Center"
                                         Scale="1.2"/>
@@ -75,7 +75,7 @@
                      <Label x:Name="LoadingLabel"
                             Text="Loading..."
                             FontSize="16"
-                            TextColor="White"
+                            TextColor="{StaticResource Primary}"
                             Opacity="0.8"
                             HorizontalOptions="Center"/>
               </StackLayout>

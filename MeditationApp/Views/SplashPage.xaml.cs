@@ -1,4 +1,5 @@
 using MeditationApp.Services;
+using MeditationApp.ViewModels;
 
 namespace MeditationApp.Views;
 
@@ -6,83 +7,83 @@ public partial class SplashPage : ContentPage
 {
     private readonly HybridAuthService _hybridAuthService;
     private readonly PreloadService _preloadService;
+    private readonly TodayViewModel _todayViewModel;
     private bool _hasNavigated = false;
 
-    public SplashPage(HybridAuthService hybridAuthService, PreloadService preloadService)
+    public SplashPage(HybridAuthService hybridAuthService, PreloadService preloadService, TodayViewModel todayViewModel)
     {
         InitializeComponent();
         _hybridAuthService = hybridAuthService;
         _preloadService = preloadService;
+        _todayViewModel = todayViewModel;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        if (_hasNavigated) return;
 
-        if (_hasNavigated)
-            return;
-
-        // Animate the splash content appearing
         await SplashContent.FadeTo(1, 500, Easing.CubicOut);
-
         await CheckAuthenticationAndNavigate();
     }
 
     private async Task CheckAuthenticationAndNavigate()
     {
-        if (_hasNavigated)
-            return;
+        if (_hasNavigated) return;
 
         try
         {
+            // Quick auth check
             LoadingLabel.Text = "Checking authentication...";
-
-            // First do a quick check to see if we can immediately proceed
-            bool quickAuthResult = await _hybridAuthService.QuickAuthCheckAsync();
-            
-            if (quickAuthResult)
+            if (!await _hybridAuthService.QuickAuthCheckAsync())
             {
-                // Start preloading calendar data in background immediately
-                LoadingLabel.Text = "Loading app data...";
-                System.Diagnostics.Debug.WriteLine("SplashPage: Starting calendar preload...");
-                _ = Task.Run(async () => await _preloadService.PreloadCalendarAsync());
-                
-                // Do a more thorough check in the background if needed
-                LoadingLabel.Text = "Verifying session...";
-                bool isLoggedIn = await _hybridAuthService.IsUserLoggedInAsync();
-                
-                if (isLoggedIn)
-                {
-                    LoadingLabel.Text = "Welcome back!";
-                    await Task.Delay(300); // Brief success message
-                    
-                    System.Diagnostics.Debug.WriteLine("SplashPage: Navigating to MainTabs");
-                    _hasNavigated = true;
-                    // Navigate to main app
-                    await Shell.Current.GoToAsync("//MainTabs");
-                    return;
-                }
+                await NavigateToLogin();
+                return;
             }
 
-            // If we reach here, user needs to log in
-            LoadingLabel.Text = "Please sign in";
+            // Start background tasks
+            LoadingLabel.Text = "Loading app data...";
+            _ = Task.Run(async () => await _preloadService.PreloadCalendarAsync());
+            
+            // Verify login status
+            if (!await _hybridAuthService.IsUserLoggedInAsync())
+            {
+                await NavigateToLogin();
+                return;
+            }
+
+            // Load today's session
+            LoadingLabel.Text = "Loading today's session...";
+            await _todayViewModel.EnsureDataLoaded();
+            
+            // Navigate to main app
+            LoadingLabel.Text = "Welcome back!";
             await Task.Delay(300);
             
-            System.Diagnostics.Debug.WriteLine("SplashPage: Navigating to LoginPage");
             _hasNavigated = true;
-            // Navigate to login
-            await Shell.Current.GoToAsync("//LoginPage");
+            await Shell.Current.GoToAsync("//MainTabs");
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error during splash authentication check: {ex.Message}");
-            LoadingLabel.Text = "Loading error, redirecting...";
-            await Task.Delay(500);
-            
-            System.Diagnostics.Debug.WriteLine("SplashPage: Error occurred, navigating to LoginPage");
-            _hasNavigated = true;
-            // Fallback to login page
-            await Shell.Current.GoToAsync("//LoginPage");
+            await NavigateToLogin("Loading error, redirecting...");
         }
+    }
+
+    private async Task NavigateToLogin(string? message = null)
+    {
+        if (message != null)
+        {
+            LoadingLabel.Text = message;
+            await Task.Delay(500);
+        }
+        else
+        {
+            LoadingLabel.Text = "Please sign in";
+            await Task.Delay(300);
+        }
+        
+        _hasNavigated = true;
+        await Shell.Current.GoToAsync("//LoginPage");
     }
 }
