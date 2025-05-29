@@ -1,0 +1,4 @@
+input SessionInsightsInput {
+    notes: String!
+    mood: Int
+} 

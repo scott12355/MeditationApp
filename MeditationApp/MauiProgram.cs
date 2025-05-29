@@ -96,7 +96,8 @@ public static class MauiProgram
             return new AudioService(httpClient, graphQLService);
         });
 
-        builder.Services.AddTransient<ViewModels.TodayViewModel>();
+        // Register TodayViewModel as singleton so splash screen and TodayPage share the same instance
+        builder.Services.AddSingleton<ViewModels.TodayViewModel>();
 
         // Register views
         builder.Services.AddTransient<Views.SplashPage>();
@@ -113,7 +114,6 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewModels.LoginViewModel>();
         builder.Services.AddTransient<ViewModels.SignUpViewModel>();
         builder.Services.AddTransient<ViewModels.VerificationViewModel>();
-        builder.Services.AddTransient<ViewModels.TodayViewModel>();
         builder.Services.AddTransient<ViewModels.SettingsViewModel>();
         builder.Services.AddTransient<ViewModels.CalendarControlViewModel>();
 
@@ -123,6 +123,9 @@ public static class MauiProgram
 
         // Register CalendarDataService (shared service for calendar data)
         builder.Services.AddSingleton<MeditationApp.Services.CalendarDataService>();
+
+        // Register NotificationService
+        builder.Services.AddSingleton<MeditationApp.Services.NotificationService>();
 
 #if DEBUG
         builder.Logging.AddDebug();

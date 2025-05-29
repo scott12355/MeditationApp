@@ -16,6 +16,27 @@
             <converters:BoolToPlayPauseConverter x:Key="BoolToPlayPauseConverter"/>
             <converters:EqualityToColorConverter x:Key="EqualityToColorConverter"/>
             <converters:IntToBoolConverter x:Key="IntToBoolConverter"/>
+            <converters:StatusToDisplayStringConverter x:Key="StatusToDisplayStringConverter"/>
+            <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
+            <converters:StatusToBackgroundColorConverter x:Key="StatusToBackgroundColorConverter"/>
+            <converters:StatusToTextColorConverter x:Key="StatusToTextColorConverter"/>
+            <converters:StatusToBoolConverter x:Key="StatusToBoolConverter"/>
+            <converters:StringToBoolConverter x:Key="StringToBoolConverter"/>
+            <Color x:Key="Primary">#5B7FFF</Color>
+            <Color x:Key="Secondary">#FF6B6B</Color>
+            <Color x:Key="Tertiary">#4ECDC4</Color>
+            <Color x:Key="White">White</Color>
+            <Color x:Key="Black">Black</Color>
+            <Color x:Key="Gray100">#F1F1F1</Color>
+            <Color x:Key="Gray200">#E0E0E0</Color>
+            <Color x:Key="Gray300">#CCCCCC</Color>
+            <Color x:Key="Gray400">#999999</Color>
+            <Color x:Key="Gray500">#666666</Color>
+            <Color x:Key="Gray600">#444444</Color>
+            <Color x:Key="Gray700">#333333</Color>
+            <Color x:Key="Gray800">#222222</Color>
+            <Color x:Key="Gray900">#111111</Color>
+            <Color x:Key="Error">#FF4444</Color>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

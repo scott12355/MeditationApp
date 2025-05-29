@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using MeditationApp.Services;
 using MeditationApp.Models;
+using Microsoft.Maui.Controls;
 
 namespace MeditationApp.ViewModels;
 
@@ -72,7 +73,8 @@ public class DayDetailViewModel : INotifyPropertyChanged
                     Type = !string.IsNullOrEmpty(session.AudioPath) ? Path.GetFileNameWithoutExtension(session.AudioPath) : "Meditation",
                     Time = session.Timestamp.TimeOfDay,
                     Duration = 15, // Default duration since it's not in the database model
-                    Status = session.Status == "completed" ? "Completed" : "Incomplete"
+                    Status = session.Status,
+                    StatusText = session.Status.ToDisplayString()
                 });
             }
 
@@ -116,5 +118,6 @@ public class MeditationSessionModel
     public string Type { get; set; } = string.Empty;
     public TimeSpan Time { get; set; }
     public int Duration { get; set; }
-    public string Status { get; set; } = string.Empty;
+    public MeditationSessionStatus Status { get; set; }
+    public string StatusText { get; set; } = string.Empty;
 }

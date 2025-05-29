@@ -1,0 +1,9 @@
+# AddUserDailyInsights GraphQL Mutation
+mutation AddUserDailyInsights($UserDailyInsightsInput: UserDailyInsightsInput!) {
+    addUserDailyInsights(UserDailyInsightsInput: $UserDailyInsightsInput) {
+        userID
+        date
+        notes
+        mood
+    }
+} 

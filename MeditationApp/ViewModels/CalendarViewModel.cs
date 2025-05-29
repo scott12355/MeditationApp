@@ -133,7 +133,7 @@ public class CalendarViewModel : INotifyPropertyChanged
                     Date = session.Timestamp,
                     Duration = TimeSpan.FromMinutes(15), // Default duration since it's not in the model
                     Type = !string.IsNullOrEmpty(session.AudioPath) ? Path.GetFileNameWithoutExtension(session.AudioPath) : "Meditation",
-                    Completed = session.Status == "completed"
+                    Completed = session.Status == MeditationSessionStatus.COMPLETED
                 });
             }
         }

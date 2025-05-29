@@ -1,0 +1,9 @@
+mutation CreateMeditationSession($userID: ID!) {
+    createMeditationSession(userID: $userID) {
+        sessionID
+        userID
+        timestamp
+        audioPath
+        status
+    }
+} 

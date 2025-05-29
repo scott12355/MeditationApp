@@ -8,12 +8,14 @@ namespace MeditationApp.ViewModels;
 public class SettingsViewModel : INotifyPropertyChanged
 {
     private readonly HybridAuthService _hybridAuthService;
+    private readonly NotificationService _notificationService;
     
     private string _userName = "John Doe";
     private string _email = "john.doe@example.com";
     private bool _notificationsEnabled = true;
     private TimeSpan _reminderTime = new TimeSpan(8, 0, 0);
     private int _defaultSessionDuration = 10;
+    private bool _isNotificationPermissionGranted = false;
 
     public string UserName
     {
@@ -65,12 +67,23 @@ public class SettingsViewModel : INotifyPropertyChanged
         }
     }
 
+    public bool IsNotificationPermissionGranted
+    {
+        get => _isNotificationPermissionGranted;
+        private set
+        {
+            _isNotificationPermissionGranted = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ICommand SaveSettingsCommand { get; }
     public ICommand LogoutCommand { get; }
 
-    public SettingsViewModel(HybridAuthService hybridAuthService)
+    public SettingsViewModel(HybridAuthService hybridAuthService, NotificationService notificationService)
     {
         _hybridAuthService = hybridAuthService;
+        _notificationService = notificationService;
         SaveSettingsCommand = new Command(OnSaveSettings);
         LogoutCommand = new Command(OnLogout);
         LoadUserData();
@@ -78,9 +91,25 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     private async void OnSaveSettings()
     {
-        // TODO: Save settings to service
-        if (Application.Current?.MainPage != null)
-            await Application.Current.MainPage.DisplayAlert("Settings", "Settings saved successfully!", "OK");
+        if (NotificationsEnabled)
+        {
+            // Schedule the notification
+            await _notificationService.ScheduleDailyNotification(ReminderTime);
+        }
+        else
+        {
+            // Cancel all notifications if disabled
+            await _notificationService.CancelAllNotifications();
+        }
+
+        // Show confirmation
+        if (Application.Current?.Windows?.FirstOrDefault()?.Page != null)
+        {
+            await Application.Current.Windows.First().Page.DisplayAlert(
+                "Settings Saved",
+                "Your notification preferences have been updated.",
+                "OK");
+        }
     }
 
     private async void OnLogout()

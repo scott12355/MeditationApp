@@ -1,0 +1,9 @@
+# ListUserDailyInsights GraphQL Query
+query ListUserDailyInsights($userID: ID!) {
+    listUserDailyInsights(userID: $userID) {
+        userID
+        date
+        notes
+        mood
+    }
+} 

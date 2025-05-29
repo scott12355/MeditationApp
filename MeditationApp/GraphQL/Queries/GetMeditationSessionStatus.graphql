@@ -1,0 +1,7 @@
+# GetMeditationSessionStatus GraphQL Query
+query GetMeditationSessionStatus($sessionID: ID!) {
+    getMeditationSessionStatus(sessionID: $sessionID) {
+        status
+        errorMessage
+    }
+} 

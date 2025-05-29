@@ -5,10 +5,10 @@ namespace MeditationApp.Views;
 
 public partial class SettingsPage : ContentPage
 {
-    public SettingsPage(HybridAuthService hybridAuthService)
+    public SettingsPage(SettingsViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = new SettingsViewModel(hybridAuthService);
+        BindingContext = viewModel;
     }
 
     private async void OnViewProfileClicked(object sender, EventArgs e)

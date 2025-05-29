@@ -1,26 +1,20 @@
-using System;
 using System.Globalization;
-using Microsoft.Maui.Controls;
 
 namespace MeditationApp.Converters;
 
-public class InverseBoolConverter : IValueConverter
+public class StringToBoolConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is bool boolValue)
+        if (value is string str)
         {
-            return !boolValue;
+            return !string.IsNullOrEmpty(str);
         }
         return false;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is bool boolValue)
-        {
-            return !boolValue;
-        }
-        return false;
+        throw new NotImplementedException();
     }
-}
+} 

@@ -33,6 +33,9 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
+		<string>remote-notification</string>
 	</array>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>We need to send you notifications to remind you about your daily meditation practice.</string>
 </dict>
 </plist>

@@ -46,6 +46,19 @@
                                TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}"/>
                         <TimePicker Time="{Binding ReminderTime}"
                                     FontSize="16"/>
+                        
+                        <!-- Notification Permission Status -->
+                        <Label Text="{Binding IsNotificationPermissionGranted, StringFormat='Notification Permission: {0}'}"
+                               FontSize="14"
+                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}"
+                               IsVisible="{Binding NotificationsEnabled}"/>
+                        
+                        <!-- Save Button -->
+                        <Button Text="Save Notification Settings"
+                                Command="{Binding SaveSettingsCommand}"
+                                Margin="0,10,0,0"
+                                BackgroundColor="{StaticResource Primary}"
+                                TextColor="White"/>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </Frame>

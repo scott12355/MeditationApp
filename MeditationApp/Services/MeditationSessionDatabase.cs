@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.IO;
+using MeditationApp.Models;
 
 namespace MeditationApp.Services
 {
@@ -19,6 +20,7 @@ namespace MeditationApp.Services
         {
             _database = new SQLiteAsyncConnection(dbPath);
             _database.CreateTableAsync<Models.MeditationSession>().Wait();
+            _database.CreateTableAsync<Models.UserDailyInsights>().Wait();
         }
 
         public Task<List<Models.MeditationSession>> GetSessionsAsync()
@@ -53,6 +55,7 @@ namespace MeditationApp.Services
             var endDate = startDate.AddDays(1);
             var sessions = await _database.Table<Models.MeditationSession>()
                 .Where(s => s.Timestamp >= startDate && s.Timestamp < endDate)
+                .Where(s => s.Status == MeditationSessionStatus.COMPLETED)
                 .ToListAsync();
             
             System.Diagnostics.Debug.WriteLine($"Database: Loaded {sessions.Count} sessions for date {cacheKey} from database");
@@ -90,6 +93,7 @@ namespace MeditationApp.Services
             var endDate = startDate.AddMonths(1);
             var sessions = await _database.Table<Models.MeditationSession>()
                 .Where(s => s.Timestamp >= startDate && s.Timestamp < endDate)
+                .Where(s => s.Status == MeditationSessionStatus.COMPLETED)
                 .ToListAsync();
             
             System.Diagnostics.Debug.WriteLine($"Database: Loaded {sessions.Count} sessions for month {cacheKey} from database");
@@ -155,39 +159,39 @@ namespace MeditationApp.Services
             if (existingSessions.Any()) return;
 
             // Add some sample sessions
-            var sampleSessions = new List<Models.MeditationSession>
+            var sampleSessions = new List<MeditationSession>
             {
-                new Models.MeditationSession
+                new MeditationSession
                 {
                     Uuid = Guid.NewGuid().ToString(),
                     UserID = "sample_user",
                     Timestamp = DateTime.Today.AddHours(7).AddMinutes(30),
                     AudioPath = "morning_meditation.mp3",
-                    Status = "completed"
+                    Status = MeditationSessionStatus.COMPLETED
                 },
-                new Models.MeditationSession
+                new MeditationSession
                 {
                     Uuid = Guid.NewGuid().ToString(),
                     UserID = "sample_user",
                     Timestamp = DateTime.Today.AddHours(12).AddMinutes(15),
                     AudioPath = "mindfulness_break.mp3",
-                    Status = "completed"
+                    Status = MeditationSessionStatus.COMPLETED
                 },
-                new Models.MeditationSession
+                new MeditationSession
                 {
                     Uuid = Guid.NewGuid().ToString(),
                     UserID = "sample_user",
                     Timestamp = DateTime.Today.AddDays(-1).AddHours(20),
                     AudioPath = "evening_relaxation.mp3",
-                    Status = "completed"
+                    Status = MeditationSessionStatus.COMPLETED
                 },
-                new Models.MeditationSession
+                new MeditationSession
                 {
                     Uuid = Guid.NewGuid().ToString(),
                     UserID = "sample_user",
                     Timestamp = DateTime.Today.AddDays(-2).AddHours(8),
                     AudioPath = "breathing_exercise.mp3",
-                    Status = "completed"
+                    Status = MeditationSessionStatus.COMPLETED
                 }
             };
 
@@ -195,6 +199,48 @@ namespace MeditationApp.Services
             {
                 await SaveSessionAsync(session);
             }
+        }
+
+        // User Daily Insights methods
+        public async Task<Models.UserDailyInsights?> GetDailyInsightsAsync(string userId, DateTime date)
+        {
+            var startOfDay = date.Date;
+            var endOfDay = startOfDay.AddDays(1);
+            
+            return await _database.Table<Models.UserDailyInsights>()
+                .Where(i => i.UserID == userId && i.Date >= startOfDay && i.Date < endOfDay)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<int> SaveDailyInsightsAsync(Models.UserDailyInsights insights)
+        {
+            insights.LastUpdated = DateTime.UtcNow;
+            int result;
+            
+            if (insights.ID != 0)
+                result = await _database.UpdateAsync(insights);
+            else
+                result = await _database.InsertAsync(insights);
+            
+            return result;
+        }
+
+        public async Task<int> DeleteDailyInsightsAsync(Models.UserDailyInsights insights)
+        {
+            return await _database.DeleteAsync(insights);
+        }
+
+        public async Task<List<Models.UserDailyInsights>> GetUnsyncedInsightsAsync()
+        {
+            return await _database.Table<Models.UserDailyInsights>()
+                .Where(i => !i.IsSynced)
+                .ToListAsync();
+        }
+
+        public async Task MarkInsightsAsSyncedAsync(Models.UserDailyInsights insights)
+        {
+            insights.IsSynced = true;
+            await _database.UpdateAsync(insights);
         }
     }
 }

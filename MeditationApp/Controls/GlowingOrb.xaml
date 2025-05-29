@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
+             x:Class="MeditationApp.Controls.GlowingOrb">
+    
+    <Grid>
+        <!-- More layers with warmer tones for a more dynamic glow -->
+
+        <!-- Outer Glow Layer 1 -->
+        <Ellipse WidthRequest="250"
+                 HeightRequest="250"
+                 Fill="#10FF8C00"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Opacity="0.5">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="20"
+                                                   FloatRangeY="15"
+                                                   Duration="9000"
+                                                   Delay="500"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <!-- Outer Glow Layer 2 -->
+        <Ellipse WidthRequest="230"
+                 HeightRequest="230"
+                 Fill="#15FF8C00"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Opacity="0.55">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="25"
+                                                   FloatRangeY="20"
+                                                   Duration="10000"
+                                                   Delay="0"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <!-- Middle Glow Layer 1 -->
+        <Ellipse WidthRequest="180"
+                 HeightRequest="180"
+                 Fill="#20FFA500"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Opacity="0.6">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="30"
+                                                   FloatRangeY="25"
+                                                   Duration="11000"
+                                                   Delay="1500"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <!-- Middle Glow Layer 2 -->
+        <Ellipse WidthRequest="160"
+                 HeightRequest="160"
+                 Fill="#25FFA500"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Opacity="0.65">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="35"
+                                                   FloatRangeY="30"
+                                                   Duration="12000"
+                                                   Delay="1000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <!-- Inner Glow Layer 1 -->
+        <Ellipse WidthRequest="120"
+                 HeightRequest="120"
+                 Fill="#30FFFF00"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Opacity="0.7">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="40"
+                                                   FloatRangeY="35"
+                                                   Duration="13000"
+                                                   Delay="2500"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <!-- Inner Glow Layer 2 -->
+        <Ellipse WidthRequest="100"
+                 HeightRequest="100"
+                 Fill="#35FFFF00"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Opacity="0.75">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="45"
+                                                   FloatRangeY="40"
+                                                   Duration="14000"
+                                                   Delay="2000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <!-- Core Orb -->
+        <Ellipse WidthRequest="70"
+                 HeightRequest="70"
+                 Fill="#50FFD700"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Opacity="0.85">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="50"
+                                                   FloatRangeY="45"
+                                                   Duration="15000"
+                                                   Delay="3000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+    </Grid>
+</ContentView> 
