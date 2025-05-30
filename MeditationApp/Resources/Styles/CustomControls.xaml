@@ -26,10 +26,10 @@
                         Value="0.5"/>
         </Style>
 
-        <Style x:Key="ButtonStyle"
+        <Style x:Key="ButtonPrimary"
                TargetType="Button">
                 <Setter Property="BackgroundColor"
-                        Value="#50B948"/>
+                        Value="{StaticResource Primary}"/>
                 <Setter Property="TextColor"
                         Value="White"/>
                 <Setter Property="CornerRadius"
@@ -113,7 +113,7 @@
                 <Setter Property="BorderColor"
                         Value="{StaticResource Gray200}"/>
                 <Setter Property="FocusedBorderColor"
-                        Value="#71BEF1"/>
+                        Value="{StaticResource Primary}"/>
                 <Setter Property="IconColor"
                         Value="{StaticResource Gray400}"/>
                 <Setter Property="Margin"

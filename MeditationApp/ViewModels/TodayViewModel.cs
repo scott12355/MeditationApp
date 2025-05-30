@@ -76,6 +76,9 @@ public partial class TodayViewModel : ObservableObject
     [ObservableProperty]
     private bool _isRequestingSession = false;
 
+    [ObservableProperty]
+    private bool _isMoodSelectorExpanded = false;
+
     private Models.UserDailyInsights? _currentInsights;
 
     public string FormattedDate => CurrentDate.ToString("dddd, MMMM dd, yyyy");
@@ -687,8 +690,15 @@ public partial class TodayViewModel : ObservableObject
         if (int.TryParse(mood, out int moodValue))
         {
             SelectedMood = moodValue;
+            IsMoodSelectorExpanded = false; // Collapse the selector after selection
             await SaveUserDailyInsights();
         }
+    }
+
+    [RelayCommand]
+    private void ToggleMoodSelector()
+    {
+        IsMoodSelectorExpanded = !IsMoodSelectorExpanded;
     }
 
     partial void OnSessionNotesChanged(string value)
@@ -815,7 +825,10 @@ public partial class TodayViewModel : ObservableObject
         }
     }
 
-    private async Task LoadTodayData()
+    /// <summary>
+    /// Loads today's session data and insights, refreshing from server if online
+    /// </summary>
+    public async Task LoadTodayData()
     {
         if (Microsoft.Maui.Networking.Connectivity.NetworkAccess != Microsoft.Maui.Networking.NetworkAccess.Internet)
         {
@@ -1275,6 +1288,9 @@ public partial class TodayViewModel : ObservableObject
         {
             Debug.WriteLine("Logging out user due to expired/invalid refresh token");
             
+            // Clear view model state first
+            await ClearViewModelState();
+            
             // Clear all stored tokens
             Microsoft.Maui.Storage.SecureStorage.Remove("access_token");
             Microsoft.Maui.Storage.SecureStorage.Remove("id_token");
@@ -1296,17 +1312,65 @@ public partial class TodayViewModel : ObservableObject
                             "Your session has expired. Please log in again.", 
                             "OK");
                     
-                    await Shell.Current.GoToAsync("///LoginPage");
+                    // Clear the navigation stack and navigate to login
+                    await Shell.Current.GoToAsync("LoginPage", animate: true);
                 }
                 catch (Exception navEx)
                 {
                     Debug.WriteLine($"Navigation error during logout: {navEx.Message}");
+                    // Try alternative navigation if first attempt fails
+                    try
+                    {
+                        await Shell.Current.GoToAsync("SignUpPage", animate: true);
+                    }
+                    catch (Exception fallbackEx)
+                    {
+                        Debug.WriteLine($"Fallback navigation also failed: {fallbackEx.Message}");
+                    }
                 }
             });
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error during logout: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Clears all state in the view model
+    /// </summary>
+    public async Task ClearViewModelState()
+    {
+        try
+        {
+            // Stop any playing audio
+            if (IsPlaying)
+            {
+                await StopAudio();
+            }
+
+            // Clear all properties
+            CurrentDate = DateTime.Now;
+            SelectedMood = null;
+            SessionNotes = string.Empty;
+            HasExistingInsights = false;
+            InsightsDate = DateTime.MinValue;
+            _currentInsights = null;
+            _refreshAttemptCount = 0;
+            _lastRefreshAttempt = DateTime.MinValue;
+            IsSyncingInsights = false;
+            IsLoading = false;
+            IsPlaying = false;
+            PlayPauseIcon = "▶";
+            
+            // Clear any cached data
+            _sessionDatabase.ClearCache();
+            
+            Debug.WriteLine("TodayViewModel state cleared successfully");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error clearing TodayViewModel state: {ex.Message}");
         }
     }
 
@@ -1572,7 +1636,8 @@ public partial class TodayViewModel : ObservableObject
         {
             "COMPLETED" => MeditationSessionStatus.COMPLETED,
             "FAILED" => MeditationSessionStatus.FAILED,
-            "REQUESTED" => MeditationSessionStatus.REQUESTED, 
+            "REQUESTED" => MeditationSessionStatus.REQUESTED,
+            _ => MeditationSessionStatus.REQUESTED // Default case for any unhandled values
         };
     }
 
@@ -1721,6 +1786,30 @@ public partial class TodayViewModel : ObservableObject
         catch (Exception ex)
         {
             Debug.WriteLine($"[SyncInsights] Error syncing insights: {ex.Message}\nStack trace: {ex.StackTrace}");
+        }
+    }
+
+    private async Task StopAudio()
+    {
+        try
+        {
+            if (AudioPlayer != null)
+            {
+                Debug.WriteLine("Stopping audio playback");
+                if (AudioPlayer.CurrentState == MediaElementState.Playing)
+                {
+                    AudioPlayer.Stop();
+                    IsPlaying = false;
+                    PlaybackPosition = TimeSpan.Zero;
+                    PlaybackProgress = 0;
+                    OnPropertyChanged(nameof(CurrentPositionText));
+                    Debug.WriteLine("Audio playback stopped successfully");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error stopping audio: {ex.Message}");
         }
     }
 }

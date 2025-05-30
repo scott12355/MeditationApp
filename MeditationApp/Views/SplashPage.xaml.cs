@@ -43,7 +43,6 @@ public partial class SplashPage : ContentPage
 
             // Start background tasks
             LoadingLabel.Text = "Loading app data...";
-            _ = Task.Run(async () => await _preloadService.PreloadCalendarAsync());
             
             // Verify login status
             if (!await _hybridAuthService.IsUserLoggedInAsync())

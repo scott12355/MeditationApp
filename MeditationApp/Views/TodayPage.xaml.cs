@@ -12,7 +12,7 @@ namespace MeditationApp.Views;
 public partial class TodayPage : ContentPage
 {
     private TodayViewModel _viewModel;
-    private MediaElement _audioPlayer;
+    private MediaElement? _audioPlayer; // Will be initialized in OnAppearing
     private IDispatcherTimer animationTimer; // Timer for the orb animation
     private Animation textPulseAnimation; // Animation for the text label
 
@@ -21,6 +21,7 @@ public partial class TodayPage : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = viewModel;
+        _audioPlayer = null; // Will be set in OnAppearing
 
         // Set the drawable for the GraphicsViews
         GlowingOrbGraphicsView.Drawable = new GlowingOrbDrawable(Color.FromArgb("#FFA500")); // Orange for Generating
@@ -52,7 +53,7 @@ public partial class TodayPage : ContentPage
         BindingContextChanged += TodayPage_BindingContextChanged;
     }
 
-    private void TodayPage_BindingContextChanged(object sender, EventArgs e)
+    private void TodayPage_BindingContextChanged(object? sender, EventArgs e)
     {
         if (BindingContext is TodayViewModel vm)
         {
@@ -63,7 +64,7 @@ public partial class TodayPage : ContentPage
         }
     }
 
-    private void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void ViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (sender is TodayViewModel vm)
         {
@@ -74,6 +75,12 @@ public partial class TodayPage : ContentPage
                 e.PropertyName == nameof(TodayViewModel.IsPolling))
             {
                  UpdateAnimations(vm.TodaySession?.Status);
+            }
+            
+            // Handle mood selector expansion/collapse animation
+            if (e.PropertyName == nameof(TodayViewModel.IsMoodSelectorExpanded))
+            {
+                _ = AnimateMoodSelector(vm.IsMoodSelectorExpanded);
             }
         }
     }
@@ -106,6 +113,77 @@ public partial class TodayPage : ContentPage
                  GeneratingStatusLabel.AbortAnimation("TextPulseAnimation");
                  GeneratingStatusLabel.Scale = 1.0; // Reset scale
             }
+        }
+    }
+
+    private async Task AnimateMoodSelector(bool isExpanded)
+    {
+        // Ensure the XAML elements exist before animating
+        if (CollapsedMoodFrame == null || ExpandedMoodSelector == null)
+            return;
+
+        // Cancel any ongoing animations to prevent conflicts
+        CollapsedMoodFrame.AbortAnimation("MoodAnimation");
+        ExpandedMoodSelector.AbortAnimation("MoodAnimation");
+            
+        if (isExpanded)
+        {
+            // Make expanded selector visible but invisible for smooth transition
+            ExpandedMoodSelector.IsVisible = true;
+            ExpandedMoodSelector.Opacity = 0;
+            ExpandedMoodSelector.Scale = 0.6; // Start smaller for more dramatic effect
+            ExpandedMoodSelector.TranslationY = -5; // Reduced translation for fixed height container
+            
+            // Collapse animation with spring easing
+            var collapseAnimation = new Animation();
+            collapseAnimation.Add(0, 0.7, new Animation(v => CollapsedMoodFrame.Opacity = v, 1, 0, Easing.CubicOut));
+            collapseAnimation.Add(0, 0.7, new Animation(v => CollapsedMoodFrame.Scale = v, 1, 0.6, Easing.CubicOut));
+            collapseAnimation.Add(0, 0.7, new Animation(v => CollapsedMoodFrame.TranslationY = v, 0, 3, Easing.CubicOut));
+            
+            // Expand animation with spring easing - starts a bit before collapse finishes for overlap
+            collapseAnimation.Add(0.3, 1, new Animation(v => ExpandedMoodSelector.Opacity = v, 0, 1, Easing.SpringOut));
+            collapseAnimation.Add(0.3, 1, new Animation(v => ExpandedMoodSelector.Scale = v, 0.6, 1, Easing.SpringOut));
+            collapseAnimation.Add(0.3, 1, new Animation(v => ExpandedMoodSelector.TranslationY = v, -5, 0, Easing.SpringOut));
+            
+            var tcs = new TaskCompletionSource<bool>();
+            collapseAnimation.Commit(this, "MoodAnimation", 16, 600, 
+                finished: (v, c) => {
+                    CollapsedMoodFrame.IsVisible = false;
+                    tcs.SetResult(true);
+                });
+            
+            await tcs.Task;
+        }
+        else
+        {
+            // Make collapsed frame visible but invisible for smooth transition
+            CollapsedMoodFrame.IsVisible = true;
+            CollapsedMoodFrame.Opacity = 0;
+            CollapsedMoodFrame.Scale = 0.6;
+            CollapsedMoodFrame.TranslationY = 3;
+            
+            // Collapse expanded selector and expand collapsed frame with spring easing
+            var expandAnimation = new Animation();
+            expandAnimation.Add(0, 0.7, new Animation(v => ExpandedMoodSelector.Opacity = v, 1, 0, Easing.CubicOut));
+            expandAnimation.Add(0, 0.7, new Animation(v => ExpandedMoodSelector.Scale = v, 1, 0.6, Easing.CubicOut));
+            expandAnimation.Add(0, 0.7, new Animation(v => ExpandedMoodSelector.TranslationY = v, 0, -5, Easing.CubicOut));
+            
+            // Show collapsed frame with spring effect
+            expandAnimation.Add(0.3, 1, new Animation(v => CollapsedMoodFrame.Opacity = v, 0, 1, Easing.SpringOut));
+            expandAnimation.Add(0.3, 1, new Animation(v => CollapsedMoodFrame.Scale = v, 0.6, 1, Easing.SpringOut));
+            expandAnimation.Add(0.3, 1, new Animation(v => CollapsedMoodFrame.TranslationY = v, 3, 0, Easing.SpringOut));
+            
+            var tcs = new TaskCompletionSource<bool>();
+            expandAnimation.Commit(this, "MoodAnimation", 16, 600,
+                finished: (v, c) => {
+                    ExpandedMoodSelector.IsVisible = false;
+                    // Reset transform properties
+                    ExpandedMoodSelector.TranslationY = 0;
+                    CollapsedMoodFrame.TranslationY = 0;
+                    tcs.SetResult(true);
+                });
+            
+            await tcs.Task;
         }
     }
 

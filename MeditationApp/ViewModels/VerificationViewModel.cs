@@ -37,7 +37,7 @@ public class VerificationViewModel : BindableObject
         _cognitoAuthService = cognitoAuthService;
         VerifyCommand = new Command(async () => await OnVerify());
         ResendCodeCommand = new Command(async () => await OnResendCode());
-        BackToLoginCommand = new Command(async () => await Shell.Current.GoToAsync("///LoginPage"));
+        BackToLoginCommand = new Command(async () => await Shell.Current.GoToAsync("..", animate: true));
     }
 
     private async Task OnVerify()
@@ -77,7 +77,7 @@ public class VerificationViewModel : BindableObject
                         {
                             try
                             {
-                                await Shell.Current.GoToAsync("//MainTabs");
+                                await Shell.Current.GoToAsync("//MainTabs", animate: true);
                                 System.Diagnostics.Debug.WriteLine("Navigation to MainTabs completed successfully");
                             }
                             catch (Exception navEx)
@@ -94,7 +94,7 @@ public class VerificationViewModel : BindableObject
                 }
                 // Fallback: show alert and go to login
                 await Application.Current?.MainPage?.DisplayAlert("Success", "Your account has been verified. You can now login.", "OK");
-                await Shell.Current.GoToAsync("///LoginPage");
+                await Shell.Current.GoToAsync("..", animate: true);
             }
             else
             {

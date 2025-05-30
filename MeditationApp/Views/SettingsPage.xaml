@@ -63,40 +63,11 @@
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Meditation Settings -->
-            <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                   CornerRadius="15"
-                   Padding="20">
-                <VerticalStackLayout Spacing="15">
-                    <Label Text="Meditation Preferences"
-                           Style="{StaticResource SubHeadline}"/>
-
-                    <VerticalStackLayout Spacing="10">
-                        <Label Text="Default Session Duration (minutes)"
-                               FontSize="14"
-                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}"/>
-                        <Stepper Value="{Binding DefaultSessionDuration}"
-                                 Minimum="5"
-                                 Maximum="60"
-                                 Increment="5"/>
-                        <Label Text="{Binding DefaultSessionDuration, StringFormat='{0} minutes'}"
-                               FontSize="16"
-                               HorizontalOptions="Center"
-                               TextColor="{StaticResource Primary}"/>
-                    </VerticalStackLayout>
-                </VerticalStackLayout>
-            </Frame>
-
             <!-- Action Buttons -->
             <VerticalStackLayout Spacing="15"
                                  Margin="0,20,0,0">
                 <Button Text="View Profile"
                         Clicked="OnViewProfileClicked"
-                        Style="{StaticResource ButtonOutline}"
-                        HeightRequest="50"/>
-
-                <Button Text="Save Settings"
-                        Command="{Binding SaveSettingsCommand}"
                         Style="{StaticResource ButtonOutline}"
                         HeightRequest="50"/>
 

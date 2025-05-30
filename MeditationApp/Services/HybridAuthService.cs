@@ -1,4 +1,5 @@
 using MeditationApp.Services;
+using MeditationApp.ViewModels;
 
 namespace MeditationApp.Services;
 
@@ -6,11 +7,19 @@ public class HybridAuthService
 {
     private readonly CognitoAuthService _cognitoService;
     private readonly LocalAuthService _localService;
+    private readonly MeditationSessionDatabase _sessionDatabase;
+    private readonly PreloadService _preloadService;
 
-    public HybridAuthService(CognitoAuthService cognitoService, LocalAuthService localService)
+    public HybridAuthService(
+        CognitoAuthService cognitoService, 
+        LocalAuthService localService,
+        MeditationSessionDatabase sessionDatabase,
+        PreloadService preloadService)
     {
         _cognitoService = cognitoService;
         _localService = localService;
+        _sessionDatabase = sessionDatabase;
+        _preloadService = preloadService;
     }
 
     public async Task<AuthenticationResult> SignInAsync(string username, string password)
@@ -215,7 +224,16 @@ public class HybridAuthService
         SecureStorage.Default.Remove("access_token");
         SecureStorage.Default.Remove("id_token");
         SecureStorage.Default.Remove("refresh_token");
+
+        // Clear local auth data
         await _localService.ClearLocalDataAsync();
+
+        // Clear database data
+        await _sessionDatabase.ClearAllSessionsAsync();
+        _sessionDatabase.ClearCache();
+        
+
+        
     }
 
     public async Task<bool> IsOfflineModeAsync()

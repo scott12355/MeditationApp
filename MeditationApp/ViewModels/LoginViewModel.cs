@@ -97,7 +97,7 @@ public class LoginViewModel : BindableObject
 
     private async Task OnSignUp()
     {
-        await Shell.Current.GoToAsync("SignUpPage");
+        await Shell.Current.GoToAsync("SignUpPage", animate: true);
     }
 
     public void ClearFields()

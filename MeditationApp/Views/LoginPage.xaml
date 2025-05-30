@@ -107,13 +107,8 @@
                 IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                 SemanticProperties.Hint="Logs into your account"
                 HorizontalOptions="Fill"
-                BackgroundColor="#FF71BEF1"
-                TextColor="Black"
-                BorderWidth="0"
-                FontAttributes="Bold"
-                FontSize="20"
                 Margin="0,50,0,0"
-                Style="{StaticResource ButtonStyle}"
+                Style="{StaticResource ButtonPrimary}"
                 />
 
         </VerticalStackLayout>

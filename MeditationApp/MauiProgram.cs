@@ -69,8 +69,15 @@ public static class MauiProgram
         // Register local authentication service
         builder.Services.AddSingleton<LocalAuthService>();
         
-        // Register hybrid authentication service
-        builder.Services.AddSingleton<HybridAuthService>();
+        // Register hybrid authentication service with all dependencies
+        builder.Services.AddSingleton<HybridAuthService>(provider =>
+        {
+            var cognitoService = provider.GetRequiredService<CognitoAuthService>();
+            var localService = provider.GetRequiredService<LocalAuthService>();
+            var sessionDatabase = provider.GetRequiredService<MeditationSessionDatabase>();
+            var preloadService = provider.GetRequiredService<PreloadService>();
+            return new HybridAuthService(cognitoService, localService, sessionDatabase, preloadService);
+        });
 
         // Register preload service
         builder.Services.AddSingleton<PreloadService>();
@@ -115,14 +122,22 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewModels.SignUpViewModel>();
         builder.Services.AddTransient<ViewModels.VerificationViewModel>();
         builder.Services.AddTransient<ViewModels.SettingsViewModel>();
-        builder.Services.AddTransient<ViewModels.CalendarControlViewModel>();
+        builder.Services.AddTransient<ViewModels.SwipeCalendarViewModel>();
+        builder.Services.AddTransient<ViewModels.DayDetailViewModel>(provider =>
+            new ViewModels.DayDetailViewModel(
+                provider.GetRequiredService<MeditationSessionDatabase>(),
+                provider.GetService<CalendarDataService>(),
+                provider.GetService<CognitoAuthService>(),
+                provider.GetRequiredService<IAudioService>()
+            )
+        );
 
         // Register MeditationSessionDatabase
         string dbPath = Path.Combine(FileSystem.AppDataDirectory, "meditation_sessions.db3");
         builder.Services.AddSingleton(new MeditationApp.Services.MeditationSessionDatabase(dbPath));
 
-        // Register CalendarDataService (shared service for calendar data)
-        builder.Services.AddSingleton<MeditationApp.Services.CalendarDataService>();
+        // Register CalendarDataService
+        builder.Services.AddSingleton<CalendarDataService>();
 
         // Register NotificationService
         builder.Services.AddSingleton<MeditationApp.Services.NotificationService>();

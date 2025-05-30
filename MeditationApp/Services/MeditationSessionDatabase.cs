@@ -55,7 +55,6 @@ namespace MeditationApp.Services
             var endDate = startDate.AddDays(1);
             var sessions = await _database.Table<Models.MeditationSession>()
                 .Where(s => s.Timestamp >= startDate && s.Timestamp < endDate)
-                .Where(s => s.Status == MeditationSessionStatus.COMPLETED)
                 .ToListAsync();
             
             System.Diagnostics.Debug.WriteLine($"Database: Loaded {sessions.Count} sessions for date {cacheKey} from database");
@@ -63,6 +62,16 @@ namespace MeditationApp.Services
             // Update cache
             _dailyCache[cacheKey] = (DateTime.Now, new List<Models.MeditationSession>(sessions));
             
+            return sessions;
+        }
+
+        public async Task<List<Models.MeditationSession>> GetAllSessionsForDateAsync(DateTime date)
+        {
+            var startDate = date.Date;
+            var endDate = startDate.AddDays(1);
+            var sessions = await _database.Table<MeditationSession>()
+                .Where(s => s.Timestamp >= startDate && s.Timestamp < endDate)
+                .ToListAsync();
             return sessions;
         }
 
@@ -93,7 +102,6 @@ namespace MeditationApp.Services
             var endDate = startDate.AddMonths(1);
             var sessions = await _database.Table<Models.MeditationSession>()
                 .Where(s => s.Timestamp >= startDate && s.Timestamp < endDate)
-                .Where(s => s.Status == MeditationSessionStatus.COMPLETED)
                 .ToListAsync();
             
             System.Diagnostics.Debug.WriteLine($"Database: Loaded {sessions.Count} sessions for month {cacheKey} from database");
@@ -112,14 +120,22 @@ namespace MeditationApp.Services
         public async Task<int> SaveSessionAsync(Models.MeditationSession session)
         {
             int result;
-            if (session.SessionID != 0)
+            // Check if a session with the same Uuid exists
+            var existing = await _database.Table<Models.MeditationSession>()
+                .Where(s => s.Uuid == session.Uuid)
+                .FirstOrDefaultAsync();
+            if (existing != null)
+            {
+                // Preserve the existing SessionID
+                session.SessionID = existing.SessionID;
                 result = await _database.UpdateAsync(session);
+            }
             else
+            {
                 result = await _database.InsertAsync(session);
-            
+            }
             // Clear cache to ensure fresh data on next load
             ClearCache();
-            
             return result;
         }
 
@@ -241,6 +257,16 @@ namespace MeditationApp.Services
         {
             insights.IsSynced = true;
             await _database.UpdateAsync(insights);
+        }
+
+        public async Task<List<Models.UserDailyInsights>> GetDailyInsightsForMonthAsync(string userId, int year, int month)
+        {
+            var startOfMonth = new DateTime(year, month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1);
+            
+            return await _database.Table<Models.UserDailyInsights>()
+                .Where(i => i.UserID == userId && i.Date >= startOfMonth && i.Date < endOfMonth)
+                .ToListAsync();
         }
     }
 }

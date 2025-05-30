@@ -239,7 +239,8 @@ public partial class ProfilePage : ContentPage
     private async Task ClearTokensAndNavigateToLogin()
     {
         await _hybridAuthService.SignOutAsync();
-        await Shell.Current.GoToAsync("///LoginPage");
+        await Shell.Current.GoToAsync("..", animate: true);
+        await Shell.Current.GoToAsync("LoginPage", animate: true);
     }
 
     private async void OnSignOutClicked(object sender, EventArgs e)
@@ -250,7 +251,8 @@ public partial class ProfilePage : ContentPage
             SignOutButton.IsEnabled = false;
 
             await _hybridAuthService.SignOutAsync();
-            await Shell.Current.GoToAsync("///LoginPage");
+            await Shell.Current.GoToAsync("..", animate: true);
+            await Shell.Current.GoToAsync("LoginPage", animate: true);
         }
         catch (Exception ex)
         {

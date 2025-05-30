@@ -65,12 +65,7 @@
                 IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                 SemanticProperties.Hint="Verify your account"
                 HorizontalOptions="Fill"
-                BackgroundColor="#FF71BEF1"
-                TextColor="Black"
-                BorderWidth="0"
-                FontAttributes="Bold"
-                FontSize="20"
-                Style="{StaticResource ButtonStyle}"
+                Style="{StaticResource ButtonPrimary}"
                 Margin="0,20,0,10"/>
 
             <Button

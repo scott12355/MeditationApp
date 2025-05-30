@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:controls="clr-namespace:MeditationApp.Controls"
+             xmlns:viewmodels="clr-namespace:MeditationApp.ViewModels"
+             xmlns:models="clr-namespace:MeditationApp.Models"
              x:Class="MeditationApp.Views.CalendarPage"
              Title="Calendar">
 
@@ -10,170 +11,150 @@
                      Clicked="OnSettingsClicked"/>
     </ContentPage.ToolbarItems>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-        <!-- Calendar Header -->
-        <VerticalStackLayout Grid.Row="0"
-                             Padding="20,20,20,10"
-                             Spacing="10">
-            <Label Text="Meditation Calendar"
-                   Style="{StaticResource Headline}"
-                   HorizontalOptions="Center"/>
-            <Label Text="Track your meditation journey"
-                   Style="{StaticResource BodyText}"
+        <!-- Month Header with Navigation -->
+        <Grid Grid.Row="0"
+              BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#2C2C2C}"
+              Padding="20,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Text="‹"
+                    FontSize="24"
+                    BackgroundColor="Transparent"
+                    TextColor="{AppThemeBinding Light=#007ACC, Dark=#4FC3F7}"
+                    Command="{Binding PreviousMonthCommand}"/>
+
+            <Label Grid.Column="1"
+                   Text="{Binding SelectedMonth.DisplayName}"
+                   FontSize="20"
+                   FontAttributes="Bold"
                    HorizontalOptions="Center"
-                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray200}}"/>
-        </VerticalStackLayout>
+                   VerticalOptions="Center"
+                   TextColor="{AppThemeBinding Light=#333333, Dark=#FFFFFF}"/>
 
-        <!-- Apple-style Calendar -->
-        <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="20,0,20,20"
-                                 Spacing="20">
+            <Button Grid.Column="2"
+                    Text="›"
+                    FontSize="24"
+                    BackgroundColor="Transparent"
+                    TextColor="{AppThemeBinding Light=#007ACC, Dark=#4FC3F7}"
+                    Command="{Binding NextMonthCommand}"/>
+        </Grid>
 
-                <!-- Calendar Control -->
-                <ContentView x:Name="CalendarPlaceholder"
-                        HeightRequest="400"/>
+        <!-- Swipeable Month Content -->
+        <CarouselView Grid.Row="1"
+                      ItemsSource="{Binding Months}"
+                      Position="{Binding SelectedMonthIndex}"
+                      PositionChangedCommand="{Binding MonthChangedCommand}"
+                      PositionChangedCommandParameter="{Binding Position, Source={RelativeSource Self}}"
+                      BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#1E1E1E}">
 
-                <!-- Today's Sessions -->
-                <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                       CornerRadius="15"
-                       Padding="20">
-                    <VerticalStackLayout Spacing="15">
-                        <Label Text="Today's Sessions"
-                               Style="{StaticResource SubHeadline}"/>
+            <CarouselView.ItemTemplate>
+                <DataTemplate x:DataType="viewmodels:MonthlyData">
+                    <Grid>
+                        <!-- Loading Indicator -->
+                        <ActivityIndicator IsVisible="{Binding IsLoading}"
+                                           IsRunning="{Binding IsLoading}"
+                                           Color="{AppThemeBinding Light=#007ACC, Dark=#4FC3F7}"
+                                           VerticalOptions="Center"/>
 
-                        <!-- Skeleton loading for sessions -->
-                        <VerticalStackLayout IsVisible="{Binding IsLoading}"
-                                             Spacing="10">
-                            <controls:SkeletonView IsLoading="{Binding IsLoading}"
-                                                   HeightRequest="60"
-                                                   CornerRadius="8"/>
-                            <controls:SkeletonView IsLoading="{Binding IsLoading}"
-                                                   HeightRequest="60"
-                                                   CornerRadius="8"/>
-                        </VerticalStackLayout>
+                        <!-- Month Content -->
+                        <CollectionView ItemsSource="{Binding Days}"
+                                        IsVisible="{Binding IsLoaded}"
+                                        BackgroundColor="Transparent">
 
-                        <!-- Sessions List -->
-                        <CollectionView ItemsSource="{Binding Sessions}"
-                                        BackgroundColor="Transparent"
-                                        MaximumHeightRequest="200"
-                                        IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}">
                             <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid ColumnDefinitions="*,Auto"
-                                          Padding="0,5"
-                                          BackgroundColor="Transparent">
-                                        <VerticalStackLayout Grid.Column="0"
-                                                             Spacing="2">
-                                            <Label Text="{Binding Type}"
-                                                   FontSize="16"
-                                                   FontAttributes="Bold"/>
-                                            <Label Text="{Binding Date, StringFormat='At {0:HH:mm}'}"
+                                <DataTemplate x:DataType="viewmodels:DayData">
+                                    <Grid Padding="15,8">
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SwipeCalendarViewModel}}, Path=NavigateToDayCommand}"
+                                                                  CommandParameter="{Binding .}"/>
+                                        </Grid.GestureRecognizers>
+
+                                        <!-- Day Card -->
+                                        <Border BackgroundColor="{AppThemeBinding Light=#FAFAFA, Dark=#2A2A2A}"
+                                                Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#404040}"
+                                                StrokeThickness="1"
+                                                StrokeShape="RoundRectangle 12"
+                                                Padding="16"
+                                                IsVisible="{Binding HasData}">
+                                            <Border.Shadow>
+                                                <Shadow Brush="Black"
+                                                        Opacity="0.1"
+                                                        Radius="4"
+                                                        Offset="0,2"/>
+                                            </Border.Shadow>
+
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+
+                                                <!-- Date Header -->
+                                                <Grid Grid.Row="0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Label Grid.Column="0"
+                                                           Text="{Binding DisplayDate}"
+                                                           FontSize="16"
+                                                           FontAttributes="Bold"
+                                                           TextColor="{AppThemeBinding Light=#333333, Dark=#FFFFFF}"/>
+
+                                                    <Label Grid.Column="1"
+                                                           Text="{Binding MoodEmoji}"
+                                                           FontSize="20"
+                                                           IsVisible="{Binding Mood, Converter={StaticResource IsNotNullConverter}}"/>
+                                                </Grid>
+
+
+
+
+
+                                                <!-- Notes Preview -->
+                                                <Label Grid.Row="3"
+                                                       Text="{Binding Notes}"
+                                                       FontSize="12"
+                                                       TextColor="{AppThemeBinding Light=#888888, Dark=#AAAAAA}"
+                                                       Margin="0,8,0,0"
+                                                       LineBreakMode="TailTruncation"
+                                                       MaxLines="2"
+                                                       IsVisible="{Binding Notes, Converter={StaticResource StringToBoolConverter}}"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Empty Day Placeholder -->
+                                        <Border BackgroundColor="Transparent"
+                                                Stroke="Transparent"
+                                                StrokeShape="RoundRectangle 8"
+                                                Padding="16,8"
+                                                IsVisible="{Binding HasData, Converter={StaticResource InverseBoolConverter}}">
+                                            <Label Text="{Binding DisplayDate}"
                                                    FontSize="14"
-                                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
-                                        </VerticalStackLayout>
-                                        <Label Grid.Column="1"
-                                               Text="{Binding CompletedText}"
-                                               FontSize="14"
-                                               TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
-                                               VerticalOptions="Center"/>
+                                                   TextColor="{AppThemeBinding Light=#CCCCCC, Dark=#555555}"
+                                                   Opacity="0.6"/>
+                                        </Border>
                                     </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>
-
-                            <CollectionView.EmptyView>
-                                <ContentView>
-                                    <Label Text="No meditation sessions for today"
-                                           FontSize="16"
-                                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"
-                                           HorizontalOptions="Center"
-                                           Margin="0,20"/>
-                                </ContentView>
-                            </CollectionView.EmptyView>
                         </CollectionView>
-                    </VerticalStackLayout>
-                </Frame>
-
-                <!-- Quick Stats -->
-                <Frame BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                       CornerRadius="15"
-                       Padding="20">
-                    <VerticalStackLayout Spacing="15">
-                        <Label Text="This Month"
-                               Style="{StaticResource SubHeadline}"/>
-
-                        <!-- Skeleton loading for stats -->
-                        <Grid ColumnDefinitions="*,*"
-                              ColumnSpacing="15"
-                              IsVisible="{Binding IsLoadingStats}">
-                            <Frame Grid.Column="0"
-                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
-                                   CornerRadius="10"
-                                   Padding="15">
-                                <VerticalStackLayout Spacing="5">
-                                    <controls:SkeletonView IsLoading="{Binding IsLoadingStats}"
-                                                           HeightRequest="16"
-                                                           CornerRadius="4"/>
-                                    <controls:SkeletonView IsLoading="{Binding IsLoadingStats}"
-                                                           HeightRequest="24"
-                                                           CornerRadius="4"/>
-                                </VerticalStackLayout>
-                            </Frame>
-
-                            <Frame Grid.Column="1"
-                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
-                                   CornerRadius="10"
-                                   Padding="15">
-                                <VerticalStackLayout Spacing="5">
-                                    <controls:SkeletonView IsLoading="{Binding IsLoadingStats}"
-                                                           HeightRequest="16"
-                                                           CornerRadius="4"/>
-                                    <controls:SkeletonView IsLoading="{Binding IsLoadingStats}"
-                                                           HeightRequest="24"
-                                                           CornerRadius="4"/>
-                                </VerticalStackLayout>
-                            </Frame>
-                        </Grid>
-
-                        <Grid ColumnDefinitions="*,*"
-                              ColumnSpacing="15"
-                              IsVisible="{Binding IsLoadingStats, Converter={StaticResource InverseBoolConverter}}">
-                            <Frame Grid.Column="0"
-                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
-                                   CornerRadius="10"
-                                   Padding="15">
-                                <VerticalStackLayout Spacing="5">
-                                    <Label Text="Total Sessions"
-                                           FontSize="14"
-                                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
-                                    <Label Text="{Binding TotalSessions}"
-                                           FontSize="24"
-                                           FontAttributes="Bold"
-                                           TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
-                                </VerticalStackLayout>
-                            </Frame>
-
-                            <Frame Grid.Column="1"
-                                   BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray800}}"
-                                   CornerRadius="10"
-                                   Padding="15">
-                                <VerticalStackLayout Spacing="5">
-                                    <Label Text="Total Time"
-                                           FontSize="14"
-                                           TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray300}}"/>
-                                    <Label Text="{Binding TotalMinutes, StringFormat='{0} min'}"
-                                           FontSize="24"
-                                           FontAttributes="Bold"
-                                           TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryDark}}"/>
-                                </VerticalStackLayout>
-                            </Frame>
-                        </Grid>
-                    </VerticalStackLayout>
-                </Frame>
-
-            </VerticalStackLayout>
-        </ScrollView>
-
+                    </Grid>
+                </DataTemplate>
+            </CarouselView.ItemTemplate>
+        </CarouselView>
     </Grid>
-
 </ContentPage>

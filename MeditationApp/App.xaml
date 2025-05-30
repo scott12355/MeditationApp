@@ -22,7 +22,8 @@
             <converters:StatusToTextColorConverter x:Key="StatusToTextColorConverter"/>
             <converters:StatusToBoolConverter x:Key="StatusToBoolConverter"/>
             <converters:StringToBoolConverter x:Key="StringToBoolConverter"/>
-            <Color x:Key="Primary">#5B7FFF</Color>
+            <converters:MoodToEmojiConverter x:Key="MoodToEmojiConverter"/>
+            <converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
             <Color x:Key="Secondary">#FF6B6B</Color>
             <Color x:Key="Tertiary">#4ECDC4</Color>
             <Color x:Key="White">White</Color>
