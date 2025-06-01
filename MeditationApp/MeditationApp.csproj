@@ -26,12 +26,12 @@
         <ApplicationId>com.lucen.ios</ApplicationId>
 
         <!-- Versions -->
-        <ApplicationDisplayVersion>1</ApplicationDisplayVersion>
-        <ApplicationVersion>1.2</ApplicationVersion>
+        <ApplicationDisplayVersion>1.5</ApplicationDisplayVersion>
+        <ApplicationVersion>1</ApplicationVersion>
         
         
 
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">12.2</SupportedOSPlatformVersion>
+        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">21.0</SupportedOSPlatformVersion>
     </PropertyGroup>
 
@@ -66,8 +66,8 @@
         <PackageReference Include="CommunityToolkit.Maui" Version="8.0.0" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
         <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
-        <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.70" />
-        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.70" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.100" />
+        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.100" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.5" />
         <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
     </ItemGroup>
@@ -78,6 +78,7 @@
         <CodeSignKey>Apple Distribution: SCOTT ROBERT TOPPING (AB3X6W384R)</CodeSignKey>
         <CodesignProvision>Lucen Signing</CodesignProvision>
     </PropertyGroup>
+
 
 
  

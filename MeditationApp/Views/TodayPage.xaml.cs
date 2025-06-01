@@ -12,7 +12,7 @@ namespace MeditationApp.Views;
 public partial class TodayPage : ContentPage
 {
     private TodayViewModel _viewModel;
-    private MediaElement? _audioPlayer; // Will be initialized in OnAppearing
+    // private MediaElement? _audioPlayer; // Will be initialized in OnAppearing
     private IDispatcherTimer animationTimer; // Timer for the orb animation
     private Animation textPulseAnimation; // Animation for the text label
 
@@ -21,7 +21,7 @@ public partial class TodayPage : ContentPage
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = viewModel;
-        _audioPlayer = null; // Will be set in OnAppearing
+        // _audioPlayer = null; // Will be set in OnAppearing
 
         // Set the drawable for the GraphicsViews
         GlowingOrbGraphicsView.Drawable = new GlowingOrbDrawable(Color.FromArgb("#FFA500")); // Orange for Generating
@@ -192,11 +192,11 @@ public partial class TodayPage : ContentPage
         base.OnAppearing();
         if (_viewModel != null)
         {
-            _audioPlayer = this.FindByName<MediaElement>(nameof(AudioPlayer));
-            if (_audioPlayer != null)
-            {
-                _viewModel.SetMediaElement(_audioPlayer);
-            }
+            // _audioPlayer = this.FindByName<MediaElement>(nameof(AudioPlayer));
+            // if (_audioPlayer != null)
+            // {
+            //     _viewModel.SetMediaElement(_audioPlayer);
+            // }
         }
         // Animations are now managed by ViewModel PropertyChanged and UpdateAnimations
         // We can call UpdateAnimations here on appearing just in case the status was set before the page appeared
@@ -208,8 +208,8 @@ public partial class TodayPage : ContentPage
         base.OnDisappearing();
         if (_viewModel != null)
         {
-            _viewModel.CleanupMediaElement();
-            _audioPlayer = null;
+            // _viewModel.CleanupMediaElement();
+            // _audioPlayer = null;
         }
         // Ensure animations are stopped when the page is not visible
         animationTimer?.Stop();

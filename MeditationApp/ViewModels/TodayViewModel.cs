@@ -6,7 +6,6 @@ using System.Text.Json;
 using System.IO;
 using System.Diagnostics;
 using Microsoft.Maui.Controls;
-using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Maui.Core.Primitives;
 using MeditationApp.Utils;
 using System.ComponentModel;
@@ -37,8 +36,8 @@ public partial class TodayViewModel : ObservableObject
     [ObservableProperty]
     private string _downloadStatus = string.Empty;
 
-    [ObservableProperty]
-    private MediaElement? _audioPlayer;
+    // [ObservableProperty]
+    // private MediaElement? _audioPlayer;
 
     [ObservableProperty]
     private bool _isLoading = false; // Start with false to prevent initial loading state
@@ -75,25 +74,25 @@ public partial class TodayViewModel : ObservableObject
     public string FormattedDate => CurrentDate.ToString("dddd, MMMM dd, yyyy");
     
     // Delegate audio-related properties to the AudioPlayerService
-    public bool IsPlaying => _audioPlayerService.IsPlaying;
-    public double PlaybackProgress => _audioPlayerService.PlaybackProgress;
-    public TimeSpan PlaybackPosition => _audioPlayerService.PlaybackPosition;
-    public TimeSpan PlaybackDuration => _audioPlayerService.PlaybackDuration;
-    public string CurrentPositionText => _audioPlayerService.CurrentPositionText;
-    public string TotalDurationText => _audioPlayerService.TotalDurationText;
-    public string PlayPauseIcon => _audioPlayerService.PlayPauseIcon;
+    // public bool IsPlaying => _audioPlayerService.IsPlaying;
+    // public double PlaybackProgress => _audioPlayerService.PlaybackProgress;
+    // public TimeSpan PlaybackPosition => _audioPlayerService.PlaybackPosition;
+    // public TimeSpan PlaybackDuration => _audioPlayerService.PlaybackDuration;
+    // public string CurrentPositionText => _audioPlayerService.CurrentPositionText;
+    // public string TotalDurationText => _audioPlayerService.TotalDurationText;
+    // public string PlayPauseIcon => _audioPlayerService.PlayPauseIcon;
     
     // Delegate metadata properties to the AudioPlayerService
-    public string UserName => _audioPlayerService.UserName;
-    public DateTime SessionDate => _audioPlayerService.SessionDate;
-    public string SessionDateText => _audioPlayerService.SessionDateText;
+    // public string UserName => _audioPlayerService.UserName;
+    // public DateTime SessionDate => _audioPlayerService.SessionDate;
+    // public string SessionDateText => _audioPlayerService.SessionDateText;
 
     private readonly GraphQLService _graphQLService;
     private readonly CognitoAuthService _cognitoAuthService;
     private readonly MeditationSessionDatabase _sessionDatabase;
     private readonly SessionStatusPoller _sessionStatusPoller;
     private readonly IAudioDownloadService _audioDownloadService;
-    private readonly AudioPlayerService _audioPlayerService;
+    // private readonly AudioPlayerService _audioPlayerService;
 
     private Task? _initializationTask;
     private CancellationTokenSource? _pollingCts;
@@ -104,24 +103,24 @@ public partial class TodayViewModel : ObservableObject
     private const int MAX_REFRESH_ATTEMPTS = 3;
     private static readonly TimeSpan REFRESH_COOLDOWN = TimeSpan.FromMinutes(1);
 
-    public TodayViewModel(GraphQLService graphQLService, CognitoAuthService cognitoAuthService, MeditationSessionDatabase sessionDatabase, IAudioDownloadService audioDownloadService, SessionStatusPoller sessionStatusPoller, AudioPlayerService audioPlayerService)
+    public TodayViewModel(GraphQLService graphQLService, CognitoAuthService cognitoAuthService, MeditationSessionDatabase sessionDatabase, IAudioDownloadService audioDownloadService, SessionStatusPoller sessionStatusPoller)
     {
         _graphQLService = graphQLService;
         _cognitoAuthService = cognitoAuthService;
         _sessionDatabase = sessionDatabase;
         _audioDownloadService = audioDownloadService;
         _sessionStatusPoller = sessionStatusPoller;
-        _audioPlayerService = audioPlayerService;
+        // _audioPlayerService = audioPlayerService;
         
         // Subscribe to events
-        _audioPlayerService.MediaOpened += OnMediaOpened;
-        _audioPlayerService.MediaEnded += OnMediaEnded;
-        _audioPlayerService.MediaFailed += OnMediaFailed;
-        _audioPlayerService.PositionChanged += OnPositionChanged;
-        _audioPlayerService.StateChanged += OnStateChanged;
+        // _audioPlayerService.MediaOpened += OnMediaOpened;
+        // _audioPlayerService.MediaEnded += OnMediaEnded;
+        // _audioPlayerService.MediaFailed += OnMediaFailed;
+        // _audioPlayerService.PositionChanged += OnPositionChanged;
+        // _audioPlayerService.StateChanged += OnStateChanged;
         
         // Subscribe to property changes to forward audio-related properties
-        _audioPlayerService.PropertyChanged += OnAudioPlayerServicePropertyChanged;
+        // _audioPlayerService.PropertyChanged += OnAudioPlayerServicePropertyChanged;
         
         // Start loading data immediately
         _initializationTask = LoadTodayDataAsync();
@@ -165,35 +164,35 @@ public partial class TodayViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    private async Task TogglePlayback()
-    {
-        // If we're currently playing, just pause
-        if (_audioPlayerService.IsPlaying)
-        {
-            _audioPlayerService.Pause();
-            return;
-        }
-
-        // If we're not playing, we need to ensure audio is loaded before playing
-        if (TodaySession != null && TodaySession.IsDownloaded && !string.IsNullOrEmpty(TodaySession.LocalAudioPath))
-        {
-            // Load audio with metadata before playing
-            await LoadAudioWithMetadata();
-            _audioPlayerService.Play();
-        }
-        else
-        {
-            // Show message that session needs to be downloaded first
-            var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-            if (page != null)
-            {
-                await page.DisplayAlert("Download Required", 
-                    "Please download the session first before playing.", 
-                    "OK");
-            }
-        }
-    }
+    // [RelayCommand]
+    // private async Task TogglePlayback()
+    // {
+    //     // If we're currently playing, just pause
+    //     if (_audioPlayerService.IsPlaying)
+    //     {
+    //         _audioPlayerService.Pause();
+    //         return;
+    //     }
+    //
+    //     // If we're not playing, we need to ensure audio is loaded before playing
+    //     if (TodaySession != null && TodaySession.IsDownloaded && !string.IsNullOrEmpty(TodaySession.LocalAudioPath))
+    //     {
+    //         // Load audio with metadata before playing
+    //         await LoadAudioWithMetadata();
+    //         _audioPlayerService.Play();
+    //     }
+    //     else
+    //     {
+    //         // Show message that session needs to be downloaded first
+    //         var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
+    //         if (page != null)
+    //         {
+    //             await page.DisplayAlert("Download Required", 
+    //                 "Please download the session first before playing.", 
+    //                 "OK");
+    //         }
+    //     }
+    // }
 
     private async Task LoadAudioWithMetadata()
     {
@@ -261,16 +260,16 @@ public partial class TodayViewModel : ObservableObject
             }
 
             // Set audio source with metadata
-            _audioPlayerService.SetAudioSourceWithMetadata(
-                TodaySession.LocalAudioPath, 
-                userName, 
-                TodaySession.Timestamp);
+            // _audioPlayerService.SetAudioSourceWithMetadata(
+                // TodaySession.LocalAudioPath, 
+                // userName, 
+                // TodaySession.Timestamp);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error loading audio with metadata: {ex.Message}");
             // Fallback to basic audio loading if metadata fails
-            _audioPlayerService.SetAudioSource(TodaySession.LocalAudioPath);
+            // _audioPlayerService.SetAudioSource(TodaySession.LocalAudioPath);
         }
     }
 
@@ -335,74 +334,14 @@ public partial class TodayViewModel : ObservableObject
     }
 
     // MediaElement event handlers called from the View
-    public void SetMediaElement(MediaElement player)
-    {
-        _audioPlayerService.SetMediaElement(player);
-        AudioPlayer = player; // Set the AudioPlayer property so event handlers can access it
-    }
+    // public void SetMediaElement(MediaElement player) { /* commented out */ }
+    // public void CleanupMediaElement() { /* commented out */ }
 
-    public void CleanupMediaElement()
-    {
-        // Unsubscribe from AudioPlayerService events (not direct MediaElement events)
-        // The AudioPlayerService handles the MediaElement lifecycle
-        AudioPlayer = null;
-    }
-
-    private void OnMediaOpened(object? sender, EventArgs e)
-    {
-        Debug.WriteLine($"OnMediaOpened: Duration = {_audioPlayerService.Duration}, State = {_audioPlayerService.CurrentState}");
-        // AudioPlayerService handles the state, no need to update properties here
-    }
-
-    private void OnMediaEnded(object? sender, EventArgs e)
-    {
-        Debug.WriteLine($"OnMediaEnded: Event received, State = {_audioPlayerService.CurrentState}");
-        // AudioPlayerService handles the state, no need to update properties here
-    }
-
-    private void OnMediaFailed(object? sender, MediaFailedEventArgs e)
-    {
-        Debug.WriteLine($"OnMediaFailed: Error = {e.ErrorMessage}, State = {_audioPlayerService.CurrentState}");
-        
-        Debug.WriteLine($"Current session state - Uuid: {TodaySession?.Uuid}, IsDownloaded: {TodaySession?.IsDownloaded}, LocalAudioPath: {TodaySession?.LocalAudioPath}");
-        
-        if (TodaySession != null && !string.IsNullOrEmpty(TodaySession.LocalAudioPath))
-        {
-            try
-            {
-                var fileInfo = new FileInfo(TodaySession.LocalAudioPath);
-                Debug.WriteLine($"Audio file info - Exists: {fileInfo.Exists}, Size: {fileInfo.Length} bytes, Last modified: {fileInfo.LastWriteTime}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error getting file info: {ex.Message}");
-            }
-        }
-        
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-            if (page != null)
-            {
-                await page.DisplayAlert(
-                    "Playback Error", 
-                    $"Failed to play audio: {e.ErrorMessage}\n\nPlease try downloading the session again.", 
-                    "OK");
-            }
-        });
-    }
-
-    private void OnPositionChanged(object? sender, MediaPositionChangedEventArgs e)
-    {
-        Debug.WriteLine($"OnPositionChanged: Position = {e.Position}, Duration = {_audioPlayerService.Duration}, State = {_audioPlayerService.CurrentState}");
-        // AudioPlayerService handles the state, no need to update properties here
-    }
-
-    private void OnStateChanged(object? sender, MediaStateChangedEventArgs e)
-    {
-        Debug.WriteLine($"OnStateChanged: New state = {e.NewState}");
-        // AudioPlayerService handles the state, no need to update properties here
-    }
+    // private void OnMediaOpened(object? sender, EventArgs e) { /* commented out */ }
+    // private void OnMediaEnded(object? sender, EventArgs e) { /* commented out */ }
+    // private void OnMediaFailed(object? sender, MediaFailedEventArgs e) { /* commented out */ }
+    // private void OnPositionChanged(object? sender, MediaPositionChangedEventArgs e) { /* commented out */ }
+    // private void OnStateChanged(object? sender, MediaStateChangedEventArgs e) { /* commented out */ }
 
     [RelayCommand]
     private async Task RequestNewSession()
@@ -1338,11 +1277,11 @@ public partial class TodayViewModel : ObservableObject
     {
         try
         {
-            // Stop any playing audio
-            if (IsPlaying)
-            {
-                StopAudio();
-            } 
+            // // Stop any playing audio
+            // if (IsPlaying)
+            // {
+            //     StopAudio();
+            // } 
 
             // Clear all properties
             CurrentDate = DateTime.Now;
@@ -1647,16 +1586,9 @@ public partial class TodayViewModel : ObservableObject
     {
         try
         {
-            if (AudioPlayer != null)
-            {
-                Debug.WriteLine("Stopping audio playback");
-                if (AudioPlayer.CurrentState == MediaElementState.Playing)
-                {
-                    AudioPlayer.Stop();
-                    // Audio state is now managed by AudioPlayerService
-                    Debug.WriteLine("Audio playback stopped successfully");
-                }
-            }
+            // if (AudioPlayer != null) { /* commented out */ }
+            // if (AudioPlayer.CurrentState == MediaElementState.Playing) { /* commented out */ }
+            // AudioPlayer.Stop();
         }
         catch (Exception ex)
         {
@@ -1664,41 +1596,41 @@ public partial class TodayViewModel : ObservableObject
         }
     }
 
-    private void OnAudioPlayerServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        // Forward audio-related property changes to update UI bindings
-        switch (e.PropertyName)
-        {
-            case nameof(AudioPlayerService.IsPlaying):
-                OnPropertyChanged(nameof(IsPlaying));
-                break;
-            case nameof(AudioPlayerService.PlaybackPosition):
-                OnPropertyChanged(nameof(PlaybackPosition));
-                break;
-            case nameof(AudioPlayerService.PlaybackDuration):
-                OnPropertyChanged(nameof(PlaybackDuration));
-                break;
-            case nameof(AudioPlayerService.PlaybackProgress):
-                OnPropertyChanged(nameof(PlaybackProgress));
-                break;
-            case nameof(AudioPlayerService.CurrentPositionText):
-                OnPropertyChanged(nameof(CurrentPositionText));
-                break;
-            case nameof(AudioPlayerService.TotalDurationText):
-                OnPropertyChanged(nameof(TotalDurationText));
-                break;
-            case nameof(AudioPlayerService.PlayPauseIcon):
-                OnPropertyChanged(nameof(PlayPauseIcon));
-                break;
-            case nameof(AudioPlayerService.UserName):
-                OnPropertyChanged(nameof(UserName));
-                break;
-            case nameof(AudioPlayerService.SessionDate):
-                OnPropertyChanged(nameof(SessionDate));
-                break;
-            case nameof(AudioPlayerService.SessionDateText):
-                OnPropertyChanged(nameof(SessionDateText));
-                break;
-        }
-    }
+    // private void OnAudioPlayerServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    // {
+    //     // Forward audio-related property changes to update UI bindings
+    //     switch (e.PropertyName)
+    //     {
+    //         case nameof(AudioPlayerService.IsPlaying):
+    //             OnPropertyChanged(nameof(IsPlaying));
+    //             break;
+    //         case nameof(AudioPlayerService.PlaybackPosition):
+    //             OnPropertyChanged(nameof(PlaybackPosition));
+    //             break;
+    //         case nameof(AudioPlayerService.PlaybackDuration):
+    //             OnPropertyChanged(nameof(PlaybackDuration));
+    //             break;
+    //         case nameof(AudioPlayerService.PlaybackProgress):
+    //             OnPropertyChanged(nameof(PlaybackProgress));
+    //             break;
+    //         case nameof(AudioPlayerService.CurrentPositionText):
+    //             OnPropertyChanged(nameof(CurrentPositionText));
+    //             break;
+    //         case nameof(AudioPlayerService.TotalDurationText):
+    //             OnPropertyChanged(nameof(TotalDurationText));
+    //             break;
+    //         case nameof(AudioPlayerService.PlayPauseIcon):
+    //             OnPropertyChanged(nameof(PlayPauseIcon));
+    //             break;
+    //         case nameof(AudioPlayerService.UserName):
+    //             OnPropertyChanged(nameof(UserName));
+    //             break;
+    //         case nameof(AudioPlayerService.SessionDate):
+    //             OnPropertyChanged(nameof(SessionDate));
+    //             break;
+    //         case nameof(AudioPlayerService.SessionDateText):
+    //             OnPropertyChanged(nameof(SessionDateText));
+    //             break;
+    //     }
+    // }
 }

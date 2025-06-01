@@ -576,11 +576,11 @@
                                         </Frame>
 
                                         <!-- Hidden MediaElement for audio playback -->
-                                        <toolkit:MediaElement x:Name="AudioPlayer"
+                                        <!-- <toolkit:MediaElement x:Name="AudioPlayer"
                                                               IsVisible="False"
                                                               ShouldAutoPlay="False"
                                                               ShouldShowPlaybackControls="False"
-                                                              Source="{Binding TodaySession.LocalAudioPath}"/>
+                                                              Source="{Binding TodaySession.LocalAudioPath}"/> -->
                                     </VerticalStackLayout>
                                 </VerticalStackLayout>
                             </Border>

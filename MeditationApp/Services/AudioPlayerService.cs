@@ -1,7 +1,5 @@
 using Microsoft.Maui.Controls;
 using System;
-using CommunityToolkit.Maui.Core.Primitives;
-using CommunityToolkit.Maui.Views;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -9,7 +7,7 @@ namespace MeditationApp.Services;
 
 public class AudioPlayerService : INotifyPropertyChanged
 {
-    private MediaElement? _mediaElement;
+    // private MediaElement? _mediaElement;
     private bool _isPlaying = false;
     private TimeSpan _playbackPosition = TimeSpan.Zero;
     private TimeSpan _playbackDuration = TimeSpan.Zero;
@@ -21,9 +19,9 @@ public class AudioPlayerService : INotifyPropertyChanged
 
     public event EventHandler? MediaOpened;
     public event EventHandler? MediaEnded;
-    public event EventHandler<MediaFailedEventArgs>? MediaFailed;
-    public event EventHandler<MediaPositionChangedEventArgs>? PositionChanged;
-    public event EventHandler<MediaStateChangedEventArgs>? StateChanged;
+    // public event EventHandler<MediaFailedEventArgs>? MediaFailed;
+    // public event EventHandler<MediaPositionChangedEventArgs>? PositionChanged;
+    // public event EventHandler<MediaStateChangedEventArgs>? StateChanged;
     public event PropertyChangedEventHandler? PropertyChanged;
 
     // Playback state properties
@@ -120,25 +118,23 @@ public class AudioPlayerService : INotifyPropertyChanged
         : SessionDate.ToString("dddd, MMMM dd, yyyy");
 
     // MediaElement access properties
-    public MediaElementState? CurrentState => _mediaElement?.CurrentState;
-    public TimeSpan? Duration => _mediaElement?.Duration;
-    public TimeSpan? Position => _mediaElement?.Position;
+    // public MediaElementState? CurrentState => _mediaElement?.CurrentState;
+    // public TimeSpan? Duration => _mediaElement?.Duration;
+    // public TimeSpan? Position => _mediaElement?.Position;
 
-    public void SetMediaElement(MediaElement mediaElement)
-    {
-        if (_mediaElement != null)
-            UnwireEvents(_mediaElement);
+    // public void SetMediaElement(MediaElement mediaElement)
+    // {
+    //     if (_mediaElement != null)
+    //         UnwireEvents(_mediaElement);
 
-        _mediaElement = mediaElement;
-        WireEvents(_mediaElement);
-    }
+    //     _mediaElement = mediaElement;
+    //     WireEvents(_mediaElement);
+    // }
 
     public void SetAudioSource(string filePath)
     {
-        if (_mediaElement != null && !string.IsNullOrEmpty(filePath))
-        {
-            _mediaElement.Source = MediaSource.FromFile(filePath);
-        }
+        // if (_mediaElement != null && !string.IsNullOrEmpty(filePath))
+        //     _mediaElement.Source = MediaSource.FromFile(filePath);
     }
 
     public void SetAudioSourceWithMetadata(string filePath, string userName, DateTime sessionDate)
@@ -161,51 +157,51 @@ public class AudioPlayerService : INotifyPropertyChanged
 
     public void Play()
     {
-        _mediaElement?.Play();
+        // _mediaElement?.Play();
     }
 
     public void Pause()
     {
-        _mediaElement?.Pause();
+        // _mediaElement?.Pause();
     }
 
     public void Stop()
     {
-        _mediaElement?.Stop();
+        // _mediaElement?.Stop();
     }
 
     public void SeekTo(TimeSpan position)
     {
-        if (_mediaElement != null && position >= TimeSpan.Zero && position <= _mediaElement.Duration)
-        {
-            _mediaElement.SeekTo(position);
-        }
+        // if (_mediaElement != null && position >= TimeSpan.Zero && position <= _mediaElement.Duration)
+        // {
+        //     _mediaElement.SeekTo(position);
+        // }
     }
 
-    private void WireEvents(MediaElement mediaElement)
-    {
-        mediaElement.MediaOpened += OnMediaOpened;
-        mediaElement.MediaEnded += OnMediaEnded;
-        mediaElement.MediaFailed += OnMediaFailed;
-        mediaElement.PositionChanged += OnPositionChanged;
-        mediaElement.StateChanged += OnStateChanged;
-    }
+    // private void WireEvents(MediaElement mediaElement)
+    // {
+    //     mediaElement.MediaOpened += OnMediaOpened;
+    //     mediaElement.MediaEnded += OnMediaEnded;
+    //     mediaElement.MediaFailed += OnMediaFailed;
+    //     mediaElement.PositionChanged += OnPositionChanged;
+    //     mediaElement.StateChanged += OnStateChanged;
+    // }
 
-    private void UnwireEvents(MediaElement mediaElement)
-    {
-        mediaElement.MediaOpened -= OnMediaOpened;
-        mediaElement.MediaEnded -= OnMediaEnded;
-        mediaElement.MediaFailed -= OnMediaFailed;
-        mediaElement.PositionChanged -= OnPositionChanged;
-        mediaElement.StateChanged -= OnStateChanged;
-    }
+    // private void UnwireEvents(MediaElement mediaElement)
+    // {
+    //     mediaElement.MediaOpened -= OnMediaOpened;
+    //     mediaElement.MediaEnded -= OnMediaEnded;
+    //     mediaElement.MediaFailed -= OnMediaFailed;
+    //     mediaElement.PositionChanged -= OnPositionChanged;
+    //     mediaElement.StateChanged -= OnStateChanged;
+    // }
 
     private void OnMediaOpened(object? sender, EventArgs e)
     {
-        if (_mediaElement != null)
-        {
-            PlaybackDuration = _mediaElement.Duration;
-        }
+        // if (_mediaElement != null)
+        // {
+        //     PlaybackDuration = _mediaElement.Duration;
+        // }
         MediaOpened?.Invoke(sender, e);
     }
 
@@ -217,30 +213,30 @@ public class AudioPlayerService : INotifyPropertyChanged
         MediaEnded?.Invoke(sender, e);
     }
 
-    private void OnMediaFailed(object? sender, MediaFailedEventArgs e)
-    {
-        IsPlaying = false;
-        MediaFailed?.Invoke(sender, e);
-    }
+    // private void OnMediaFailed(object? sender, MediaFailedEventArgs e)
+    // {
+    //     IsPlaying = false;
+    //     MediaFailed?.Invoke(sender, e);
+    // }
 
-    private void OnPositionChanged(object? sender, MediaPositionChangedEventArgs e)
-    {
-        PlaybackPosition = e.Position;
-        if (_mediaElement != null)
-        {
-            PlaybackDuration = _mediaElement.Duration;
-            PlaybackProgress = _mediaElement.Duration.TotalSeconds > 0 
-                ? e.Position.TotalSeconds / _mediaElement.Duration.TotalSeconds 
-                : 0;
-        }
-        PositionChanged?.Invoke(sender, e);
-    }
+    // private void OnPositionChanged(object? sender, MediaPositionChangedEventArgs e)
+    // {
+    //     PlaybackPosition = e.Position;
+    //     if (_mediaElement != null)
+    //     {
+    //         PlaybackDuration = _mediaElement.Duration;
+    //         PlaybackProgress = _mediaElement.Duration.TotalSeconds > 0 
+    //             ? e.Position.TotalSeconds / _mediaElement.Duration.TotalSeconds 
+    //             : 0.0;
+    //     }
+    //     PositionChanged?.Invoke(sender, e);
+    // }
 
-    private void OnStateChanged(object? sender, MediaStateChangedEventArgs e)
-    {
-        IsPlaying = e.NewState == MediaElementState.Playing;
-        StateChanged?.Invoke(sender, e);
-    }
+    // private void OnStateChanged(object? sender, MediaStateChangedEventArgs e)
+    // {
+    //     IsPlaying = e.NewState == MediaElementState.Playing;
+    //     StateChanged?.Invoke(sender, e);
+    // }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {

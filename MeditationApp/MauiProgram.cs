@@ -25,7 +25,6 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseMauiCommunityToolkitMediaElement()
             .UseMauiCommunityToolkit()
             .ConfigureFonts(fonts =>
             {
@@ -151,7 +150,7 @@ public static class MauiProgram
         });
         
         // Register AudioPlayerService
-        builder.Services.AddSingleton<AudioPlayerService>();
+        // builder.Services.AddSingleton<AudioPlayerService>();
 
 #if DEBUG
         builder.Logging.AddDebug();
