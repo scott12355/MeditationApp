@@ -74,25 +74,25 @@ public partial class TodayViewModel : ObservableObject
     public string FormattedDate => CurrentDate.ToString("dddd, MMMM dd, yyyy");
     
     // Delegate audio-related properties to the AudioPlayerService
-    // public bool IsPlaying => _audioPlayerService.IsPlaying;
-    // public double PlaybackProgress => _audioPlayerService.PlaybackProgress;
-    // public TimeSpan PlaybackPosition => _audioPlayerService.PlaybackPosition;
-    // public TimeSpan PlaybackDuration => _audioPlayerService.PlaybackDuration;
-    // public string CurrentPositionText => _audioPlayerService.CurrentPositionText;
-    // public string TotalDurationText => _audioPlayerService.TotalDurationText;
-    // public string PlayPauseIcon => _audioPlayerService.PlayPauseIcon;
+    public bool IsPlaying => _audioPlayerService.IsPlaying;
+    public double PlaybackProgress => _audioPlayerService.PlaybackProgress;
+    public TimeSpan PlaybackPosition => _audioPlayerService.PlaybackPosition;
+    public TimeSpan PlaybackDuration => _audioPlayerService.PlaybackDuration;
+    public string CurrentPositionText => _audioPlayerService.CurrentPositionText;
+    public string TotalDurationText => _audioPlayerService.TotalDurationText;
+    public string PlayPauseIcon => _audioPlayerService.PlayPauseIcon;
     
     // Delegate metadata properties to the AudioPlayerService
-    // public string UserName => _audioPlayerService.UserName;
-    // public DateTime SessionDate => _audioPlayerService.SessionDate;
-    // public string SessionDateText => _audioPlayerService.SessionDateText;
+    public string UserName => _audioPlayerService.UserName;
+    public DateTime SessionDate => _audioPlayerService.SessionDate;
+    public string SessionDateText => _audioPlayerService.SessionDateText;
 
     private readonly GraphQLService _graphQLService;
     private readonly CognitoAuthService _cognitoAuthService;
     private readonly MeditationSessionDatabase _sessionDatabase;
     private readonly SessionStatusPoller _sessionStatusPoller;
     private readonly IAudioDownloadService _audioDownloadService;
-    // private readonly AudioPlayerService _audioPlayerService;
+    private readonly AudioPlayerService _audioPlayerService;
 
     private Task? _initializationTask;
     private CancellationTokenSource? _pollingCts;
@@ -103,27 +103,66 @@ public partial class TodayViewModel : ObservableObject
     private const int MAX_REFRESH_ATTEMPTS = 3;
     private static readonly TimeSpan REFRESH_COOLDOWN = TimeSpan.FromMinutes(1);
 
-    public TodayViewModel(GraphQLService graphQLService, CognitoAuthService cognitoAuthService, MeditationSessionDatabase sessionDatabase, IAudioDownloadService audioDownloadService, SessionStatusPoller sessionStatusPoller)
+    public TodayViewModel(GraphQLService graphQLService, CognitoAuthService cognitoAuthService, MeditationSessionDatabase sessionDatabase, IAudioDownloadService audioDownloadService, SessionStatusPoller sessionStatusPoller, AudioPlayerService audioPlayerService)
     {
         _graphQLService = graphQLService;
         _cognitoAuthService = cognitoAuthService;
         _sessionDatabase = sessionDatabase;
         _audioDownloadService = audioDownloadService;
         _sessionStatusPoller = sessionStatusPoller;
-        // _audioPlayerService = audioPlayerService;
+        _audioPlayerService = audioPlayerService;
         
         // Subscribe to events
-        // _audioPlayerService.MediaOpened += OnMediaOpened;
-        // _audioPlayerService.MediaEnded += OnMediaEnded;
-        // _audioPlayerService.MediaFailed += OnMediaFailed;
-        // _audioPlayerService.PositionChanged += OnPositionChanged;
-        // _audioPlayerService.StateChanged += OnStateChanged;
+        _audioPlayerService.MediaOpened += OnMediaOpened;
+        _audioPlayerService.MediaEnded += OnMediaEnded;
         
         // Subscribe to property changes to forward audio-related properties
-        // _audioPlayerService.PropertyChanged += OnAudioPlayerServicePropertyChanged;
+        _audioPlayerService.PropertyChanged += OnAudioPlayerServicePropertyChanged;
         
         // Start loading data immediately
         _initializationTask = LoadTodayDataAsync();
+    }
+
+    private void OnMediaOpened(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(PlaybackDuration));
+        OnPropertyChanged(nameof(TotalDurationText));
+    }
+
+    private void OnMediaEnded(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(IsPlaying));
+        OnPropertyChanged(nameof(PlayPauseIcon));
+    }
+
+    private void OnAudioPlayerServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        // Forward audio-related property changes to update UI bindings
+        switch (e.PropertyName)
+        {
+            case nameof(AudioPlayerService.IsPlaying):
+                OnPropertyChanged(nameof(IsPlaying));
+                OnPropertyChanged(nameof(PlayPauseIcon));
+                break;
+            case nameof(AudioPlayerService.PlaybackPosition):
+                OnPropertyChanged(nameof(PlaybackPosition));
+                OnPropertyChanged(nameof(CurrentPositionText));
+                break;
+            case nameof(AudioPlayerService.PlaybackDuration):
+                OnPropertyChanged(nameof(PlaybackDuration));
+                OnPropertyChanged(nameof(TotalDurationText));
+                break;
+            case nameof(AudioPlayerService.PlaybackProgress):
+                OnPropertyChanged(nameof(PlaybackProgress));
+                break;
+            case nameof(AudioPlayerService.UserName):
+                OnPropertyChanged(nameof(UserName));
+                break;
+            case nameof(AudioPlayerService.SessionDate):
+                OnPropertyChanged(nameof(SessionDate));
+                OnPropertyChanged(nameof(SessionDateText));
+                break;
+        }
     }
 
     /// <summary>
@@ -164,35 +203,35 @@ public partial class TodayViewModel : ObservableObject
         }
     }
 
-    // [RelayCommand]
-    // private async Task TogglePlayback()
-    // {
-    //     // If we're currently playing, just pause
-    //     if (_audioPlayerService.IsPlaying)
-    //     {
-    //         _audioPlayerService.Pause();
-    //         return;
-    //     }
-    //
-    //     // If we're not playing, we need to ensure audio is loaded before playing
-    //     if (TodaySession != null && TodaySession.IsDownloaded && !string.IsNullOrEmpty(TodaySession.LocalAudioPath))
-    //     {
-    //         // Load audio with metadata before playing
-    //         await LoadAudioWithMetadata();
-    //         _audioPlayerService.Play();
-    //     }
-    //     else
-    //     {
-    //         // Show message that session needs to be downloaded first
-    //         var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-    //         if (page != null)
-    //         {
-    //             await page.DisplayAlert("Download Required", 
-    //                 "Please download the session first before playing.", 
-    //                 "OK");
-    //         }
-    //     }
-    // }
+    [RelayCommand]
+    private async Task TogglePlayback()
+    {
+        // If we're currently playing, just pause
+        if (_audioPlayerService.IsPlaying)
+        {
+            _audioPlayerService.Pause();
+            return;
+        }
+
+        // If we're not playing, we need to ensure audio is loaded before playing
+        if (TodaySession != null && TodaySession.IsDownloaded && !string.IsNullOrEmpty(TodaySession.LocalAudioPath))
+        {
+            // Load audio with metadata before playing
+            await LoadAudioWithMetadata();
+            await _audioPlayerService.PlayFromFileAsync(TodaySession.LocalAudioPath);
+        }
+        else
+        {
+            // Show message that session needs to be downloaded first
+            var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (page != null)
+            {
+                await page.DisplayAlert("Download Required", 
+                    "Please download the session first before playing.", 
+                    "OK");
+            }
+        }
+    }
 
     private async Task LoadAudioWithMetadata()
     {
@@ -260,16 +299,16 @@ public partial class TodayViewModel : ObservableObject
             }
 
             // Set audio source with metadata
-            // _audioPlayerService.SetAudioSourceWithMetadata(
-                // TodaySession.LocalAudioPath, 
-                // userName, 
-                // TodaySession.Timestamp);
+            _audioPlayerService.SetAudioSourceWithMetadata(
+                TodaySession.LocalAudioPath, 
+                userName, 
+                TodaySession.Timestamp);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error loading audio with metadata: {ex.Message}");
             // Fallback to basic audio loading if metadata fails
-            // _audioPlayerService.SetAudioSource(TodaySession.LocalAudioPath);
+            _audioPlayerService.SetAudioSourceWithMetadata(TodaySession.LocalAudioPath, "User", TodaySession.Timestamp);
         }
     }
 

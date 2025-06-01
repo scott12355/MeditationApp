@@ -1,13 +1,18 @@
 using Microsoft.Maui.Controls;
+using Plugin.Maui.Audio;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.IO;
+using System.Timers;
 
 namespace MeditationApp.Services;
 
 public class AudioPlayerService : INotifyPropertyChanged
 {
-    // private MediaElement? _mediaElement;
+    private readonly IAudioManager _audioManager;
+    private IAudioPlayer? _currentPlayer;
+
     private bool _isPlaying = false;
     private TimeSpan _playbackPosition = TimeSpan.Zero;
     private TimeSpan _playbackDuration = TimeSpan.Zero;
@@ -17,11 +22,11 @@ public class AudioPlayerService : INotifyPropertyChanged
     private string _userName = string.Empty;
     private DateTime _sessionDate = DateTime.MinValue;
 
+    // Timer for position updates
+    private System.Timers.Timer? _positionTimer;
+
     public event EventHandler? MediaOpened;
     public event EventHandler? MediaEnded;
-    // public event EventHandler<MediaFailedEventArgs>? MediaFailed;
-    // public event EventHandler<MediaPositionChangedEventArgs>? PositionChanged;
-    // public event EventHandler<MediaStateChangedEventArgs>? StateChanged;
     public event PropertyChangedEventHandler? PropertyChanged;
 
     // Playback state properties
@@ -35,6 +40,11 @@ public class AudioPlayerService : INotifyPropertyChanged
                 _isPlaying = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(PlayPauseIcon));
+                
+                if (value)
+                    StartPositionTimer();
+                else
+                    StopPositionTimer();
             }
         }
     }
@@ -49,6 +59,12 @@ public class AudioPlayerService : INotifyPropertyChanged
                 _playbackPosition = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(CurrentPositionText));
+                
+                // Update progress
+                if (PlaybackDuration.TotalSeconds > 0)
+                {
+                    PlaybackProgress = value.TotalSeconds / PlaybackDuration.TotalSeconds;
+                }
             }
         }
     }
@@ -117,129 +133,158 @@ public class AudioPlayerService : INotifyPropertyChanged
         ? string.Empty 
         : SessionDate.ToString("dddd, MMMM dd, yyyy");
 
-    // MediaElement access properties
-    // public MediaElementState? CurrentState => _mediaElement?.CurrentState;
-    // public TimeSpan? Duration => _mediaElement?.Duration;
-    // public TimeSpan? Position => _mediaElement?.Position;
-
-    // public void SetMediaElement(MediaElement mediaElement)
-    // {
-    //     if (_mediaElement != null)
-    //         UnwireEvents(_mediaElement);
-
-    //     _mediaElement = mediaElement;
-    //     WireEvents(_mediaElement);
-    // }
-
-    public void SetAudioSource(string filePath)
+    public AudioPlayerService(IAudioManager audioManager)
     {
-        // if (_mediaElement != null && !string.IsNullOrEmpty(filePath))
-        //     _mediaElement.Source = MediaSource.FromFile(filePath);
-    }
-
-    public void SetAudioSourceWithMetadata(string filePath, string userName, DateTime sessionDate)
-    {
-        // Set metadata first
-        UserName = userName;
-        SessionDate = sessionDate;
+        _audioManager = audioManager;
         
-        // Then set the audio source
-        SetAudioSource(filePath);
+        // Initialize position timer
+        _positionTimer = new System.Timers.Timer(500); // Update every 500ms
+        _positionTimer.Elapsed += OnPositionTimerElapsed;
     }
 
-    public void TogglePlayback()
+    private void OnPositionTimerElapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
-        if (IsPlaying)
-            Pause();
-        else
-            Play();
+        if (_currentPlayer != null && _currentPlayer.IsPlaying)
+        {
+            // Update position and duration from the current player
+            PlaybackPosition = TimeSpan.FromSeconds(_currentPlayer.CurrentPosition);
+            PlaybackDuration = TimeSpan.FromSeconds(_currentPlayer.Duration);
+            
+            // Check if playback has ended
+            if (_currentPlayer.CurrentPosition >= _currentPlayer.Duration && _currentPlayer.Duration > 0)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    IsPlaying = false;
+                    PlaybackPosition = TimeSpan.Zero;
+                    PlaybackProgress = 0;
+                    MediaEnded?.Invoke(this, EventArgs.Empty);
+                });
+            }
+        }
     }
 
-    public void Play()
+    private void StartPositionTimer()
     {
-        // _mediaElement?.Play();
+        _positionTimer?.Start();
+    }
+
+    private void StopPositionTimer()
+    {
+        _positionTimer?.Stop();
+    }
+
+    public async Task<bool> PlayFromUrlAsync(string url)
+    {
+        try
+        {
+            await StopAsync();
+            _currentPlayer = _audioManager.CreatePlayer(await FileSystem.OpenAppPackageFileAsync(url));
+            
+            if (_currentPlayer != null)
+            {
+                _currentPlayer.Play();
+                IsPlaying = true;
+                MediaOpened?.Invoke(this, EventArgs.Empty);
+                return true;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error playing audio: {ex.Message}");
+            return false;
+        }
+    }
+
+    public async Task<bool> PlayFromFileAsync(string filePath)
+    {
+        try
+        {
+            if (!File.Exists(filePath))
+            {
+                System.Diagnostics.Debug.WriteLine($"Audio file not found: {filePath}");
+                return false;
+            }
+
+            await StopAsync();
+            
+            var fileStream = File.OpenRead(filePath);
+            _currentPlayer = _audioManager.CreatePlayer(fileStream);
+            
+            if (_currentPlayer != null)
+            {
+                _currentPlayer.Play();
+                IsPlaying = true;
+                MediaOpened?.Invoke(this, EventArgs.Empty);
+                return true;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error playing audio file: {ex.Message}");
+            return false;
+        }
     }
 
     public void Pause()
     {
-        // _mediaElement?.Pause();
+        if (_currentPlayer != null && _currentPlayer.IsPlaying)
+        {
+            _currentPlayer.Pause();
+            IsPlaying = false;
+        }
     }
 
-    public void Stop()
+    public void Resume()
     {
-        // _mediaElement?.Stop();
+        if (_currentPlayer != null && !_currentPlayer.IsPlaying)
+        {
+            _currentPlayer.Play();
+            IsPlaying = true;
+        }
     }
 
-    public void SeekTo(TimeSpan position)
+    public Task StopAsync()
     {
-        // if (_mediaElement != null && position >= TimeSpan.Zero && position <= _mediaElement.Duration)
-        // {
-        //     _mediaElement.SeekTo(position);
-        // }
+        if (_currentPlayer != null)
+        {
+            _currentPlayer.Stop();
+            _currentPlayer.Dispose();
+            _currentPlayer = null;
+            IsPlaying = false;
+            PlaybackPosition = TimeSpan.Zero;
+            PlaybackProgress = 0;
+        }
+        return Task.CompletedTask;
     }
 
-    // private void WireEvents(MediaElement mediaElement)
-    // {
-    //     mediaElement.MediaOpened += OnMediaOpened;
-    //     mediaElement.MediaEnded += OnMediaEnded;
-    //     mediaElement.MediaFailed += OnMediaFailed;
-    //     mediaElement.PositionChanged += OnPositionChanged;
-    //     mediaElement.StateChanged += OnStateChanged;
-    // }
-
-    // private void UnwireEvents(MediaElement mediaElement)
-    // {
-    //     mediaElement.MediaOpened -= OnMediaOpened;
-    //     mediaElement.MediaEnded -= OnMediaEnded;
-    //     mediaElement.MediaFailed -= OnMediaFailed;
-    //     mediaElement.PositionChanged -= OnPositionChanged;
-    //     mediaElement.StateChanged -= OnStateChanged;
-    // }
-
-    private void OnMediaOpened(object? sender, EventArgs e)
+    public void Seek(double positionInSeconds)
     {
-        // if (_mediaElement != null)
-        // {
-        //     PlaybackDuration = _mediaElement.Duration;
-        // }
-        MediaOpened?.Invoke(sender, e);
+        if (_currentPlayer != null)
+        {
+            _currentPlayer.Seek(positionInSeconds);
+        }
     }
 
-    private void OnMediaEnded(object? sender, EventArgs e)
+    public void SetAudioSourceWithMetadata(string filePath, string userName, DateTime sessionDate)
     {
-        IsPlaying = false;
-        PlaybackPosition = TimeSpan.Zero;
-        PlaybackProgress = 0;
-        MediaEnded?.Invoke(sender, e);
+        UserName = userName;
+        SessionDate = sessionDate;
+        // Note: We don't automatically play here, just set metadata
+        System.Diagnostics.Debug.WriteLine($"Audio metadata set - User: {userName}, Date: {sessionDate:yyyy-MM-dd}");
     }
-
-    // private void OnMediaFailed(object? sender, MediaFailedEventArgs e)
-    // {
-    //     IsPlaying = false;
-    //     MediaFailed?.Invoke(sender, e);
-    // }
-
-    // private void OnPositionChanged(object? sender, MediaPositionChangedEventArgs e)
-    // {
-    //     PlaybackPosition = e.Position;
-    //     if (_mediaElement != null)
-    //     {
-    //         PlaybackDuration = _mediaElement.Duration;
-    //         PlaybackProgress = _mediaElement.Duration.TotalSeconds > 0 
-    //             ? e.Position.TotalSeconds / _mediaElement.Duration.TotalSeconds 
-    //             : 0.0;
-    //     }
-    //     PositionChanged?.Invoke(sender, e);
-    // }
-
-    // private void OnStateChanged(object? sender, MediaStateChangedEventArgs e)
-    // {
-    //     IsPlaying = e.NewState == MediaElementState.Playing;
-    //     StateChanged?.Invoke(sender, e);
-    // }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void Dispose()
+    {
+        _positionTimer?.Stop();
+        _positionTimer?.Dispose();
+        _ = StopAsync();
     }
 }

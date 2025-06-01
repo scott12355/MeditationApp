@@ -15,16 +15,18 @@ public class DayDetailViewModel : INotifyPropertyChanged
     private readonly CalendarDataService? _calendarDataService;
     private readonly CognitoAuthService? _cognitoAuthService;
     private readonly IAudioDownloadService _audioDownloadService;
+    private readonly AudioPlayerService? _audioPlayerService;
     private bool _isLoading;
     private string _notes = string.Empty;
     private int? _mood;
 
-    public DayDetailViewModel(MeditationSessionDatabase database, CalendarDataService? calendarDataService = null, CognitoAuthService? cognitoAuthService = null, IAudioDownloadService? audioService = null)
+    public DayDetailViewModel(MeditationSessionDatabase database, CalendarDataService? calendarDataService = null, CognitoAuthService? cognitoAuthService = null, IAudioDownloadService? audioService = null, AudioPlayerService? audioPlayerService = null)
     {
         _database = database;
         _calendarDataService = calendarDataService;
         _cognitoAuthService = cognitoAuthService;
         _audioDownloadService = audioService ?? throw new ArgumentNullException(nameof(audioService));
+        _audioPlayerService = audioPlayerService;
         AddSessionCommand = new Command(OnAddSession);
         PlaySessionCommand = new Command<MeditationSession>(OnPlaySession);
     }
@@ -158,9 +160,27 @@ public class DayDetailViewModel : INotifyPropertyChanged
             // At this point, localPath should be valid and file should exist
             if (!string.IsNullOrEmpty(localPath) && File.Exists(localPath))
             {
-                // TODO: Trigger actual audio playback here (e.g., via MediaElement or navigation)
-                if (page != null)
-                    await page.DisplayAlert("Play Session", $"Playing: {localPath}", "OK");
+                // Use AudioPlayerService if available, otherwise show placeholder
+                if (_audioPlayerService != null)
+                {
+                    var success = await _audioPlayerService.PlayFromFileAsync(localPath);
+                    if (!success)
+                    {
+                        if (page != null)
+                            await page.DisplayAlert("Error", "Failed to play the audio file.", "OK");
+                    }
+                    else
+                    {
+                        if (page != null)
+                            await page.DisplayAlert("Playing Session", $"Now playing meditation session.", "OK");
+                    }
+                }
+                else
+                {
+                    // Fallback: just show that we would play
+                    if (page != null)
+                        await page.DisplayAlert("Play Session", $"Playing: {localPath}", "OK");
+                }
             }
             else
             {

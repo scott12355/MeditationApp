@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using MeditationApp.Models;
 using CommunityToolkit.Maui;
+using Plugin.Maui.Audio;
 #if IOS
 using Microsoft.Maui.Handlers;
 #endif
@@ -103,7 +104,16 @@ public static class MauiProgram
         });
 
         // Register TodayViewModel as singleton so splash screen and TodayPage share the same instance
-        builder.Services.AddSingleton<ViewModels.TodayViewModel>();
+        builder.Services.AddSingleton<ViewModels.TodayViewModel>(provider =>
+            new ViewModels.TodayViewModel(
+                provider.GetRequiredService<GraphQLService>(),
+                provider.GetRequiredService<CognitoAuthService>(),
+                provider.GetRequiredService<MeditationSessionDatabase>(),
+                provider.GetRequiredService<IAudioDownloadService>(),
+                provider.GetRequiredService<SessionStatusPoller>(),
+                provider.GetRequiredService<AudioPlayerService>()
+            )
+        );
 
         // Register views
         builder.Services.AddTransient<Views.SplashPage>();
@@ -127,7 +137,8 @@ public static class MauiProgram
                 provider.GetRequiredService<MeditationSessionDatabase>(),
                 provider.GetService<CalendarDataService>(),
                 provider.GetService<CognitoAuthService>(),
-                provider.GetRequiredService<IAudioDownloadService>()
+                provider.GetRequiredService<IAudioDownloadService>(),
+                provider.GetRequiredService<AudioPlayerService>()
             )
         );
 
@@ -141,6 +152,9 @@ public static class MauiProgram
         // Register NotificationService
         builder.Services.AddSingleton<MeditationApp.Services.NotificationService>();
         
+        // Register Plugin.Maui.Audio
+        builder.Services.AddSingleton(AudioManager.Current);
+        
         // Register SessionStatusPoller
         builder.Services.AddSingleton<SessionStatusPoller>(provider =>
         {
@@ -149,8 +163,12 @@ public static class MauiProgram
             return new SessionStatusPoller(graphQLService, sessionDatabase);
         });
         
-        // Register AudioPlayerService
-        // builder.Services.AddSingleton<AudioPlayerService>();
+        // Register AudioPlayerService with Plugin.Maui.Audio dependency
+        builder.Services.AddSingleton<AudioPlayerService>(provider =>
+        {
+            var audioManager = provider.GetRequiredService<IAudioManager>();
+            return new AudioPlayerService(audioManager);
+        });
 
 #if DEBUG
         builder.Logging.AddDebug();
