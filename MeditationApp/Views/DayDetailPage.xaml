@@ -8,7 +8,6 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:MeditationSessionStatusToColorConverter x:Key="MeditationSessionStatusToColorConverter"/>
-            <converters:EditSaveButtonTextConverter x:Key="EditSaveButtonTextConverter"/>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
         </ResourceDictionary>
     </ContentPage.Resources>

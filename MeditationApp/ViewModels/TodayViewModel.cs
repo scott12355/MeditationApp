@@ -8,6 +8,9 @@ using System.Diagnostics;
 using Microsoft.Maui.Controls;
 using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Maui.Core.Primitives;
+using MeditationApp.Utils;
+using System.ComponentModel;
+using Microsoft.Maui.Storage;
 
 namespace MeditationApp.ViewModels;
 
@@ -20,7 +23,7 @@ public partial class TodayViewModel : ObservableObject
     private int? _selectedMood = null; // Default to neutral mood
 
     [ObservableProperty]
-    private MeditationApp.Models.MeditationSession? _todaySession = null;
+    private MeditationSession? _todaySession = null;
 
     [ObservableProperty]
     private bool _hasTodaySession = false;
@@ -32,22 +35,7 @@ public partial class TodayViewModel : ObservableObject
     private bool _isDownloading = false;
 
     [ObservableProperty]
-    private bool _isPlaying = false;
-
-    [ObservableProperty]
-    private double _playbackProgress = 0.0;
-
-    [ObservableProperty]
-    private TimeSpan _playbackPosition = TimeSpan.Zero;
-
-    [ObservableProperty]
-    private TimeSpan _playbackDuration = TimeSpan.Zero;
-
-    [ObservableProperty]
     private string _downloadStatus = string.Empty;
-
-    [ObservableProperty]
-    private string _playPauseIcon = "▶";
 
     [ObservableProperty]
     private MediaElement? _audioPlayer;
@@ -57,6 +45,9 @@ public partial class TodayViewModel : ObservableObject
 
     // Track if this is the initial load to prevent UI flicker
     private bool _isInitialLoad = true;
+
+    // Flag to prevent recursive property change notifications during data loading
+    private bool _isLoadingData = false;
 
     [ObservableProperty]
     private bool _isPolling = false;
@@ -79,22 +70,33 @@ public partial class TodayViewModel : ObservableObject
     [ObservableProperty]
     private bool _isMoodSelectorExpanded = false;
 
-    private Models.UserDailyInsights? _currentInsights;
+    private UserDailyInsights? _currentInsights;
 
     public string FormattedDate => CurrentDate.ToString("dddd, MMMM dd, yyyy");
     
-    public string CurrentPositionText => PlaybackPosition.ToString(@"mm\:ss");
+    // Delegate audio-related properties to the AudioPlayerService
+    public bool IsPlaying => _audioPlayerService.IsPlaying;
+    public double PlaybackProgress => _audioPlayerService.PlaybackProgress;
+    public TimeSpan PlaybackPosition => _audioPlayerService.PlaybackPosition;
+    public TimeSpan PlaybackDuration => _audioPlayerService.PlaybackDuration;
+    public string CurrentPositionText => _audioPlayerService.CurrentPositionText;
+    public string TotalDurationText => _audioPlayerService.TotalDurationText;
+    public string PlayPauseIcon => _audioPlayerService.PlayPauseIcon;
     
-    public string TotalDurationText => PlaybackDuration.ToString(@"mm\:ss");
+    // Delegate metadata properties to the AudioPlayerService
+    public string UserName => _audioPlayerService.UserName;
+    public DateTime SessionDate => _audioPlayerService.SessionDate;
+    public string SessionDateText => _audioPlayerService.SessionDateText;
 
     private readonly GraphQLService _graphQLService;
     private readonly CognitoAuthService _cognitoAuthService;
     private readonly MeditationSessionDatabase _sessionDatabase;
-    private readonly IAudioService _audioService;
+    private readonly SessionStatusPoller _sessionStatusPoller;
+    private readonly IAudioDownloadService _audioDownloadService;
+    private readonly AudioPlayerService _audioPlayerService;
+
     private Task? _initializationTask;
     private CancellationTokenSource? _pollingCts;
-    private const int POLLING_INTERVAL_MS = 5000; // Poll every 5 seconds
-    private const int MAX_POLLING_DURATION_MS = 300000; // Stop polling after 5 minutes
     
     // Token refresh management
     private static DateTime _lastRefreshAttempt = DateTime.MinValue;
@@ -102,12 +104,24 @@ public partial class TodayViewModel : ObservableObject
     private const int MAX_REFRESH_ATTEMPTS = 3;
     private static readonly TimeSpan REFRESH_COOLDOWN = TimeSpan.FromMinutes(1);
 
-    public TodayViewModel(GraphQLService graphQLService, CognitoAuthService cognitoAuthService, MeditationSessionDatabase sessionDatabase, IAudioService audioService)
+    public TodayViewModel(GraphQLService graphQLService, CognitoAuthService cognitoAuthService, MeditationSessionDatabase sessionDatabase, IAudioDownloadService audioDownloadService, SessionStatusPoller sessionStatusPoller, AudioPlayerService audioPlayerService)
     {
         _graphQLService = graphQLService;
         _cognitoAuthService = cognitoAuthService;
         _sessionDatabase = sessionDatabase;
-        _audioService = audioService;
+        _audioDownloadService = audioDownloadService;
+        _sessionStatusPoller = sessionStatusPoller;
+        _audioPlayerService = audioPlayerService;
+        
+        // Subscribe to events
+        _audioPlayerService.MediaOpened += OnMediaOpened;
+        _audioPlayerService.MediaEnded += OnMediaEnded;
+        _audioPlayerService.MediaFailed += OnMediaFailed;
+        _audioPlayerService.PositionChanged += OnPositionChanged;
+        _audioPlayerService.StateChanged += OnStateChanged;
+        
+        // Subscribe to property changes to forward audio-related properties
+        _audioPlayerService.PropertyChanged += OnAudioPlayerServicePropertyChanged;
         
         // Start loading data immediately
         _initializationTask = LoadTodayDataAsync();
@@ -154,115 +168,119 @@ public partial class TodayViewModel : ObservableObject
     [RelayCommand]
     private async Task TogglePlayback()
     {
-        if (TodaySession == null || AudioPlayer == null)
+        // If we're currently playing, just pause
+        if (_audioPlayerService.IsPlaying)
         {
-            Debug.WriteLine("TogglePlayback: TodaySession or AudioPlayer is null");
+            _audioPlayerService.Pause();
             return;
         }
 
+        // If we're not playing, we need to ensure audio is loaded before playing
+        if (TodaySession != null && TodaySession.IsDownloaded && !string.IsNullOrEmpty(TodaySession.LocalAudioPath))
+        {
+            // Load audio with metadata before playing
+            await LoadAudioWithMetadata();
+            _audioPlayerService.Play();
+        }
+        else
+        {
+            // Show message that session needs to be downloaded first
+            var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (page != null)
+            {
+                await page.DisplayAlert("Download Required", 
+                    "Please download the session first before playing.", 
+                    "OK");
+            }
+        }
+    }
+
+    private async Task LoadAudioWithMetadata()
+    {
+        if (TodaySession == null || string.IsNullOrEmpty(TodaySession.LocalAudioPath))
+            return;
+
         try
         {
-            Debug.WriteLine($"TogglePlayback: Current IsPlaying state: {IsPlaying}");
-            if (!IsPlaying)
+            // Get user profile information for metadata
+            string userName = "User"; // Default fallback
+            
+            // Try to get user information from stored tokens
+            try
             {
-                Debug.WriteLine("TogglePlayback: Attempting to start playback");
-                // Check if session is downloaded and file exists
-                if (!TodaySession.IsDownloaded || string.IsNullOrEmpty(TodaySession.LocalAudioPath) || !File.Exists(TodaySession.LocalAudioPath))
+                var accessToken = await SecureStorage.Default.GetAsync("access_token");
+                if (!string.IsNullOrEmpty(accessToken))
                 {
-                    Debug.WriteLine($"TogglePlayback: Session {TodaySession.Uuid} needs download - IsDownloaded: {TodaySession.IsDownloaded}, File exists: {(!string.IsNullOrEmpty(TodaySession.LocalAudioPath) && File.Exists(TodaySession.LocalAudioPath))}");
+                    var userAttributes = await _cognitoAuthService.GetUserAttributesAsync(accessToken);
                     
-                    // Update session state if file is missing
-                    if (TodaySession.IsDownloaded)
-                    {
-                        TodaySession.IsDownloaded = false;
-                        TodaySession.LocalAudioPath = null;
-                        TodaySession.DownloadedAt = null;
-                        TodaySession.FileSizeBytes = null;
-                        await _sessionDatabase.SaveSessionAsync(TodaySession);
-                    }
-                    
-                    await DownloadSessionInternal(true);
-                    if (!TodaySession.IsDownloaded)
-                    {
-                        Debug.WriteLine($"TogglePlayback: Download failed for session {TodaySession.Uuid}");
-                        return; // Download failed
-                    }
-                }
+                    string firstName = string.Empty;
+                    string lastName = string.Empty;
+                    string username = string.Empty;
+                    string email = string.Empty;
 
-                var fileInfo = new FileInfo(TodaySession.LocalAudioPath!);
-                Debug.WriteLine($"TogglePlayback: Attempting to play audio file: {TodaySession.LocalAudioPath} (Size: {fileInfo.Length} bytes, Last modified: {fileInfo.LastWriteTime})");
-
-                // Verify file is readable
-                try
-                {
-                    using (var stream = File.OpenRead(TodaySession.LocalAudioPath!))
+                    foreach (var attribute in userAttributes)
                     {
-                        Debug.WriteLine($"File stream opened successfully, length: {stream.Length}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error verifying file: {ex.Message}");
-                    await MainThread.InvokeOnMainThreadAsync(async () =>
-                    {
-                        var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-                        if (page != null)
+                        switch (attribute.Name)
                         {
-                            await page.DisplayAlert(
-                                "Error", 
-                                "The audio file appears to be corrupted. Please try downloading the session again.", 
-                                "OK");
+                            case "given_name":
+                                firstName = attribute.Value;
+                                break;
+                            case "family_name":
+                                lastName = attribute.Value;
+                                break;
+                            case "preferred_username":
+                            case "username":
+                                username = attribute.Value;
+                                break;
+                            case "email":
+                                email = attribute.Value;
+                                break;
                         }
-                    });
-                    return;
-                }
+                    }
 
-                // Start playback
-                Debug.WriteLine($"TogglePlayback: Current state = {AudioPlayer.CurrentState}");
-                if (AudioPlayer.CurrentState == MediaElementState.Paused || 
-                    AudioPlayer.CurrentState == MediaElementState.Stopped)
-                {
-                    AudioPlayer.Play();
-                    IsPlaying = true;
-                    Debug.WriteLine("TogglePlayback: Play() called successfully");
-                }
-                else
-                {
-                    Debug.WriteLine($"TogglePlayback: Current state is {AudioPlayer.CurrentState}, cannot play");
+                    // Create display name from available information
+                    var displayName = $"{firstName} {lastName}".Trim();
+                    if (!string.IsNullOrEmpty(displayName))
+                    {
+                        userName = displayName;
+                    }
+                    else if (!string.IsNullOrEmpty(username))
+                    {
+                        userName = username;
+                    }
+                    else if (!string.IsNullOrEmpty(email))
+                    {
+                        userName = email;
+                    }
                 }
             }
-            else
+            catch (Exception ex)
             {
-                // Pause playback
-                Debug.WriteLine($"TogglePlayback: Current state = {AudioPlayer.CurrentState}");
-                if (AudioPlayer.CurrentState == MediaElementState.Playing)
-                {
-                    AudioPlayer.Pause();
-                    IsPlaying = false;
-                    Debug.WriteLine("TogglePlayback: Pause() called successfully");
-                }
-                else
-                {
-                    Debug.WriteLine($"TogglePlayback: Current state is {AudioPlayer.CurrentState}, cannot pause");
-                }
+                Debug.WriteLine($"Could not fetch user attributes: {ex.Message}");
+                // Continue with default userName
             }
+
+            // Set audio source with metadata
+            _audioPlayerService.SetAudioSourceWithMetadata(
+                TodaySession.LocalAudioPath, 
+                userName, 
+                TodaySession.Timestamp);
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"TogglePlayback: Error toggling playback: {ex.Message}\nStack trace: {ex.StackTrace}");
-            var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-            if (page != null)
-                await page.DisplayAlert("Error", $"An error occurred while controlling playback: {ex.Message}", "OK");
+            Debug.WriteLine($"Error loading audio with metadata: {ex.Message}");
+            // Fallback to basic audio loading if metadata fails
+            _audioPlayerService.SetAudioSource(TodaySession.LocalAudioPath);
         }
     }
 
     [RelayCommand]
     private async Task DownloadTodaySession()
     {
-        await DownloadSessionInternal(true);
+        await DownloadSessionInternal();
     }
     
-    private async Task DownloadSessionInternal(bool showDialogs = false)
+    private async Task DownloadSessionInternal()
     {
         if (TodaySession == null || IsDownloading) return;
 
@@ -272,18 +290,10 @@ public partial class TodayViewModel : ObservableObject
             DownloadStatus = "Getting download URL...";
 
             // Get presigned URL for the session
-            var presignedUrl = await _audioService.GetPresignedUrlAsync(TodaySession.Uuid);
+            var presignedUrl = await _audioDownloadService.GetPresignedUrlAsync(TodaySession.Uuid);
             if (string.IsNullOrEmpty(presignedUrl))
             {
                 DownloadStatus = "Failed to get download URL";
-                var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-                if (showDialogs && page != null)
-                {
-                    await page.DisplayAlert(
-                        "Error", 
-                        "Failed to get download URL for the session", 
-                        "OK");
-                }
                 IsDownloading = false;
                 return;
             }
@@ -291,7 +301,7 @@ public partial class TodayViewModel : ObservableObject
             DownloadStatus = "Downloading session...";
 
             // Download the audio file
-            var success = await _audioService.DownloadSessionAudioAsync(TodaySession, presignedUrl);
+            var success = await _audioDownloadService.DownloadSessionAudioAsync(TodaySession, presignedUrl);
             if (success)
             {
                 // Update session in database
@@ -303,40 +313,17 @@ public partial class TodayViewModel : ObservableObject
 
                 DownloadStatus = "Download complete!";
 
-                var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-                if (showDialogs && page != null)
-                {
-                    await page.DisplayAlert(
-                        "Success", 
-                        "Session downloaded successfully!", 
-                        "OK");
-                }
+               
             }
             else
             {
                 DownloadStatus = "Download failed";
-                var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-                if (showDialogs && page != null)
-                {
-                    await page.DisplayAlert(
-                        "Error", 
-                        "Failed to download the session", 
-                        "OK");
-                }
             }
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Error downloading session: {ex.Message}");
             DownloadStatus = "Download failed";
-            var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
-            if (showDialogs && page != null)
-            {
-                await page.DisplayAlert(
-                    "Error", 
-                    "An error occurred while downloading the session", 
-                    "OK");
-            }
         }
         finally
         {
@@ -350,50 +337,32 @@ public partial class TodayViewModel : ObservableObject
     // MediaElement event handlers called from the View
     public void SetMediaElement(MediaElement player)
     {
-        AudioPlayer = player;
-        AudioPlayer.MediaOpened += OnMediaOpened;
-        AudioPlayer.MediaEnded += OnMediaEnded;
-        AudioPlayer.MediaFailed += OnMediaFailed;
-        AudioPlayer.PositionChanged += OnPositionChanged;
-        AudioPlayer.StateChanged += OnStateChanged;
+        _audioPlayerService.SetMediaElement(player);
+        AudioPlayer = player; // Set the AudioPlayer property so event handlers can access it
     }
 
     public void CleanupMediaElement()
     {
-        if (AudioPlayer != null)
-        {
-            AudioPlayer.MediaOpened -= OnMediaOpened;
-            AudioPlayer.MediaEnded -= OnMediaEnded;
-            AudioPlayer.MediaFailed -= OnMediaFailed;
-            AudioPlayer.PositionChanged -= OnPositionChanged;
-            AudioPlayer.StateChanged -= OnStateChanged;
-            AudioPlayer = null;
-        }
+        // Unsubscribe from AudioPlayerService events (not direct MediaElement events)
+        // The AudioPlayerService handles the MediaElement lifecycle
+        AudioPlayer = null;
     }
 
     private void OnMediaOpened(object? sender, EventArgs e)
     {
-        if (AudioPlayer == null) return;
-        Debug.WriteLine($"OnMediaOpened: Duration = {AudioPlayer.Duration}, State = {AudioPlayer.CurrentState}");
-        PlaybackDuration = AudioPlayer.Duration;
-        OnPropertyChanged(nameof(TotalDurationText));
+        Debug.WriteLine($"OnMediaOpened: Duration = {_audioPlayerService.Duration}, State = {_audioPlayerService.CurrentState}");
+        // AudioPlayerService handles the state, no need to update properties here
     }
 
     private void OnMediaEnded(object? sender, EventArgs e)
     {
-        if (AudioPlayer == null) return;
-        Debug.WriteLine($"OnMediaEnded: Event received, State = {AudioPlayer.CurrentState}");
-        IsPlaying = false;
-        PlaybackPosition = TimeSpan.Zero;
-        PlaybackProgress = 0;
-        OnPropertyChanged(nameof(CurrentPositionText));
+        Debug.WriteLine($"OnMediaEnded: Event received, State = {_audioPlayerService.CurrentState}");
+        // AudioPlayerService handles the state, no need to update properties here
     }
 
     private void OnMediaFailed(object? sender, MediaFailedEventArgs e)
     {
-        if (AudioPlayer == null) return;
-        Debug.WriteLine($"OnMediaFailed: Error = {e.ErrorMessage}, State = {AudioPlayer.CurrentState}");
-        IsPlaying = false;
+        Debug.WriteLine($"OnMediaFailed: Error = {e.ErrorMessage}, State = {_audioPlayerService.CurrentState}");
         
         Debug.WriteLine($"Current session state - Uuid: {TodaySession?.Uuid}, IsDownloaded: {TodaySession?.IsDownloaded}, LocalAudioPath: {TodaySession?.LocalAudioPath}");
         
@@ -425,22 +394,14 @@ public partial class TodayViewModel : ObservableObject
 
     private void OnPositionChanged(object? sender, MediaPositionChangedEventArgs e)
     {
-        if (AudioPlayer == null) return;
-        Debug.WriteLine($"OnPositionChanged: Position = {e.Position}, Duration = {AudioPlayer.Duration}, State = {AudioPlayer.CurrentState}");
-        PlaybackPosition = e.Position;
-        PlaybackDuration = AudioPlayer.Duration;
-        PlaybackProgress = AudioPlayer.Duration.TotalSeconds > 0 ? e.Position.TotalSeconds / AudioPlayer.Duration.TotalSeconds : 0;
-        OnPropertyChanged(nameof(CurrentPositionText));
-        OnPropertyChanged(nameof(TotalDurationText));
+        Debug.WriteLine($"OnPositionChanged: Position = {e.Position}, Duration = {_audioPlayerService.Duration}, State = {_audioPlayerService.CurrentState}");
+        // AudioPlayerService handles the state, no need to update properties here
     }
 
     private void OnStateChanged(object? sender, MediaStateChangedEventArgs e)
     {
-        if (AudioPlayer == null) return;
         Debug.WriteLine($"OnStateChanged: New state = {e.NewState}");
-        
-        // Update IsPlaying based on the new state
-        IsPlaying = e.NewState == MediaElementState.Playing;
+        // AudioPlayerService handles the state, no need to update properties here
     }
 
     [RelayCommand]
@@ -501,7 +462,7 @@ public partial class TodayViewModel : ObservableObject
                 Debug.WriteLine("[RequestSession] Starting session creation request");
                 
                 // Load the mutation
-                string mutation = await LoadGraphQLQueryFromAssetAsync("CreateMeditationSession.graphql");
+                string mutation = await GraphQLQueryLoader.LoadQueryAsync("CreateMeditationSession.graphql");
                 if (string.IsNullOrWhiteSpace(mutation))
                 {
                     Debug.WriteLine("[RequestSession] GraphQL mutation is empty or failed to load.");
@@ -623,7 +584,7 @@ public partial class TodayViewModel : ObservableObject
                 var timestamp = DateTimeOffset.FromUnixTimeMilliseconds(
                     timestampMillis).DateTime;
 
-                var status = ParseSessionStatus(sessionElem.GetProperty("status").GetString() ?? MeditationSessionStatus.REQUESTED.ToString());
+                var status = MeditationSessionStatusHelper.ParseSessionStatus(sessionElem.GetProperty("status").GetString() ?? MeditationSessionStatus.REQUESTED.ToString());
                 var audioPath = sessionElem.TryGetProperty("audioPath", out var audioPathElem) ? audioPathElem.GetString() : null;
 
                 // Create new session object
@@ -687,6 +648,13 @@ public partial class TodayViewModel : ObservableObject
     [RelayCommand]
     private async Task SelectMood(string mood)
     {
+        // Skip saving if we're currently loading data to prevent recursion
+        if (_isLoadingData)
+        {
+            Debug.WriteLine("[SelectMood] Skipping mood selection during data loading");
+            return;
+        }
+        
         if (int.TryParse(mood, out int moodValue))
         {
             SelectedMood = moodValue;
@@ -704,6 +672,14 @@ public partial class TodayViewModel : ObservableObject
     partial void OnSessionNotesChanged(string value)
     {
         Debug.WriteLine($"[Notes] Notes changed to: {value}");
+        
+        // Skip saving if we're currently loading data to prevent recursion
+        if (_isLoadingData)
+        {
+            Debug.WriteLine("[Notes] Skipping notes change handling during data loading");
+            return;
+        }
+        
         // Debounce the save operation to avoid too many API calls
         _ = Task.Run(async () =>
         {
@@ -726,6 +702,13 @@ public partial class TodayViewModel : ObservableObject
     {
         try
         {
+            // Prevent recursive calls when loading data
+            if (_isLoadingData)
+            {
+                Debug.WriteLine("[SaveInsights] Skipping save during data loading to prevent recursion");
+                return;
+            }
+
             Debug.WriteLine("[SaveInsights] Starting to save user daily insights");
             var userId = await GetCurrentUserId();
             if (string.IsNullOrEmpty(userId))
@@ -763,7 +746,7 @@ public partial class TodayViewModel : ObservableObject
                 try
                 {
                     Debug.WriteLine($"[SaveInsights] Syncing insights with server - Notes: {SessionNotes}, Mood: {SelectedMood}");
-                    string mutation = await LoadGraphQLQueryFromAssetAsync("AddUserDailyInsights.graphql");
+                    string mutation = await GraphQLQueryLoader.LoadQueryAsync("AddUserDailyInsights.graphql");
                     if (string.IsNullOrWhiteSpace(mutation))
                     {
                         Debug.WriteLine("[SaveInsights] GraphQL mutation is empty or failed to load.");
@@ -875,28 +858,37 @@ public partial class TodayViewModel : ObservableObject
 
                 if (todayInsight.ValueKind != JsonValueKind.Undefined)
                 {
-                    var notes = todayInsight.GetProperty("notes").GetString();
-                    if (todayInsight.TryGetProperty("mood", out var moodElem) && 
-                        moodElem.TryGetInt32(out var mood))
+                    // Set flag to prevent recursive property change notifications
+                    _isLoadingData = true;
+                    try
                     {
-                        SelectedMood = mood;
-                    }
-                    SessionNotes = notes ?? string.Empty;
-                    HasExistingInsights = true;
-                    InsightsDate = today;
+                        var notes = todayInsight.GetProperty("notes").GetString();
+                        if (todayInsight.TryGetProperty("mood", out var moodElem) && 
+                            moodElem.TryGetInt32(out var mood))
+                        {
+                            SelectedMood = mood;
+                        }
+                        SessionNotes = notes ?? string.Empty;
+                        HasExistingInsights = true;
+                        InsightsDate = today;
 
-                    // Save to local database
-                    _currentInsights = new Models.UserDailyInsights
+                        // Save to local database
+                        _currentInsights = new Models.UserDailyInsights
+                        {
+                            UserID = userId,
+                            Date = InsightsDate,
+                            Notes = SessionNotes,
+                            Mood = SelectedMood,
+                            IsSynced = true
+                        };
+                        await _sessionDatabase.SaveDailyInsightsAsync(_currentInsights);
+                        
+                        Debug.WriteLine($"Loaded and saved insights from server - Mood: {SelectedMood}, Notes: {SessionNotes}");
+                    }
+                    finally
                     {
-                        UserID = userId,
-                        Date = InsightsDate,
-                        Notes = SessionNotes,
-                        Mood = SelectedMood,
-                        IsSynced = true
-                    };
-                    await _sessionDatabase.SaveDailyInsightsAsync(_currentInsights);
-                    
-                    Debug.WriteLine($"Loaded and saved insights from server - Mood: {SelectedMood}, Notes: {SessionNotes}");
+                        _isLoadingData = false;
+                    }
                 }
                 else
                 {
@@ -946,7 +938,7 @@ public partial class TodayViewModel : ObservableObject
 
     private async Task<JsonDocument> LoadDailyInsightsAsync(string userId)
     {
-        string query = await LoadGraphQLQueryFromAssetAsync("ListUserDailyInsights.graphql");
+        string query = await GraphQLQueryLoader.LoadQueryAsync("ListUserDailyInsights.graphql");
         if (string.IsNullOrWhiteSpace(query))
         {
             Debug.WriteLine("GraphQL query is empty or failed to load.");
@@ -974,24 +966,42 @@ public partial class TodayViewModel : ObservableObject
                 return;
             }
 
-            var insights = await _sessionDatabase.GetDailyInsightsAsync(userId, DateTime.Now.Date);
-            if (insights != null)
+            // Only set flag if not already loading to prevent double-setting
+            bool wasAlreadyLoading = _isLoadingData;
+            if (!wasAlreadyLoading)
             {
-                _currentInsights = insights;
-                SelectedMood = insights.Mood;
-                SessionNotes = insights.Notes;
-                HasExistingInsights = true;
-                InsightsDate = insights.Date;
-                Debug.WriteLine($"[LoadLocal] Loaded insights from local DB - Mood: {SelectedMood}, Notes: {SessionNotes}");
+                _isLoadingData = true;
             }
-            else
+
+            try
             {
-                // Clear insights if none exist
-                _currentInsights = null;
-                SelectedMood = null;
-                SessionNotes = string.Empty;
-                HasExistingInsights = false;
-                Debug.WriteLine("[LoadLocal] No insights found in local DB");
+                var insights = await _sessionDatabase.GetDailyInsightsAsync(userId, DateTime.Now.Date);
+                if (insights != null)
+                {
+                    _currentInsights = insights;
+                    SelectedMood = insights.Mood;
+                    SessionNotes = insights.Notes;
+                    HasExistingInsights = true;
+                    InsightsDate = insights.Date;
+                    Debug.WriteLine($"[LoadLocal] Loaded insights from local DB - Mood: {SelectedMood}, Notes: {SessionNotes}");
+                }
+                else
+                {
+                    // Clear insights if none exist
+                    _currentInsights = null;
+                    SelectedMood = null;
+                    SessionNotes = string.Empty;
+                    HasExistingInsights = false;
+                    Debug.WriteLine("[LoadLocal] No insights found in local DB");
+                }
+            }
+            finally
+            {
+                // Only reset the flag if we set it in this call
+                if (!wasAlreadyLoading)
+                {
+                    _isLoadingData = false;
+                }
             }
         }
         catch (Exception ex)
@@ -1002,7 +1012,7 @@ public partial class TodayViewModel : ObservableObject
 
     private async Task<JsonDocument> LoadSessionsAsync(string userId)
     {
-        string query = await LoadGraphQLQueryFromAssetAsync("ListUserMeditationSessions.graphql");
+        string query = await GraphQLQueryLoader.LoadQueryAsync("ListUserMeditationSessions.graphql");
         if (string.IsNullOrWhiteSpace(query))
         {
             Debug.WriteLine("GraphQL query is empty or failed to load.");
@@ -1076,7 +1086,7 @@ public partial class TodayViewModel : ObservableObject
                     Timestamp = timestampVal,
                     AudioPath = sessionElem.TryGetProperty("audioPath", out var audioElem) ? audioElem.GetString() ?? string.Empty : string.Empty,
                     Status = sessionElem.TryGetProperty("status", out var statusElem) ? 
-                        ParseSessionStatus(statusElem.GetString() ?? MeditationSessionStatus.REQUESTED.ToString()) : 
+                        MeditationSessionStatusHelper.ParseSessionStatus(statusElem.GetString() ?? MeditationSessionStatus.REQUESTED.ToString()) : 
                         MeditationSessionStatus.REQUESTED
                 };
 
@@ -1152,21 +1162,6 @@ public partial class TodayViewModel : ObservableObject
         else
         {
             Debug.WriteLine("[LoadLocal] No session found for today");
-        }
-    }
-
-    private async Task<string> LoadGraphQLQueryFromAssetAsync(string filename)
-    {
-        try
-        {
-            using var stream = await Microsoft.Maui.Storage.FileSystem.OpenAppPackageFileAsync($"GraphQL/Queries/{filename}");
-            using var reader = new StreamReader(stream);
-            return await reader.ReadToEndAsync();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Failed to load GraphQL asset: {filename}, {ex.Message}");
-            return string.Empty;
         }
     }
 
@@ -1289,7 +1284,7 @@ public partial class TodayViewModel : ObservableObject
             Debug.WriteLine("Logging out user due to expired/invalid refresh token");
             
             // Clear view model state first
-            await ClearViewModelState();
+            ClearViewModelState();
             
             // Clear all stored tokens
             Microsoft.Maui.Storage.SecureStorage.Remove("access_token");
@@ -1339,15 +1334,15 @@ public partial class TodayViewModel : ObservableObject
     /// <summary>
     /// Clears all state in the view model
     /// </summary>
-    public async Task ClearViewModelState()
+    public void ClearViewModelState()
     {
         try
         {
             // Stop any playing audio
             if (IsPlaying)
             {
-                await StopAudio();
-            }
+                StopAudio();
+            } 
 
             // Clear all properties
             CurrentDate = DateTime.Now;
@@ -1360,8 +1355,7 @@ public partial class TodayViewModel : ObservableObject
             _lastRefreshAttempt = DateTime.MinValue;
             IsSyncingInsights = false;
             IsLoading = false;
-            IsPlaying = false;
-            PlayPauseIcon = "▶";
+            // Audio state is now managed by AudioPlayerService
             
             // Clear any cached data
             _sessionDatabase.ClearCache();
@@ -1380,11 +1374,7 @@ public partial class TodayViewModel : ObservableObject
         OnPropertyChanged(nameof(FormattedDate));
     }
 
-    partial void OnIsPlayingChanged(bool value)
-    {
-        PlayPauseIcon = value ? "⏸" : "▶";
-        Debug.WriteLine($"IsPlaying changed to {value}, icon updated to {PlayPauseIcon}");
-    }
+
 
     partial void OnTodaySessionChanged(MeditationApp.Models.MeditationSession? oldValue, MeditationApp.Models.MeditationSession? newValue)
     {
@@ -1394,152 +1384,23 @@ public partial class TodayViewModel : ObservableObject
 
     private async Task StartPollingSessionStatus(string sessionId)
     {
-        Debug.WriteLine($"[Polling] Starting polling for session {sessionId}");
-        if (_pollingCts != null)
-        {
-            Debug.WriteLine("[Polling] Existing polling in progress, stopping it first");
-            await StopPollingSessionStatus();
-        }
+        if (TodaySession == null) return;
 
-        // Don't start polling if session is already completed or failed
-        if (TodaySession != null && 
-            (TodaySession.Status == MeditationSessionStatus.COMPLETED || 
-             TodaySession.Status == MeditationSessionStatus.FAILED))
-        {
-            Debug.WriteLine($"[Polling] Not starting polling as session is already in {TodaySession.Status} state");
-            return;
-        }
-
-        _pollingCts = new CancellationTokenSource();
         IsPolling = true;
         PollingStatus = "Checking session status...";
-        Debug.WriteLine("[Polling] Polling initialized and started");
 
-        try
-        {
-            var startTime = DateTime.UtcNow;
-            var pollCount = 0;
-            Debug.WriteLine($"[Polling] Starting polling loop at {startTime:HH:mm:ss.fff}");
-            
-            while (!_pollingCts.Token.IsCancellationRequested)
+        await _sessionStatusPoller.PollSessionStatusAsync(
+            TodaySession,
+            async (newStatus, errorMessage) =>
             {
-                pollCount++;
-                var elapsedTime = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                Debug.WriteLine($"[Polling] Poll #{pollCount} at {DateTime.UtcNow:HH:mm:ss.fff} (Elapsed: {elapsedTime:F0}ms)");
-
-                // Don't continue polling if session is already completed or failed
-                if (TodaySession != null && 
-                    (TodaySession.Status == MeditationSessionStatus.COMPLETED || 
-                     TodaySession.Status == MeditationSessionStatus.FAILED))
+                await UpdateSessionStatus(newStatus, errorMessage);
+                if (newStatus == MeditationSessionStatus.COMPLETED || newStatus == MeditationSessionStatus.FAILED)
                 {
-                    Debug.WriteLine($"[Polling] Stopping polling as session is in {TodaySession.Status} state");
-                    await StopPollingSessionStatus();
-                    break;
+                    IsPolling = false;
+                    PollingStatus = string.Empty;
                 }
-
-                if (elapsedTime > MAX_POLLING_DURATION_MS)
-                {
-                    Debug.WriteLine($"[Polling] Polling timeout reached after {pollCount} polls ({elapsedTime:F0}ms)");
-                    await StopPollingSessionStatus();
-                    if (TodaySession != null)
-                    {
-                        Debug.WriteLine("[Polling] Setting session status to FAILED due to timeout");
-                        await UpdateSessionStatus(MeditationSessionStatus.FAILED, "Session generation timed out. Please try again.");
-                    }
-                    break;
-                }
-
-                try
-                {
-                    Debug.WriteLine("[Polling] Querying backend for session status");
-                    string query = await LoadGraphQLQueryFromAssetAsync("GetMeditationSessionStatus.graphql");
-                    if (string.IsNullOrWhiteSpace(query))
-                    {
-                        Debug.WriteLine("[Polling] Using default GraphQL query");
-                        query = "query GetMeditationSessionStatus($sessionID: ID!) { getMeditationSessionStatus(sessionID: $sessionID) { status errorMessage } }";
-                    }
-
-                    var variables = new { sessionID = sessionId };
-                    var result = await _graphQLService.QueryAsync(query, variables);
-                    Debug.WriteLine($"[Polling] Backend response received: {result.RootElement}");
-
-                    if (result.RootElement.TryGetProperty("data", out var dataElem) &&
-                        dataElem.TryGetProperty("getMeditationSessionStatus", out var statusElem))
-                    {
-                        var status = statusElem.GetProperty("status").GetString();
-                        var errorMessage = statusElem.GetProperty("errorMessage").GetString();
-                        Debug.WriteLine($"[Polling] Session status: {status}, Error: {errorMessage ?? "none"}");
-
-                        if (TodaySession != null)
-                        {
-                            if (Enum.TryParse<MeditationSessionStatus>(status, out var newStatus))
-                            {
-                                var oldStatus = TodaySession.Status;
-                                Debug.WriteLine($"[Polling] Status changed from {oldStatus} to {newStatus}");
-
-                                if (newStatus == MeditationSessionStatus.FAILED)
-                                {
-                                    Debug.WriteLine($"[Polling] Session failed with error: {errorMessage}");
-                                    await UpdateSessionStatus(newStatus, errorMessage);
-                                }
-                                else if (newStatus != MeditationSessionStatus.REQUESTED || oldStatus == MeditationSessionStatus.REQUESTED)
-                                {
-                                    // Only update if not trying to go back to REQUESTED from a higher status
-                                    await UpdateSessionStatus(newStatus, null);
-                                }
-
-                                // Stop polling if session is complete or failed
-                                if (newStatus == MeditationSessionStatus.COMPLETED || 
-                                    newStatus == MeditationSessionStatus.FAILED)
-                                {
-                                    Debug.WriteLine($"[Polling] Stopping polling due to final status: {newStatus}");
-                                    await StopPollingSessionStatus();
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                Debug.WriteLine($"[Polling] Failed to parse status: {status}");
-                            }
-                        }
-                        else
-                        {
-                            Debug.WriteLine("[Polling] TodaySession is null, cannot update status");
-                        }
-                    }
-                    else
-                    {
-                        Debug.WriteLine("[Polling] Invalid response format from backend");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"[Polling] Error polling session status: {ex.Message}\nStack trace: {ex.StackTrace}");
-                    // Don't stop polling on temporary errors
-                }
-
-                Debug.WriteLine($"[Polling] Waiting {POLLING_INTERVAL_MS}ms before next poll");
-                await Task.Delay(POLLING_INTERVAL_MS, _pollingCts.Token);
             }
-        }
-        catch (OperationCanceledException)
-        {
-            Debug.WriteLine("[Polling] Polling cancelled");
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[Polling] Error in polling loop: {ex.Message}\nStack trace: {ex.StackTrace}");
-            if (TodaySession != null)
-            {
-                Debug.WriteLine("[Polling] Setting session status to FAILED due to polling error");
-                await UpdateSessionStatus(MeditationSessionStatus.FAILED, "Error checking session status. Please try again.");
-            }
-        }
-        finally
-        {
-            Debug.WriteLine("[Polling] Cleaning up polling resources");
-            await StopPollingSessionStatus();
-        }
+        );
     }
 
     private async Task UpdateSessionStatus(MeditationSessionStatus newStatus, string? errorMessage)
@@ -1586,7 +1447,7 @@ public partial class TodayViewModel : ObservableObject
         if (newStatus == MeditationSessionStatus.COMPLETED && !updatedSession.IsDownloaded)
         {
             Debug.WriteLine("[UpdateStatus] Session completed, starting auto-download");
-            await DownloadSessionInternal(false);
+            await DownloadSessionInternal();
         }
     }
 
@@ -1625,22 +1486,6 @@ public partial class TodayViewModel : ObservableObject
         return string.Empty;
     }
 
-    /// <summary>
-    /// Helper method to parse session status, handling legacy values
-    /// </summary>
-    private static MeditationSessionStatus ParseSessionStatus(string status)
-    {
-        // Handle legacy status values
-        status = status.ToUpperInvariant();
-        return status switch
-        {
-            "COMPLETED" => MeditationSessionStatus.COMPLETED,
-            "FAILED" => MeditationSessionStatus.FAILED,
-            "REQUESTED" => MeditationSessionStatus.REQUESTED,
-            _ => MeditationSessionStatus.REQUESTED // Default case for any unhandled values
-        };
-    }
-
     private async Task DownloadSessionSilentlyIfInitialLoad()
     {
         if (TodaySession == null) return;
@@ -1653,7 +1498,7 @@ public partial class TodayViewModel : ObservableObject
                 Debug.WriteLine($"[DownloadSilent] Silently downloading session {TodaySession.Uuid} during initial load");
                 
                 // Get presigned URL for the session
-                var presignedUrl = await _audioService.GetPresignedUrlAsync(TodaySession.Uuid);
+                var presignedUrl = await _audioDownloadService.GetPresignedUrlAsync(TodaySession.Uuid);
                 if (string.IsNullOrEmpty(presignedUrl))
                 {
                     Debug.WriteLine("[DownloadSilent] Failed to get presigned URL during silent download");
@@ -1661,7 +1506,7 @@ public partial class TodayViewModel : ObservableObject
                 }
 
                 // Download the audio file without UI updates
-                var success = await _audioService.DownloadSessionAudioAsync(TodaySession, presignedUrl);
+                var success = await _audioDownloadService.DownloadSessionAudioAsync(TodaySession, presignedUrl);
                 if (success)
                 {
                     // Update session in database
@@ -1685,7 +1530,7 @@ public partial class TodayViewModel : ObservableObject
         else
         {
             // If not initial load, use the regular download method with UI
-            await DownloadSessionInternal(false);
+            await DownloadSessionInternal();
         }
     }
 
@@ -1701,7 +1546,7 @@ public partial class TodayViewModel : ObservableObject
                 return;
             }
             
-            string query = await LoadGraphQLQueryFromAssetAsync("ListUserDailyInsights.graphql");
+            string query = await GraphQLQueryLoader.LoadQueryAsync("ListUserDailyInsights.graphql");
             if (string.IsNullOrWhiteSpace(query))
             {
                 Debug.WriteLine("[SyncInsights] GraphQL query is empty or failed to load.");
@@ -1775,7 +1620,16 @@ public partial class TodayViewModel : ObservableObject
                 // If today's insights were updated, refresh the UI
                 if (savedCount > 0 || updatedCount > 0)
                 {
-                    await LoadLocalInsights();
+                    // Set flag to prevent recursive calls during refresh
+                    _isLoadingData = true;
+                    try
+                    {
+                        await LoadLocalInsights();
+                    }
+                    finally
+                    {
+                        _isLoadingData = false;
+                    }
                 }
             }
             else
@@ -1789,7 +1643,7 @@ public partial class TodayViewModel : ObservableObject
         }
     }
 
-    private async Task StopAudio()
+    private void StopAudio()
     {
         try
         {
@@ -1799,10 +1653,7 @@ public partial class TodayViewModel : ObservableObject
                 if (AudioPlayer.CurrentState == MediaElementState.Playing)
                 {
                     AudioPlayer.Stop();
-                    IsPlaying = false;
-                    PlaybackPosition = TimeSpan.Zero;
-                    PlaybackProgress = 0;
-                    OnPropertyChanged(nameof(CurrentPositionText));
+                    // Audio state is now managed by AudioPlayerService
                     Debug.WriteLine("Audio playback stopped successfully");
                 }
             }
@@ -1810,6 +1661,44 @@ public partial class TodayViewModel : ObservableObject
         catch (Exception ex)
         {
             Debug.WriteLine($"Error stopping audio: {ex.Message}");
+        }
+    }
+
+    private void OnAudioPlayerServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        // Forward audio-related property changes to update UI bindings
+        switch (e.PropertyName)
+        {
+            case nameof(AudioPlayerService.IsPlaying):
+                OnPropertyChanged(nameof(IsPlaying));
+                break;
+            case nameof(AudioPlayerService.PlaybackPosition):
+                OnPropertyChanged(nameof(PlaybackPosition));
+                break;
+            case nameof(AudioPlayerService.PlaybackDuration):
+                OnPropertyChanged(nameof(PlaybackDuration));
+                break;
+            case nameof(AudioPlayerService.PlaybackProgress):
+                OnPropertyChanged(nameof(PlaybackProgress));
+                break;
+            case nameof(AudioPlayerService.CurrentPositionText):
+                OnPropertyChanged(nameof(CurrentPositionText));
+                break;
+            case nameof(AudioPlayerService.TotalDurationText):
+                OnPropertyChanged(nameof(TotalDurationText));
+                break;
+            case nameof(AudioPlayerService.PlayPauseIcon):
+                OnPropertyChanged(nameof(PlayPauseIcon));
+                break;
+            case nameof(AudioPlayerService.UserName):
+                OnPropertyChanged(nameof(UserName));
+                break;
+            case nameof(AudioPlayerService.SessionDate):
+                OnPropertyChanged(nameof(SessionDate));
+                break;
+            case nameof(AudioPlayerService.SessionDateText):
+                OnPropertyChanged(nameof(SessionDateText));
+                break;
         }
     }
 }

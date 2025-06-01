@@ -1,7 +1,9 @@
-﻿using MeditationApp.Views;
+﻿using System;
+using MeditationApp.Views;
 using MeditationApp.Services;
 using MeditationApp.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Maui.Controls;
 
 namespace MeditationApp;
 

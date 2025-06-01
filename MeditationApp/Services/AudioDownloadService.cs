@@ -5,7 +5,7 @@ using MeditationApp.Models;
 
 namespace MeditationApp.Services
 {
-    public interface IAudioService
+    public interface IAudioDownloadService
     {
         Task<bool> DownloadSessionAudioAsync(MeditationSession session, string presignedUrl);
         Task<string?> GetPresignedUrlAsync(string sessionId);
@@ -13,13 +13,13 @@ namespace MeditationApp.Services
         string? GetLocalAudioPath(MeditationSession session);
     }
 
-    public class AudioService : IAudioService
+    public class AudioDownloadDownloadService : IAudioDownloadService
     {
         private readonly HttpClient _httpClient;
         private readonly GraphQLService _graphQLService;
         private readonly string _audioDirectory;
 
-        public AudioService(HttpClient httpClient, GraphQLService graphQLService)
+        public AudioDownloadDownloadService(HttpClient httpClient, GraphQLService graphQLService)
         {
             _httpClient = httpClient;
             _graphQLService = graphQLService;

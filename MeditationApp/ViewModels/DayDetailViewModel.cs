@@ -14,17 +14,17 @@ public class DayDetailViewModel : INotifyPropertyChanged
     private readonly MeditationSessionDatabase _database;
     private readonly CalendarDataService? _calendarDataService;
     private readonly CognitoAuthService? _cognitoAuthService;
-    private readonly IAudioService _audioService;
+    private readonly IAudioDownloadService _audioDownloadService;
     private bool _isLoading;
     private string _notes = string.Empty;
     private int? _mood;
 
-    public DayDetailViewModel(MeditationSessionDatabase database, CalendarDataService? calendarDataService = null, CognitoAuthService? cognitoAuthService = null, IAudioService? audioService = null)
+    public DayDetailViewModel(MeditationSessionDatabase database, CalendarDataService? calendarDataService = null, CognitoAuthService? cognitoAuthService = null, IAudioDownloadService? audioService = null)
     {
         _database = database;
         _calendarDataService = calendarDataService;
         _cognitoAuthService = cognitoAuthService;
-        _audioService = audioService ?? throw new ArgumentNullException(nameof(audioService));
+        _audioDownloadService = audioService ?? throw new ArgumentNullException(nameof(audioService));
         AddSessionCommand = new Command(OnAddSession);
         PlaySessionCommand = new Command<MeditationSession>(OnPlaySession);
     }
@@ -131,20 +131,20 @@ public class DayDetailViewModel : INotifyPropertyChanged
         try
         {
             // Check if session is downloaded and file exists
-            var localPath = _audioService.GetLocalAudioPath(session);
+            var localPath = _audioDownloadService.GetLocalAudioPath(session);
             if (string.IsNullOrEmpty(localPath) || !File.Exists(localPath))
             {
                 // Not downloaded or file missing, attempt download
                 if (page != null)
                     await page.DisplayAlert("Downloading", "Session audio is not downloaded. Downloading now...", "OK");
-                var presignedUrl = await _audioService.GetPresignedUrlAsync(session.Uuid);
+                var presignedUrl = await _audioDownloadService.GetPresignedUrlAsync(session.Uuid);
                 if (string.IsNullOrEmpty(presignedUrl))
                 {
                     if (page != null)
                         await page.DisplayAlert("Error", "Failed to get download URL for the session.", "OK");
                     return;
                 }
-                var success = await _audioService.DownloadSessionAudioAsync(session, presignedUrl);
+                var success = await _audioDownloadService.DownloadSessionAudioAsync(session, presignedUrl);
                 if (!success)
                 {
                     if (page != null)

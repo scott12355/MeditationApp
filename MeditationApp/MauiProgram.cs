@@ -95,12 +95,12 @@ public static class MauiProgram
         });
 
         // Register AudioService
-        builder.Services.AddSingleton<IAudioService, AudioService>(provider =>
+        builder.Services.AddSingleton<IAudioDownloadService, AudioDownloadDownloadService>(provider =>
         {
             var httpClientFactory = provider.GetRequiredService<IHttpClientFactory>();
             var httpClient = httpClientFactory.CreateClient();
             var graphQLService = provider.GetRequiredService<GraphQLService>();
-            return new AudioService(httpClient, graphQLService);
+            return new AudioDownloadDownloadService(httpClient, graphQLService);
         });
 
         // Register TodayViewModel as singleton so splash screen and TodayPage share the same instance
@@ -128,7 +128,7 @@ public static class MauiProgram
                 provider.GetRequiredService<MeditationSessionDatabase>(),
                 provider.GetService<CalendarDataService>(),
                 provider.GetService<CognitoAuthService>(),
-                provider.GetRequiredService<IAudioService>()
+                provider.GetRequiredService<IAudioDownloadService>()
             )
         );
 
@@ -141,6 +141,17 @@ public static class MauiProgram
 
         // Register NotificationService
         builder.Services.AddSingleton<MeditationApp.Services.NotificationService>();
+        
+        // Register SessionStatusPoller
+        builder.Services.AddSingleton<SessionStatusPoller>(provider =>
+        {
+            var graphQLService = provider.GetRequiredService<GraphQLService>();
+            var sessionDatabase = provider.GetRequiredService<MeditationSessionDatabase>();
+            return new SessionStatusPoller(graphQLService, sessionDatabase);
+        });
+        
+        // Register AudioPlayerService
+        builder.Services.AddSingleton<AudioPlayerService>();
 
 #if DEBUG
         builder.Logging.AddDebug();

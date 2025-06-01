@@ -26,6 +26,7 @@
     <Color x:Key="Danger">#FF6B46C1</Color>
     <Color x:Key="DangerDark">#FF8B5CF6</Color>
     <Color x:Key="BackgroundColor">#FFEFEBD3</Color>
+    <Color x:Key="BackgroundColorTransparent">#80EFEBD3</Color>
 
     <Color x:Key="White">White</Color>
     <Color x:Key="Black">Black</Color>

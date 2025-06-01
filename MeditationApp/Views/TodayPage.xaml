@@ -168,24 +168,24 @@
                                              Spacing="10"
                                              VerticalOptions="Start">
                             <HorizontalStackLayout HorizontalOptions="Center"
-                                    Spacing="15">
+                                                   Spacing="15">
                                 <!-- Very Low -->
                                 <VerticalStackLayout Spacing="4"
-                                        HorizontalOptions="Center"
-                                        VerticalOptions="End">
+                                                     HorizontalOptions="Center"
+                                                     VerticalOptions="End">
                                     <Frame Padding="0"
-                                            WidthRequest="56"
-                                            HeightRequest="56"
-                                            CornerRadius="28"
+                                           WidthRequest="56"
+                                           HeightRequest="56"
+                                           CornerRadius="28"
                                            BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
                                            HasShadow="False"
-                                            VerticalOptions="Center"
-                                            HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center"
                                            BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
                                         <Frame.Triggers>
                                             <DataTrigger TargetType="Frame"
-                                                    Binding="{Binding SelectedMood}"
-                                                    Value="1">
+                                                         Binding="{Binding SelectedMood}"
+                                                         Value="1">
                                                 <Setter Property="BorderColor"
                                                         Value="#5B7FFF"/>
                                             </DataTrigger>
@@ -217,28 +217,28 @@
                                         </Button>
                                     </Frame>
                                     <Label Text="Very Low"
-                                            FontSize="11"
-                                            HorizontalOptions="Center"
-                                            TextColor="Gray"/>
+                                           FontSize="11"
+                                           HorizontalOptions="Center"
+                                           TextColor="Gray"/>
                                 </VerticalStackLayout>
 
                                 <!-- Low -->
                                 <VerticalStackLayout Spacing="4"
-                                        HorizontalOptions="Center"
-                                        VerticalOptions="End">
+                                                     HorizontalOptions="Center"
+                                                     VerticalOptions="End">
                                     <Frame Padding="0"
-                                            WidthRequest="56"
-                                            HeightRequest="56"
-                                            CornerRadius="28"
+                                           WidthRequest="56"
+                                           HeightRequest="56"
+                                           CornerRadius="28"
                                            BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
                                            HasShadow="False"
-                                            VerticalOptions="Center"
-                                            HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center"
                                            BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
                                         <Frame.Triggers>
                                             <DataTrigger TargetType="Frame"
-                                                    Binding="{Binding SelectedMood}"
-                                                    Value="2">
+                                                         Binding="{Binding SelectedMood}"
+                                                         Value="2">
                                                 <Setter Property="BorderColor"
                                                         Value="#5B7FFF"/>
                                             </DataTrigger>
@@ -270,28 +270,28 @@
                                         </Button>
                                     </Frame>
                                     <Label Text="Low"
-                                            FontSize="11"
-                                            HorizontalOptions="Center"
-                                            TextColor="Gray"/>
+                                           FontSize="11"
+                                           HorizontalOptions="Center"
+                                           TextColor="Gray"/>
                                 </VerticalStackLayout>
 
                                 <!-- Okay -->
                                 <VerticalStackLayout Spacing="4"
-                                        HorizontalOptions="Center"
-                                        VerticalOptions="End">
+                                                     HorizontalOptions="Center"
+                                                     VerticalOptions="End">
                                     <Frame Padding="0"
-                                            WidthRequest="56"
-                                            HeightRequest="56"
-                                            CornerRadius="28"
+                                           WidthRequest="56"
+                                           HeightRequest="56"
+                                           CornerRadius="28"
                                            BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
                                            HasShadow="False"
-                                            VerticalOptions="Center"
-                                            HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center"
                                            BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
                                         <Frame.Triggers>
                                             <DataTrigger TargetType="Frame"
-                                                    Binding="{Binding SelectedMood}"
-                                                    Value="3">
+                                                         Binding="{Binding SelectedMood}"
+                                                         Value="3">
                                                 <Setter Property="BorderColor"
                                                         Value="#5B7FFF"/>
                                             </DataTrigger>
@@ -323,28 +323,28 @@
                                         </Button>
                                     </Frame>
                                     <Label Text="Okay"
-                                            FontSize="11"
-                                            HorizontalOptions="Center"
-                                            TextColor="Gray"/>
+                                           FontSize="11"
+                                           HorizontalOptions="Center"
+                                           TextColor="Gray"/>
                                 </VerticalStackLayout>
 
                                 <!-- Good -->
                                 <VerticalStackLayout Spacing="4"
-                                        HorizontalOptions="Center"
-                                        VerticalOptions="End">
+                                                     HorizontalOptions="Center"
+                                                     VerticalOptions="End">
                                     <Frame Padding="0"
-                                            WidthRequest="56"
-                                            HeightRequest="56"
-                                            CornerRadius="28"
+                                           WidthRequest="56"
+                                           HeightRequest="56"
+                                           CornerRadius="28"
                                            BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
                                            HasShadow="False"
-                                            VerticalOptions="Center"
-                                            HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center"
                                            BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
                                         <Frame.Triggers>
                                             <DataTrigger TargetType="Frame"
-                                                    Binding="{Binding SelectedMood}"
-                                                    Value="4">
+                                                         Binding="{Binding SelectedMood}"
+                                                         Value="4">
                                                 <Setter Property="BorderColor"
                                                         Value="#5B7FFF"/>
                                             </DataTrigger>
@@ -376,28 +376,28 @@
                                         </Button>
                                     </Frame>
                                     <Label Text="Good"
-                                            FontSize="11"
-                                            HorizontalOptions="Center"
-                                            TextColor="Gray"/>
+                                           FontSize="11"
+                                           HorizontalOptions="Center"
+                                           TextColor="Gray"/>
                                 </VerticalStackLayout>
 
                                 <!-- Great -->
                                 <VerticalStackLayout Spacing="4"
-                                        HorizontalOptions="Center"
-                                        VerticalOptions="End">
+                                                     HorizontalOptions="Center"
+                                                     VerticalOptions="End">
                                     <Frame Padding="0"
-                                            WidthRequest="56"
-                                            HeightRequest="56"
-                                            CornerRadius="28"
+                                           WidthRequest="56"
+                                           HeightRequest="56"
+                                           CornerRadius="28"
                                            BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
                                            HasShadow="False"
-                                            VerticalOptions="Center"
-                                            HorizontalOptions="Center"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center"
                                            BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
                                         <Frame.Triggers>
                                             <DataTrigger TargetType="Frame"
-                                                    Binding="{Binding SelectedMood}"
-                                                    Value="5">
+                                                         Binding="{Binding SelectedMood}"
+                                                         Value="5">
                                                 <Setter Property="BorderColor"
                                                         Value="#5B7FFF"/>
                                             </DataTrigger>
@@ -429,9 +429,9 @@
                                         </Button>
                                     </Frame>
                                     <Label Text="Great"
-                                            FontSize="11"
-                                            HorizontalOptions="Center"
-                                            TextColor="Gray"/>
+                                           FontSize="11"
+                                           HorizontalOptions="Center"
+                                           TextColor="Gray"/>
                                 </VerticalStackLayout>
                             </HorizontalStackLayout>
                         </VerticalStackLayout>
@@ -507,7 +507,7 @@
                                     Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
                                     StrokeShape="RoundRectangle 8,8,8,8"
                                     Padding="12,12"
-                                    IsVisible="{Binding TodaySession.Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=COMPLETED}}">
+                                    IsVisible="{Binding TodaySession.Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=COMPLETED}">
                                 <VerticalStackLayout Spacing="15">
 
                                     <!-- Green Glowing Orb for COMPLETED state -->
@@ -520,6 +520,21 @@
 
                                     <!-- Media Player Section -->
                                     <VerticalStackLayout Spacing="10">
+
+                                        <!-- Session Metadata Display -->
+                                        <VerticalStackLayout Spacing="5"
+                                                             IsVisible="{Binding UserName, Converter={StaticResource StringToBoolConverter}}">
+                                            <Label Text="{Binding UserName}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center"
+                                                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"/>
+                                            <Label Text="{Binding SessionDateText}"
+                                                   FontSize="14"
+                                                   HorizontalOptions="Center"
+                                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"/>
+                                        </VerticalStackLayout>
+
                                         <Frame Padding="10"
                                                CornerRadius="10"
                                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
