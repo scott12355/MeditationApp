@@ -8,7 +8,11 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:MeditationSessionStatusToColorConverter x:Key="MeditationSessionStatusToColorConverter"/>
+            <converters:StatusToDisplayStringConverter x:Key="StatusToDisplayStringConverter"/>
+            <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
+            <converters:StatusToBoolConverter x:Key="StatusToBoolConverter"/>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <converters:BoolToPlayPauseConverter x:Key="BoolToPlayPauseConverter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
     <ScrollView>
@@ -37,21 +41,124 @@
                                     SelectedItem="{Binding SelectedSession, Mode=TwoWay}">
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="models:MeditationSession">
-                                <Grid Padding="0,8"
-                                      ColumnDefinitions="*,Auto,Auto">
-                                    <Label Grid.Column="0"
-                                           Text="{Binding AudioPath}"
-                                           FontSize="16"
-                                           TextColor="{AppThemeBinding Light=#555555, Dark=#DDDDDD}"/>
-                                    <Label Grid.Column="1"
-                                           Text="{Binding Timestamp, StringFormat='{}{0:t}'}"
-                                           FontSize="14"
-                                           TextColor="{AppThemeBinding Light=#777777, Dark=#BBBBBB}"/>
-                                    <Label Grid.Column="2"
-                                           Text="{Binding Status, Converter={StaticResource StatusToDisplayStringConverter}}"
-                                           FontSize="14"
-                                           TextColor="{Binding Status, Converter={StaticResource MeditationSessionStatusToColorConverter}}"/>
-                                </Grid>
+                                <Border BackgroundColor="{AppThemeBinding Light=White, Dark=#1F1F1F}"
+                                        Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#333333}"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 8"
+                                        Padding="12"
+                                        Margin="0,4">
+                                    <Grid RowDefinitions="Auto,Auto,Auto"
+                                          ColumnDefinitions="*,Auto,Auto"
+                                          RowSpacing="8"
+                                          ColumnSpacing="12">
+
+                                        <!-- Session Info Row -->
+                                        <VerticalStackLayout Grid.Row="0"
+                                                Grid.Column="0"
+                                                Spacing="4">
+                                            <Label Text="{Binding Timestamp, StringFormat='Session at {0:HH:mm}'}"
+                                                   FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{AppThemeBinding Light=#333333, Dark=#FFFFFF}"/>
+                                            <Label Text="{Binding Timestamp, StringFormat='{0:dddd, MMMM dd, yyyy}'}"
+                                                   FontSize="12"
+                                                   TextColor="{AppThemeBinding Light=#666666, Dark=#CCCCCC}"/>
+                                        </VerticalStackLayout>
+
+                                        <!-- Status -->
+                                        <Label Grid.Row="0"
+                                                Grid.Column="1"
+                                               Text="{Binding Status, Converter={StaticResource StatusToDisplayStringConverter}}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center"
+                                               TextColor="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
+
+                                        <!-- Download/Play Button -->
+                                        <Button Grid.Row="0"
+                                                Grid.Column="2"
+                                                Text="{Binding IsDownloaded, Converter={StaticResource BoolToPlayPauseConverter}}"
+                                                FontSize="20"
+                                                WidthRequest="44"
+                                                HeightRequest="44"
+                                                CornerRadius="22"
+                                                BackgroundColor="{StaticResource Primary}"
+                                                TextColor="White"
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PlaySessionCommand}"
+                                                CommandParameter="{Binding .}"
+                                                IsVisible="{Binding Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=COMPLETED}"/>
+
+                                        <!-- Download Progress Indicator -->
+                                        <ActivityIndicator Grid.Row="0"
+                                                Grid.Column="2"
+                                                           IsRunning="{Binding IsDownloading}"
+                                                           IsVisible="{Binding IsDownloading}"
+                                                           Color="{StaticResource Primary}"
+                                                           WidthRequest="44"
+                                                           HeightRequest="44"/>
+
+                                        <!-- Audio Player Controls (shown when this session is playing) -->
+                                        <Border Grid.Row="1"
+                                                Grid.ColumnSpan="3"
+                                                BackgroundColor="{AppThemeBinding Light=#F8F8F8, Dark=#2A2A2A}"
+                                                StrokeShape="RoundRectangle 6"
+                                                Padding="12"
+                                                IsVisible="{Binding IsCurrentlyPlaying}">
+                                            <Grid ColumnDefinitions="Auto,*,Auto"
+                                                    ColumnSpacing="12">
+                                                <!-- Play/Pause Button -->
+                                                <Button Grid.Column="0"
+                                                        Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PlayPauseIcon}"
+                                                        FontSize="18"
+                                                        WidthRequest="40"
+                                                        HeightRequest="40"
+                                                        CornerRadius="20"
+                                                        BackgroundColor="{StaticResource Primary}"
+                                                        TextColor="White"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.TogglePlaybackCommand}"/>
+
+                                                <!-- Progress and Time -->
+                                                <VerticalStackLayout Grid.Column="1"
+                                                        Spacing="4">
+                                                    <ProgressBar Progress="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PlaybackProgress}"
+                                                                 HeightRequest="3"
+                                                                 BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
+                                                                 ProgressColor="{StaticResource Primary}"/>
+                                                    <Grid ColumnDefinitions="*,Auto">
+                                                        <Label Grid.Column="0"
+                                                               Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CurrentPositionText}"
+                                                               FontSize="10"
+                                                               TextColor="{AppThemeBinding Light=#666666, Dark=#CCCCCC}"/>
+                                                        <Label Grid.Column="1"
+                                                               Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.TotalDurationText}"
+                                                               FontSize="10"
+                                                               TextColor="{AppThemeBinding Light=#666666, Dark=#CCCCCC}"/>
+                                                    </Grid>
+                                                </VerticalStackLayout>
+
+                                                <!-- Stop Button -->
+                                                <Button Grid.Column="2"
+                                                        Text="⏹"
+                                                        FontSize="16"
+                                                        WidthRequest="36"
+                                                        HeightRequest="36"
+                                                        CornerRadius="18"
+                                                        BackgroundColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
+                                                        TextColor="{AppThemeBinding Light=#666666, Dark=#CCCCCC}"
+                                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.StopPlaybackCommand}"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Download Status -->
+                                        <Label Grid.Row="2"
+                                                Grid.ColumnSpan="3"
+                                               Text="{Binding DownloadStatus}"
+                                               FontSize="11"
+                                               TextColor="{AppThemeBinding Light=#666666, Dark=#CCCCCC}"
+                                               IsVisible="{Binding IsDownloading}"
+                                               HorizontalOptions="Center"/>
+                                    </Grid>
+                                </Border>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>

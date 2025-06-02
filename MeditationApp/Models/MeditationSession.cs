@@ -1,9 +1,10 @@
 using SQLite;
 using System;
+using System.ComponentModel;
 
 namespace MeditationApp.Models
 {
-    public class MeditationSession
+    public class MeditationSession : INotifyPropertyChanged
     {
         [PrimaryKey, AutoIncrement]
         public int SessionID { get; set; }
@@ -33,5 +34,59 @@ namespace MeditationApp.Models
         public DateTime? DownloadedAt { get; set; } = null; // When the file was downloaded
         public long? FileSizeBytes { get; set; } = null; // Size of the downloaded file
         public string? ErrorMessage { get; set; } = null; // Store error message if status is FAILED
+        
+        // Transient properties for UI state (not stored in database)
+        private bool _isDownloading = false;
+        private string _downloadStatus = string.Empty;
+        private bool _isCurrentlyPlaying = false;
+        
+        [Ignore]
+        public bool IsDownloading 
+        { 
+            get => _isDownloading;
+            set 
+            {
+                if (_isDownloading != value)
+                {
+                    _isDownloading = value;
+                    OnPropertyChanged(nameof(IsDownloading));
+                }
+            }
+        }
+        
+        [Ignore]
+        public string DownloadStatus 
+        { 
+            get => _downloadStatus;
+            set 
+            {
+                if (_downloadStatus != value)
+                {
+                    _downloadStatus = value;
+                    OnPropertyChanged(nameof(DownloadStatus));
+                }
+            }
+        }
+        
+        [Ignore]
+        public bool IsCurrentlyPlaying 
+        { 
+            get => _isCurrentlyPlaying;
+            set 
+            {
+                if (_isCurrentlyPlaying != value)
+                {
+                    _isCurrentlyPlaying = value;
+                    OnPropertyChanged(nameof(IsCurrentlyPlaying));
+                }
+            }
+        }
+        
+        public event PropertyChangedEventHandler? PropertyChanged;
+        
+        protected virtual void OnPropertyChanged(string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

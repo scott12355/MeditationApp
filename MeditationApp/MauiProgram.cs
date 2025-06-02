@@ -8,6 +8,7 @@ using System.IO;
 using MeditationApp.Models;
 using CommunityToolkit.Maui;
 using Plugin.Maui.Audio;
+using MediaManager;
 #if IOS
 using Microsoft.Maui.Handlers;
 #endif
@@ -154,6 +155,9 @@ public static class MauiProgram
         
         // Register Plugin.Maui.Audio
         builder.Services.AddSingleton(AudioManager.Current);
+        
+        // Configure MediaManager for enhanced metadata support
+        builder.Services.AddSingleton(CrossMediaManager.Current);
         
         // Register SessionStatusPoller
         builder.Services.AddSingleton<SessionStatusPoller>(provider =>

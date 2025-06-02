@@ -503,7 +503,7 @@
                                    Margin="0,8,0,0"/>
 
                             <!-- COMPLETED State Content (Green Orb + Media Player) -->
-                            <Border BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColor}, Dark=#2A2A2A}"
+                            <Border BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColorTransparent}, Dark=#2A2A2A}"
                                     Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
                                     StrokeShape="RoundRectangle 8,8,8,8"
                                     Padding="12,12"
