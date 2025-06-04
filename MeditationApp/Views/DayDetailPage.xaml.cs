@@ -1,4 +1,5 @@
 using MeditationApp.ViewModels;
+using MeditationApp.Models;
 
 namespace MeditationApp.Views;
 
@@ -24,7 +25,7 @@ public partial class DayDetailPage : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
         // Load DayData if available
-        var dayData = MeditationApp.ViewModels.SwipeCalendarViewModel.SelectedDayData;
+        var dayData = MeditationApp.ViewModels.SimpleCalendarViewModel.SelectedDayData;
         if (dayData != null)
         {
             viewModel.LoadFromDayData(dayData);

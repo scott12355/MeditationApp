@@ -70,6 +70,13 @@ public partial class TodayViewModel : ObservableObject
     [ObservableProperty]
     private bool _isMoodSelectorExpanded = false;
 
+    // Add sync-related properties
+    [ObservableProperty]
+    private bool _isSyncing = false;
+
+    [ObservableProperty]
+    private string _syncStatus = string.Empty;
+
     private UserDailyInsights? _currentInsights;
 
     public string FormattedDate => CurrentDate.ToString("dddd, MMMM dd, yyyy");
@@ -95,6 +102,7 @@ public partial class TodayViewModel : ObservableObject
     private readonly SessionStatusPoller _sessionStatusPoller;
     private readonly IAudioDownloadService _audioDownloadService;
     private readonly AudioPlayerService _audioPlayerService;
+    private readonly DatabaseSyncService _databaseSyncService;
 
     private Task? _initializationTask;
     private CancellationTokenSource? _pollingCts;
@@ -105,7 +113,7 @@ public partial class TodayViewModel : ObservableObject
     private const int MAX_REFRESH_ATTEMPTS = 3;
     private static readonly TimeSpan REFRESH_COOLDOWN = TimeSpan.FromMinutes(1);
 
-    public TodayViewModel(GraphQLService graphQLService, CognitoAuthService cognitoAuthService, MeditationSessionDatabase sessionDatabase, IAudioDownloadService audioDownloadService, SessionStatusPoller sessionStatusPoller, AudioPlayerService audioPlayerService)
+    public TodayViewModel(GraphQLService graphQLService, CognitoAuthService cognitoAuthService, MeditationSessionDatabase sessionDatabase, IAudioDownloadService audioDownloadService, SessionStatusPoller sessionStatusPoller, AudioPlayerService audioPlayerService, DatabaseSyncService databaseSyncService)
     {
         _graphQLService = graphQLService;
         _cognitoAuthService = cognitoAuthService;
@@ -113,6 +121,7 @@ public partial class TodayViewModel : ObservableObject
         _audioDownloadService = audioDownloadService;
         _sessionStatusPoller = sessionStatusPoller;
         _audioPlayerService = audioPlayerService;
+        _databaseSyncService = databaseSyncService;
         
         // Subscribe to events
         _audioPlayerService.MediaOpened += OnMediaOpened;
@@ -120,6 +129,9 @@ public partial class TodayViewModel : ObservableObject
         
         // Subscribe to property changes to forward audio-related properties
         _audioPlayerService.PropertyChanged += OnAudioPlayerServicePropertyChanged;
+        
+        // Subscribe to sync events
+        _databaseSyncService.SyncStatusChanged += OnSyncStatusChanged;
         
         // Start loading data immediately
         _initializationTask = LoadTodayDataAsync();
@@ -166,6 +178,15 @@ public partial class TodayViewModel : ObservableObject
                 OnPropertyChanged(nameof(SessionDateText));
                 break;
         }
+    }
+
+    private void OnSyncStatusChanged(object? sender, SyncStatusEventArgs e)
+    {
+        IsSyncing = e.Status == Services.SyncStatus.Starting || 
+                   e.Status == Services.SyncStatus.SyncingSessions || 
+                   e.Status == Services.SyncStatus.SyncingInsights;
+        SyncStatus = e.Message ?? string.Empty;
+        Debug.WriteLine($"[Sync] Status: {e.Status}, Message: {e.Message}");
     }
 
     /// <summary>
@@ -871,6 +892,19 @@ public partial class TodayViewModel : ObservableObject
             var sessionsTask = LoadSessionsAsync(userId);
             var insightsTask = LoadDailyInsightsAsync(userId);
             var fullSyncTask = SyncAllInsightsAsync();
+            
+            // Also trigger a background sync with the new service (fire and forget)
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await TriggerBackgroundSyncAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[LoadTodayData] Background sync failed: {ex.Message}");
+                }
+            });
             
             // Add timeout to prevent infinite hang
             using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20)))
@@ -1749,4 +1783,73 @@ public partial class TodayViewModel : ObservableObject
     //             break;
     //     }
     // }
+
+    /// <summary>
+    /// Triggers a background sync if conditions are met
+    /// </summary>
+    public async Task TriggerBackgroundSyncAsync()
+    {
+        try
+        {
+            Debug.WriteLine("[TodayViewModel] Triggering background sync");
+            var result = await _databaseSyncService.TriggerSyncIfNeededAsync();
+            
+            if (result.IsSuccess)
+            {
+                Debug.WriteLine($"[TodayViewModel] Background sync completed: {result.SessionsUpdated} sessions, {result.InsightsUpdated} insights updated");
+                
+                // Refresh local data after successful sync
+                await LoadLocalSessionsForToday();
+                await LoadLocalInsights();
+            }
+            else
+            {
+                Debug.WriteLine($"[TodayViewModel] Background sync skipped or failed: {result.Message}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[TodayViewModel] Error during background sync: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private async Task RefreshData()
+    {
+        try
+        {
+            IsLoading = true;
+            
+            // Trigger immediate sync
+            var syncResult = await _databaseSyncService.SyncAllDataAsync(forceSync: true);
+            
+            if (syncResult.IsSuccess)
+            {
+                Debug.WriteLine($"[RefreshData] Manual sync completed: {syncResult.SessionsUpdated} sessions, {syncResult.InsightsUpdated} insights updated");
+                
+                // Reload today's data after sync
+                await LoadTodayData();
+            }
+            else
+            {
+                Debug.WriteLine($"[RefreshData] Manual sync failed: {syncResult.Message}");
+                
+                // Still try to load local data
+                await LoadLocalSessionsForToday();
+                await LoadLocalInsights();
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[RefreshData] Error during manual refresh: {ex.Message}");
+            
+            // Fallback to local data
+            await LoadLocalSessionsForToday();
+            await LoadLocalInsights();
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
 }

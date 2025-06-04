@@ -274,27 +274,27 @@ public class HybridAuthService
             Console.WriteLine($"HybridAuthService: Error clearing CalendarDataService cache: {ex.Message}");
         }
         
-        // Reset SwipeCalendarViewModel to clear user-specific calendar data
+        // Reset SimpleCalendarViewModel to clear user-specific calendar data
         try
         {
             // Clear static data directly (most important for cross-user contamination)
-            SwipeCalendarViewModel.SelectedDayData = null;
+            SimpleCalendarViewModel.SelectedDayData = null;
             Console.WriteLine("HybridAuthService: Static SelectedDayData cleared");
             
-            var swipeCalendarViewModel = _serviceProvider.GetService<SwipeCalendarViewModel>();
-            if (swipeCalendarViewModel != null)
+            var simpleCalendarViewModel = _serviceProvider.GetService<SimpleCalendarViewModel>();
+            if (simpleCalendarViewModel != null)
             {
-                swipeCalendarViewModel.Reset();
-                Console.WriteLine("HybridAuthService: SwipeCalendarViewModel reset completed");
+                simpleCalendarViewModel.Reset();
+                Console.WriteLine("HybridAuthService: SimpleCalendarViewModel reset completed");
             }
             else
             {
-                Console.WriteLine("HybridAuthService: Warning - Could not find SwipeCalendarViewModel (expected for transient services)");
+                Console.WriteLine("HybridAuthService: Warning - Could not find SimpleCalendarViewModel (expected for transient services)");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"HybridAuthService: Error resetting SwipeCalendarViewModel: {ex.Message}");
+            Console.WriteLine($"HybridAuthService: Error resetting SimpleCalendarViewModel: {ex.Message}");
         }
         
         // Reset DayDetailViewModel to clear user-specific day data

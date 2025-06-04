@@ -112,7 +112,8 @@ public static class MauiProgram
                 provider.GetRequiredService<MeditationSessionDatabase>(),
                 provider.GetRequiredService<IAudioDownloadService>(),
                 provider.GetRequiredService<SessionStatusPoller>(),
-                provider.GetRequiredService<AudioPlayerService>()
+                provider.GetRequiredService<AudioPlayerService>(),
+                provider.GetRequiredService<DatabaseSyncService>()
             )
         );
 
@@ -132,7 +133,14 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewModels.SignUpViewModel>();
         builder.Services.AddTransient<ViewModels.VerificationViewModel>();
         builder.Services.AddTransient<ViewModels.SettingsViewModel>();
-        builder.Services.AddTransient<ViewModels.SwipeCalendarViewModel>();
+        builder.Services.AddTransient<ViewModels.SimpleCalendarViewModel>(provider =>
+            new ViewModels.SimpleCalendarViewModel(
+                provider.GetRequiredService<MeditationSessionDatabase>(),
+                provider.GetRequiredService<CalendarDataService>(),
+                provider.GetRequiredService<CognitoAuthService>(),
+                provider.GetRequiredService<DatabaseSyncService>()
+            )
+        );
         builder.Services.AddTransient<ViewModels.DayDetailViewModel>(provider =>
             new ViewModels.DayDetailViewModel(
                 provider.GetRequiredService<MeditationSessionDatabase>(),
@@ -149,6 +157,17 @@ public static class MauiProgram
 
         // Register CalendarDataService
         builder.Services.AddSingleton<CalendarDataService>();
+
+        // Register DatabaseSyncService
+        builder.Services.AddSingleton<DatabaseSyncService>(provider =>
+        {
+            var database = provider.GetRequiredService<MeditationSessionDatabase>();
+            var graphQLService = provider.GetRequiredService<GraphQLService>();
+            var localAuthService = provider.GetRequiredService<LocalAuthService>();
+            var calendarDataService = provider.GetRequiredService<CalendarDataService>();
+            var cognitoAuthService = provider.GetRequiredService<CognitoAuthService>();
+            return new DatabaseSyncService(database, graphQLService, localAuthService, calendarDataService, cognitoAuthService);
+        });
 
         // Register NotificationService
         builder.Services.AddSingleton<MeditationApp.Services.NotificationService>();

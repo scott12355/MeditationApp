@@ -61,8 +61,30 @@ public partial class App : Application
 
         try
         {
-            // Get the TodayViewModel from the service provider
+            // Get services from the service provider
             var todayViewModel = _serviceProvider.GetRequiredService<TodayViewModel>();
+            var databaseSyncService = _serviceProvider.GetRequiredService<DatabaseSyncService>();
+            
+            // Trigger sync when app becomes active (fire and forget)
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    var syncResult = await databaseSyncService.TriggerSyncIfNeededAsync();
+                    if (syncResult.IsSuccess)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[App Resume] Sync completed: {syncResult.SessionsUpdated} sessions, {syncResult.InsightsUpdated} insights updated");
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[App Resume] Sync skipped: {syncResult.Message}");
+                    }
+                }
+                catch (Exception syncEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[App Resume] Sync failed: {syncEx.Message}");
+                }
+            });
             
             // Check if we need to refresh (if the date has changed)
             if (todayViewModel.CurrentDate.Date != DateTime.Now.Date)

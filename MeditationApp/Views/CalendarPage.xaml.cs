@@ -5,24 +5,24 @@ namespace MeditationApp.Views;
 
 public partial class CalendarPage : ContentPage
 {
-    private readonly SwipeCalendarViewModel _viewModel;
+    private readonly SimpleCalendarViewModel _viewModel;
 
-    public CalendarPage(SwipeCalendarViewModel viewModel)
+    public CalendarPage(SimpleCalendarViewModel viewModel)
     {
         InitializeComponent();
         _viewModel = viewModel;
         BindingContext = viewModel;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
         
-        // Force clear any static data that might be contaminated from previous users
-        SwipeCalendarViewModel.SelectedDayData = null;
-        
-        // Reset and reload the ViewModel to ensure fresh data for the current user
+        // Reset the ViewModel to ensure fresh data for the current user
         _viewModel.Reset();
+        
+        // Load session days
+        await _viewModel.LoadSessionDaysCommand.ExecuteAsync(null);
     }
 
     private async void OnSettingsClicked(object sender, EventArgs e)

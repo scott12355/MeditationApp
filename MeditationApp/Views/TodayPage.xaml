@@ -735,6 +735,17 @@
                                            HorizontalTextAlignment="Center"
                                            VerticalOptions="Center"
                                            HeightRequest="150"/>
+
+                                    <Button Text="Try Again"
+                                            Command="{Binding RequestNewSessionCommand}"
+                                            BackgroundColor="{StaticResource Primary}"
+                                            TextColor="White"
+                                            CornerRadius="25"
+                                            HeightRequest="50"
+                                            WidthRequest="200"
+                                            HorizontalOptions="Center"
+                                            IsEnabled="{Binding IsRequestingSession, Converter={StaticResource InverseBoolConverter}}"
+                                            FontAttributes="Bold"/>
                                 </VerticalStackLayout>
 
                                 <!-- COMPLETED State Content -->
