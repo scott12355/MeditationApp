@@ -40,6 +40,35 @@ public partial class SwipeCalendarViewModel : ObservableObject
         InitializeMonths();
     }
 
+    /// <summary>
+    /// Resets the ViewModel state for logout/login cycles to prevent cross-user data contamination
+    /// </summary>
+    public void Reset()
+    {
+        Debug.WriteLine("SwipeCalendarViewModel: Resetting state");
+        
+        // Clear static selected day data
+        SelectedDayData = null;
+        
+        // Clear months collection
+        Months.Clear();
+        
+        // Reset selected month properties
+        SelectedMonth = null;
+        SelectedMonthIndex = 0;
+        
+        // Reset current month to today
+        CurrentMonth = DateTime.Now.Date.AddDays(1 - DateTime.Now.Day);
+        
+        // Reset loading state
+        IsLoading = false;
+        
+        Debug.WriteLine("SwipeCalendarViewModel: State reset completed");
+        
+        // Reinitialize months for the new user
+        InitializeMonths();
+    }
+
     private async void InitializeMonths()
     {
         IsLoading = true;

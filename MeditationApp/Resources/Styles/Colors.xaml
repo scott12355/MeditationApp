@@ -25,8 +25,22 @@
     <Color x:Key="Tertiary">#FFA68803</Color>
     <Color x:Key="Danger">#FF6B46C1</Color>
     <Color x:Key="DangerDark">#FF8B5CF6</Color>
+
+    <!-- Action/Play button color -->
+    <Color x:Key="ActionBlue">#5B7FFF</Color>
+
     <Color x:Key="BackgroundColor">#FFEFEBD3</Color>
     <Color x:Key="BackgroundColorTransparent">#80EFEBD3</Color>
+
+    <!-- Glassy/Translucent Colors -->
+    <Color x:Key="GlassyWhite">#4DFFFFFF</Color>
+    <!-- More transparent glassy white -->
+    <Color x:Key="GlassyBlue">#B3E3F0FF</Color>
+    <Color x:Key="GlassyGray">#99F6F6F6</Color>
+    <Color x:Key="GlassyLight">#80F7F7FF</Color>
+
+    <!-- Glassy Border for glassy UI elements -->
+    <Color x:Key="GlassyBorder">#80FFFFFF</Color>
 
     <Color x:Key="White">White</Color>
     <Color x:Key="Black">Black</Color>
@@ -74,4 +88,15 @@
                      Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush"
                      Color="{StaticResource Gray950}"/>
+
+    <SolidColorBrush x:Key="GlassyWhiteBrush"
+                     Color="{StaticResource GlassyWhite}"/>
+    <SolidColorBrush x:Key="GlassyBlueBrush"
+                     Color="{StaticResource GlassyBlue}"/>
+    <SolidColorBrush x:Key="GlassyGrayBrush"
+                     Color="{StaticResource GlassyGray}"/>
+    <SolidColorBrush x:Key="GlassyLightBrush"
+                     Color="{StaticResource GlassyLight}"/>
+    <SolidColorBrush x:Key="GlassyBorderBrush"
+                     Color="{StaticResource GlassyBorder}"/>
 </ResourceDictionary>

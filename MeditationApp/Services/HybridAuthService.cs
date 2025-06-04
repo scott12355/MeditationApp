@@ -1,5 +1,6 @@
 using MeditationApp.Services;
 using MeditationApp.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MeditationApp.Services;
 
@@ -9,17 +10,20 @@ public class HybridAuthService
     private readonly LocalAuthService _localService;
     private readonly MeditationSessionDatabase _sessionDatabase;
     private readonly PreloadService _preloadService;
+    private readonly IServiceProvider _serviceProvider;
 
     public HybridAuthService(
-        CognitoAuthService cognitoService, 
+        CognitoAuthService cognitoService,
         LocalAuthService localService,
         MeditationSessionDatabase sessionDatabase,
-        PreloadService preloadService)
+        PreloadService preloadService,
+        IServiceProvider serviceProvider)
     {
         _cognitoService = cognitoService;
         _localService = localService;
         _sessionDatabase = sessionDatabase;
         _preloadService = preloadService;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<AuthenticationResult> SignInAsync(string username, string password)
@@ -232,8 +236,87 @@ public class HybridAuthService
         await _sessionDatabase.ClearAllSessionsAsync();
         _sessionDatabase.ClearCache();
         
-
+        // Reset TodayViewModel state to prevent hanging tasks on re-login
+        try
+        {
+            var todayViewModel = _serviceProvider.GetService<TodayViewModel>();
+            if (todayViewModel != null)
+            {
+                todayViewModel.Reset();
+                Console.WriteLine("HybridAuthService: TodayViewModel reset completed");
+            }
+            else
+            {
+                Console.WriteLine("HybridAuthService: Warning - Could not find TodayViewModel service");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"HybridAuthService: Error resetting TodayViewModel: {ex.Message}");
+        }
         
+        // Clear calendar cache to prevent cross-user data contamination
+        try
+        {
+            var calendarDataService = _serviceProvider.GetService<CalendarDataService>();
+            if (calendarDataService != null)
+            {
+                calendarDataService.ClearCache();
+                Console.WriteLine("HybridAuthService: CalendarDataService cache cleared");
+            }
+            else
+            {
+                Console.WriteLine("HybridAuthService: Warning - Could not find CalendarDataService");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"HybridAuthService: Error clearing CalendarDataService cache: {ex.Message}");
+        }
+        
+        // Reset SwipeCalendarViewModel to clear user-specific calendar data
+        try
+        {
+            // Clear static data directly (most important for cross-user contamination)
+            SwipeCalendarViewModel.SelectedDayData = null;
+            Console.WriteLine("HybridAuthService: Static SelectedDayData cleared");
+            
+            var swipeCalendarViewModel = _serviceProvider.GetService<SwipeCalendarViewModel>();
+            if (swipeCalendarViewModel != null)
+            {
+                swipeCalendarViewModel.Reset();
+                Console.WriteLine("HybridAuthService: SwipeCalendarViewModel reset completed");
+            }
+            else
+            {
+                Console.WriteLine("HybridAuthService: Warning - Could not find SwipeCalendarViewModel (expected for transient services)");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"HybridAuthService: Error resetting SwipeCalendarViewModel: {ex.Message}");
+        }
+        
+        // Reset DayDetailViewModel to clear user-specific day data
+        try
+        {
+            var dayDetailViewModel = _serviceProvider.GetService<DayDetailViewModel>();
+            if (dayDetailViewModel != null)
+            {
+                dayDetailViewModel.Reset();
+                Console.WriteLine("HybridAuthService: DayDetailViewModel reset completed");
+            }
+            else
+            {
+                Console.WriteLine("HybridAuthService: Warning - Could not find DayDetailViewModel");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"HybridAuthService: Error resetting DayDetailViewModel: {ex.Message}");
+        }
+        
+        Console.WriteLine("HybridAuthService: SignOut completed, all data cleared");
     }
 
     public async Task<bool> IsOfflineModeAsync()

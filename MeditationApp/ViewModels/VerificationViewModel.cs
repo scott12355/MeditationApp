@@ -77,8 +77,8 @@ public class VerificationViewModel : BindableObject
                         {
                             try
                             {
-                                await Shell.Current.GoToAsync("//MainTabs", animate: true);
-                                System.Diagnostics.Debug.WriteLine("Navigation to MainTabs completed successfully");
+                                await Shell.Current.GoToAsync("//SplashPage", animate: true);
+                                System.Diagnostics.Debug.WriteLine("Navigation to Splash completed successfully");
                             }
                             catch (Exception navEx)
                             {

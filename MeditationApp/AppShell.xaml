@@ -28,7 +28,7 @@
     <!-- Main tabbed interface -->
     <TabBar Route="MainTabs"
             Shell.TabBarTitleColor="{StaticResource Secondary}"
-            Shell.TabBarBackgroundColor="{StaticResource BackgroundColor}">
+            Shell.TabBarBackgroundColor="{StaticResource GlassyWhite}">
         <Tab Title="Today">
             <ShellContent ContentTemplate="{DataTemplate views:TodayPage}"/>
         </Tab>

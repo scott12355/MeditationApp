@@ -45,6 +45,32 @@ public class DayDetailViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// Resets the ViewModel state for logout/login cycles to prevent cross-user data contamination
+    /// </summary>
+    public void Reset()
+    {
+        System.Diagnostics.Debug.WriteLine("DayDetailViewModel: Resetting state");
+        
+        // Clear sessions
+        Sessions.Clear();
+        
+        // Reset notes and mood
+        Notes = string.Empty;
+        Mood = null;
+        
+        // Reset selected date to today
+        SelectedDate = DateTime.Today;
+        
+        // Reset loading state
+        IsLoading = false;
+        
+        // Clear currently playing session
+        CurrentlyPlayingSession = null;
+        
+        System.Diagnostics.Debug.WriteLine("DayDetailViewModel: State reset completed");
+    }
+
     public DateTime SelectedDate
     {
         get => _selectedDate;
@@ -136,6 +162,7 @@ public class DayDetailViewModel : INotifyPropertyChanged
     public string CurrentPositionText => _audioPlayerService?.CurrentPositionText ?? "0:00";
     public string TotalDurationText => _audioPlayerService?.TotalDurationText ?? "0:00";
     public string PlayPauseIcon => _audioPlayerService?.PlayPauseIcon ?? "▶";
+    public string PlayPauseIconImage => IsPlaying ? "pause" : "play";
     
     // Currently playing session tracking
     public MeditationSession? CurrentlyPlayingSession
@@ -169,6 +196,7 @@ public class DayDetailViewModel : INotifyPropertyChanged
             case nameof(AudioPlayerService.IsPlaying):
                 OnPropertyChanged(nameof(IsPlaying));
                 OnPropertyChanged(nameof(PlayPauseIcon));
+                OnPropertyChanged(nameof(PlayPauseIconImage));
                 break;
             case nameof(AudioPlayerService.PlaybackPosition):
                 OnPropertyChanged(nameof(PlaybackPosition));
@@ -200,6 +228,7 @@ public class DayDetailViewModel : INotifyPropertyChanged
         }
         OnPropertyChanged(nameof(IsPlaying));
         OnPropertyChanged(nameof(PlayPauseIcon));
+        OnPropertyChanged(nameof(PlayPauseIconImage));
     }
 
     private void OnTogglePlayback()

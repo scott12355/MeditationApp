@@ -77,7 +77,7 @@ public static class MauiProgram
             var localService = provider.GetRequiredService<LocalAuthService>();
             var sessionDatabase = provider.GetRequiredService<MeditationSessionDatabase>();
             var preloadService = provider.GetRequiredService<PreloadService>();
-            return new HybridAuthService(cognitoService, localService, sessionDatabase, preloadService);
+            return new HybridAuthService(cognitoService, localService, sessionDatabase, preloadService, provider);
         });
 
         // Register preload service

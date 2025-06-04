@@ -58,7 +58,7 @@
                             HorizontalOptions="Center"/>
 
                      <!-- App Name -->
-                     <Label Text="Meditation App"
+                     <Label Text="Lucen Meditation"
                             FontSize="28"
                             FontAttributes="Bold"
                             TextColor="{StaticResource Primary}"

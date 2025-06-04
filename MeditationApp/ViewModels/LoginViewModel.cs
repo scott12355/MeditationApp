@@ -69,7 +69,7 @@ public class LoginViewModel : BindableObject
                 {
                     try
                     {
-                        await Shell.Current.GoToAsync("//MainTabs");
+                        await Shell.Current.GoToAsync("//SplashPage");
                         System.Diagnostics.Debug.WriteLine("Navigation to MainTabs completed successfully");
                     }
                     catch (Exception navEx)

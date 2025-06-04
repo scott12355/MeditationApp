@@ -4,8 +4,46 @@
              xmlns:controls="clr-namespace:MeditationApp.Controls"
              xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:converters="clr-namespace:MeditationApp.Converters"
              x:Class="MeditationApp.Views.TodayPage"
              Shell.NavBarIsVisible="False">
+
+    <ContentPage.Resources>
+        <!-- Converters -->
+        <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+        <converters:MoodToEmojiConverter x:Key="MoodToEmojiConverter"/>
+        <converters:MoodSelectorVisibilityConverter x:Key="MoodSelectorVisibilityConverter"/>
+        <converters:StatusToColorConverter x:Key="StatusToColorConverter"/>
+        <converters:StatusToBackgroundColorConverter x:Key="StatusToBackgroundColorConverter"/>
+        <converters:StatusToBoolConverter x:Key="StatusToBoolConverter"/>
+        <converters:StringToBoolConverter x:Key="StringToBoolConverter"/>
+
+
+        <!-- DataTemplates -->
+        <DataTemplate x:Key="SessionItemTemplate">
+            <Frame Padding="10"
+                   CornerRadius="10"
+                   BackgroundColor="{StaticResource GlassyWhite}"
+                   BorderColor="{StaticResource GlassyBorder}"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{Binding Title}"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Start"
+                           TextColor="Black"/>
+                    <Label Text="{Binding Description}"
+                           FontSize="14"
+                           HorizontalOptions="Start"
+                           TextColor="Gray"/>
+                    <Label Text="{Binding Date, StringFormat='{}{0:MMMM dd, yyyy}'}"
+                           FontSize="12"
+                           HorizontalOptions="Start"
+                           TextColor="Gray"/>
+                </VerticalStackLayout>
+            </Frame>
+        </DataTemplate>
+    </ContentPage.Resources>
 
     <ContentPage.Background>
         <LinearGradientBrush StartPoint="0,0"
@@ -90,6 +128,170 @@
             </Ellipse.Behaviors>
         </Ellipse>
 
+        <Ellipse x:Name="Orb5"
+                 WidthRequest="180"
+                 HeightRequest="180"
+                 Fill="#20FFAB91"
+                 HorizontalOptions="Start"
+                 VerticalOptions="End"
+                 Margin="-60,0,0,-60"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="28"
+                                                     FloatRangeY="22"
+                                                     Duration="11000"
+                                                     Delay="3000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <Ellipse x:Name="Orb6"
+                 WidthRequest="120"
+                 HeightRequest="120"
+                 Fill="#22FFD54F"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Start"
+                 Margin="150,-40,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="18"
+                                                     FloatRangeY="12"
+                                                     Duration="9000"
+                                                     Delay="8000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <Ellipse x:Name="Orb7"
+                 WidthRequest="160"
+                 HeightRequest="160"
+                 Fill="#18FF8A65"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Margin="0,0,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="22"
+                                                     FloatRangeY="18"
+                                                     Duration="13000"
+                                                     Delay="5000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <Ellipse x:Name="Orb8"
+                 WidthRequest="90"
+                 HeightRequest="90"
+                 Fill="#25C8E6C9"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"
+                 Margin="50,100,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="15"
+                                                     FloatRangeY="10"
+                                                     Duration="7000"
+                                                     Delay="1000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <Ellipse x:Name="Orb9"
+                 WidthRequest="110"
+                 HeightRequest="110"
+                 Fill="#20FFE082"
+                 HorizontalOptions="End"
+                 VerticalOptions="Center"
+                 Margin="0,100,-30,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="16"
+                                                     FloatRangeY="14"
+                                                     Duration="10500"
+                                                     Delay="3500"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <Ellipse x:Name="Orb10"
+                 WidthRequest="75"
+                 HeightRequest="75"
+                 Fill="#30F8BBD9"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Start"
+                 Margin="-100,80,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="12"
+                                                     FloatRangeY="8"
+                                                     Duration="6500"
+                                                     Delay="7500"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <Ellipse x:Name="Orb11"
+                 WidthRequest="140"
+                 HeightRequest="140"
+                 Fill="#22B39DDB"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Center"
+                 Margin="-50,-150,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="24"
+                                                     FloatRangeY="20"
+                                                     Duration="14000"
+                                                     Delay="2500"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <Ellipse x:Name="Orb12"
+                 WidthRequest="95"
+                 HeightRequest="95"
+                 Fill="#28FF7043"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"
+                 Margin="0,-50,-150,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="14"
+                                                     FloatRangeY="11"
+                                                     Duration="8500"
+                                                     Delay="4500"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+
+
+        <Ellipse x:Name="Orb14"
+                 WidthRequest="125"
+                 HeightRequest="125"
+                 Fill="#1F81C784"
+                 HorizontalOptions="Start"
+                 VerticalOptions="End"
+                 Margin="120,0,0,-80"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="20"
+                                                     FloatRangeY="16"
+                                                     Duration="12500"
+                                                     Delay="1500"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+
+
+        <Ellipse x:Name="Orb16"
+                 WidthRequest="105"
+                 HeightRequest="105"
+                 Fill="#26E1BEE7"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Margin="-180,-100,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="17"
+                                                     FloatRangeY="13"
+                                                     Duration="9500"
+                                                     Delay="8500"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
         <!-- Main content -->
         <ScrollView>
             <VerticalStackLayout Padding="20"
@@ -110,12 +312,24 @@
 
                 <!-- Mood Selector -->
                 <VerticalStackLayout Spacing="10"
-                                     Padding="0,20,0,0">
+                                     Padding="0,0,0,-20">
                     <Label Text="How are you feeling today?"
                            HorizontalOptions="Center"
                            FontAttributes="Bold"
                            FontSize="16"
-                           TextColor="Black"/>
+                           MinimumHeightRequest="20"
+                           MaximumHeightRequest="20"
+                           InputTransparent="True"
+                           TextColor="Black">
+                        <Label.Opacity>
+                            <MultiBinding Converter="{StaticResource MoodSelectorVisibilityConverter}"
+                                          ConverterParameter="opacity">
+                                <Binding Path="IsMoodSelectorExpanded"/>
+                                <Binding Path="SelectedMood"/>
+                            </MultiBinding>
+                        </Label.Opacity>
+                    </Label>
+
 
                     <!-- Expandable Mood Selector -->
                     <VerticalStackLayout x:Name="MoodSelectorContainer"
@@ -130,12 +344,18 @@
                                WidthRequest="56"
                                HeightRequest="56"
                                CornerRadius="28"
-                               BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                               BackgroundColor="{StaticResource GlassyWhite}"
                                HasShadow="False"
                                VerticalOptions="Center"
                                HorizontalOptions="Center"
-                               BorderColor="#5B7FFF"
-                               IsVisible="{Binding IsMoodSelectorExpanded, Converter={StaticResource InverseBoolConverter}}">
+                               BorderColor="{StaticResource GlassyBorder}">
+                            <Frame.IsVisible>
+                                <MultiBinding Converter="{StaticResource MoodSelectorVisibilityConverter}"
+                                              ConverterParameter="collapsed">
+                                    <Binding Path="IsMoodSelectorExpanded"/>
+                                    <Binding Path="SelectedMood"/>
+                                </MultiBinding>
+                            </Frame.IsVisible>
                             <Button Text="{Binding SelectedMood, Converter={StaticResource MoodToEmojiConverter}}"
                                     Command="{Binding ToggleMoodSelectorCommand}"
                                     BackgroundColor="Transparent"
@@ -164,9 +384,15 @@
 
                         <!-- Expanded State: All Emoji Options -->
                         <VerticalStackLayout x:Name="ExpandedMoodSelector"
-                                             IsVisible="{Binding IsMoodSelectorExpanded}"
                                              Spacing="10"
                                              VerticalOptions="Start">
+                            <VerticalStackLayout.IsVisible>
+                                <MultiBinding Converter="{StaticResource MoodSelectorVisibilityConverter}"
+                                              ConverterParameter="expanded">
+                                    <Binding Path="IsMoodSelectorExpanded"/>
+                                    <Binding Path="SelectedMood"/>
+                                </MultiBinding>
+                            </VerticalStackLayout.IsVisible>
                             <HorizontalStackLayout HorizontalOptions="Center"
                                                    Spacing="15">
                                 <!-- Very Low -->
@@ -177,17 +403,17 @@
                                            WidthRequest="56"
                                            HeightRequest="56"
                                            CornerRadius="28"
-                                           BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                                           BackgroundColor="{StaticResource GlassyWhite}"
                                            HasShadow="False"
                                            VerticalOptions="Center"
                                            HorizontalOptions="Center"
-                                           BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
+                                           BorderColor="{StaticResource GlassyBorder}">
                                         <Frame.Triggers>
                                             <DataTrigger TargetType="Frame"
                                                          Binding="{Binding SelectedMood}"
                                                          Value="1">
                                                 <Setter Property="BorderColor"
-                                                        Value="#5B7FFF"/>
+                                                        Value="{StaticResource ActionBlue}"/>
                                             </DataTrigger>
                                         </Frame.Triggers>
                                         <Button Text="😞"
@@ -230,17 +456,17 @@
                                            WidthRequest="56"
                                            HeightRequest="56"
                                            CornerRadius="28"
-                                           BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                                           BackgroundColor="{StaticResource GlassyWhite}"
                                            HasShadow="False"
                                            VerticalOptions="Center"
                                            HorizontalOptions="Center"
-                                           BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
+                                           BorderColor="{StaticResource GlassyBorder}">
                                         <Frame.Triggers>
                                             <DataTrigger TargetType="Frame"
                                                          Binding="{Binding SelectedMood}"
                                                          Value="2">
                                                 <Setter Property="BorderColor"
-                                                        Value="#5B7FFF"/>
+                                                        Value="{StaticResource ActionBlue}"/>
                                             </DataTrigger>
                                         </Frame.Triggers>
                                         <Button Text="😕"
@@ -283,17 +509,17 @@
                                            WidthRequest="56"
                                            HeightRequest="56"
                                            CornerRadius="28"
-                                           BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                                           BackgroundColor="{StaticResource GlassyWhite}"
                                            HasShadow="False"
                                            VerticalOptions="Center"
                                            HorizontalOptions="Center"
-                                           BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
+                                           BorderColor="{StaticResource GlassyBorder}">
                                         <Frame.Triggers>
                                             <DataTrigger TargetType="Frame"
                                                          Binding="{Binding SelectedMood}"
                                                          Value="3">
                                                 <Setter Property="BorderColor"
-                                                        Value="#5B7FFF"/>
+                                                        Value="{StaticResource ActionBlue}"/>
                                             </DataTrigger>
                                         </Frame.Triggers>
                                         <Button Text="😐"
@@ -336,17 +562,17 @@
                                            WidthRequest="56"
                                            HeightRequest="56"
                                            CornerRadius="28"
-                                           BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                                           BackgroundColor="{StaticResource GlassyWhite}"
                                            HasShadow="False"
                                            VerticalOptions="Center"
                                            HorizontalOptions="Center"
-                                           BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
+                                           BorderColor="{StaticResource GlassyBorder}">
                                         <Frame.Triggers>
                                             <DataTrigger TargetType="Frame"
                                                          Binding="{Binding SelectedMood}"
                                                          Value="4">
                                                 <Setter Property="BorderColor"
-                                                        Value="#5B7FFF"/>
+                                                        Value="{StaticResource ActionBlue}"/>
                                             </DataTrigger>
                                         </Frame.Triggers>
                                         <Button Text="🙂"
@@ -389,17 +615,17 @@
                                            WidthRequest="56"
                                            HeightRequest="56"
                                            CornerRadius="28"
-                                           BackgroundColor="{AppThemeBinding Light=White, Dark=#2A2A2A}"
+                                           BackgroundColor="{StaticResource GlassyWhite}"
                                            HasShadow="False"
                                            VerticalOptions="Center"
                                            HorizontalOptions="Center"
-                                           BorderColor="{AppThemeBinding Light=#E0E0E0, Dark=#444444}">
+                                           BorderColor="{StaticResource GlassyBorder}">
                                         <Frame.Triggers>
                                             <DataTrigger TargetType="Frame"
                                                          Binding="{Binding SelectedMood}"
                                                          Value="5">
                                                 <Setter Property="BorderColor"
-                                                        Value="#5B7FFF"/>
+                                                        Value="{StaticResource ActionBlue}"/>
                                             </DataTrigger>
                                         </Frame.Triggers>
                                         <Button Text="😃"
@@ -444,71 +670,81 @@
                     <!-- If there's a session for today -->
                     <VerticalStackLayout Spacing="15"
                                          IsVisible="{Binding HasTodaySession}">
-                        <Label Text="Today's Session"
-                               FontAttributes="Bold"
-                               FontSize="18"
-                               HorizontalOptions="Center"
-                               TextColor="Black"/>
 
-                        <!-- Container to ensure consistent height for different session states -->
-                        <Grid VerticalOptions="FillAndExpand"
-                              MinimumHeightRequest="220">
+                        <!-- Consistent Border for all session states -->
+                        <Border BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColorTransparent}, Dark=#2A2A2A}"
+                                Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
+                                StrokeShape="RoundRectangle 20,20,20,20"
+                                Padding="12,12"
+                                MinimumHeightRequest="320">
 
-                            <!-- Status Display - Only show for REQUESTED state -->
-                            <Border Stroke="{Binding TodaySession.Status, Converter={StaticResource StatusToColorConverter}}"
-                                    BackgroundColor="{Binding TodaySession.Status, Converter={StaticResource StatusToBackgroundColorConverter}}"
-                                    StrokeShape="RoundRectangle 8,8,8,8"
-                                    Padding="12,6"
-                                    IsVisible="{Binding TodaySession.Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=REQUESTED}">
-                                <VerticalStackLayout Spacing="4">
-                                    <!-- Text Label -->
+                            <Grid>
+                                <!-- REQUESTED State Content -->
+                                <VerticalStackLayout Spacing="15"
+                                                     IsVisible="{Binding TodaySession.Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=REQUESTED}">
                                     <Label x:Name="GeneratingStatusLabel"
                                            Text="Generating your meditation..."
-                                           FontSize="14"
                                            FontAttributes="Bold"
+                                           FontSize="18"
                                            HorizontalOptions="Center"
-                                           TextColor="{Binding TodaySession.Status, Converter={StaticResource StatusToTextColorConverter}}"/>
+                                           TextColor="Black"/>
 
-                                    <!-- Majestic Glowing Orb (GraphicsView) -->
+                                    <!-- Glowing Orb for REQUESTED state -->
                                     <GraphicsView x:Name="GlowingOrbGraphicsView"
                                                   HorizontalOptions="Center"
                                                   VerticalOptions="Center"
-                                                  Margin="0,10,0,0"
                                                   HeightRequest="150"
                                                   WidthRequest="150"
                                                   InputTransparent="True"/>
                                 </VerticalStackLayout>
-                            </Border>
 
-                            <!-- Downloading Indicator - Only shown while downloading -->
-                            <VerticalStackLayout Spacing="10"
-                                                 IsVisible="{Binding IsDownloading}"
-                                                 Margin="0,8,0,0">
-                                <ActivityIndicator IsRunning="True"
-                                                   Color="{StaticResource Primary}"
-                                                   HorizontalOptions="Center"/>
-                                <Label Text="{Binding DownloadStatus}"
-                                       FontSize="14"
-                                       HorizontalOptions="Center"
-                                       TextColor="Gray"/>
-                            </VerticalStackLayout>
+                                <!-- DOWNLOADING State Content -->
+                                <VerticalStackLayout Spacing="15"
+                                                     IsVisible="{Binding IsDownloading}">
+                                    <Label Text="Downloading your meditation..."
+                                           FontAttributes="Bold"
+                                           FontSize="18"
+                                           HorizontalOptions="Center"
+                                           TextColor="Black"/>
 
-                            <!-- Error Message (shown only when status is FAILED) -->
-                            <Label Text="{Binding TodaySession.ErrorMessage}"
-                                   IsVisible="{Binding TodaySession.Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=FAILED}"
-                                   FontSize="14"
-                                   TextColor="{StaticResource Error}"
-                                   HorizontalOptions="Center"
-                                   HorizontalTextAlignment="Center"
-                                   Margin="0,8,0,0"/>
+                                    <ActivityIndicator IsRunning="True"
+                                                       Color="{StaticResource Primary}"
+                                                       HorizontalOptions="Center"
+                                                       VerticalOptions="Center"
+                                                       HeightRequest="150"/>
 
-                            <!-- COMPLETED State Content (Green Orb + Media Player) -->
-                            <Border BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColorTransparent}, Dark=#2A2A2A}"
-                                    Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
-                                    StrokeShape="RoundRectangle 8,8,8,8"
-                                    Padding="12,12"
-                                    IsVisible="{Binding TodaySession.Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=COMPLETED}">
-                                <VerticalStackLayout Spacing="15">
+                                    <Label Text="{Binding DownloadStatus}"
+                                           FontSize="14"
+                                           HorizontalOptions="Center"
+                                           TextColor="Gray"/>
+                                </VerticalStackLayout>
+
+                                <!-- FAILED State Content -->
+                                <VerticalStackLayout Spacing="15"
+                                                     IsVisible="{Binding TodaySession.Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=FAILED}">
+                                    <Label Text="Something went wrong"
+                                           FontAttributes="Bold"
+                                           FontSize="18"
+                                           HorizontalOptions="Center"
+                                           TextColor="Black"/>
+
+                                    <Label Text="{Binding TodaySession.ErrorMessage}"
+                                           FontSize="14"
+                                           TextColor="{StaticResource Error}"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           VerticalOptions="Center"
+                                           HeightRequest="150"/>
+                                </VerticalStackLayout>
+
+                                <!-- COMPLETED State Content -->
+                                <VerticalStackLayout Spacing="15"
+                                                     IsVisible="{Binding TodaySession.Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=COMPLETED}">
+                                    <Label Text="Today's Session"
+                                           FontAttributes="Bold"
+                                           FontSize="18"
+                                           HorizontalOptions="Center"
+                                           TextColor="Black"/>
 
                                     <!-- Green Glowing Orb for COMPLETED state -->
                                     <GraphicsView x:Name="CompletedOrbGraphicsView"
@@ -518,74 +754,55 @@
                                                   WidthRequest="150"
                                                   InputTransparent="True"/>
 
-                                    <!-- Media Player Section -->
-                                    <VerticalStackLayout Spacing="10">
+                                    <!-- Media Player Section with fixed height -->
+                                    <Grid HeightRequest="80"
+                                          VerticalOptions="End">
+                                        <VerticalStackLayout Spacing="10">
+                                            <Frame Padding="10"
+                                                   CornerRadius="18"
+                                                   BackgroundColor="{StaticResource GlassyBlue}"
+                                                   BorderColor="{StaticResource GlassyBorder}"
+                                                   HasShadow="False"
+                                                   VerticalOptions="End">
+                                                <Grid ColumnDefinitions="Auto,*,Auto"
+                                                      ColumnSpacing="10">
 
-                                        <!-- Session Metadata Display -->
-                                        <VerticalStackLayout Spacing="5"
-                                                             IsVisible="{Binding UserName, Converter={StaticResource StringToBoolConverter}}">
-                                            <Label Text="{Binding UserName}"
-                                                   FontSize="16"
-                                                   FontAttributes="Bold"
-                                                   HorizontalOptions="Center"
-                                                   TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}"/>
-                                            <Label Text="{Binding SessionDateText}"
-                                                   FontSize="14"
-                                                   HorizontalOptions="Center"
-                                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"/>
+                                                    <!-- Play/Pause Button -->
+                                                    <ImageButton Grid.Column="0"
+                                                                 Source="{Binding PlayPauseIconImage}"
+                                                                 WidthRequest="50"
+                                                                 HeightRequest="50"
+                                                                 BackgroundColor="{StaticResource GlassyGray}"
+                                                                 Command="{Binding TogglePlaybackCommand}"
+                                                                 BorderWidth="1"
+                                                                 BorderColor="{StaticResource Gray300}"
+                                                                 CornerRadius="25"/>
+
+                                                    <!-- Progress and Time -->
+                                                    <VerticalStackLayout Grid.Column="1"
+                                                                         Spacing="5">
+                                                        <ProgressBar Progress="{Binding PlaybackProgress}"
+                                                                     HeightRequest="4"
+                                                                     BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
+                                                                     ProgressColor="{StaticResource Primary}"/>
+                                                        <Grid ColumnDefinitions="*,Auto">
+                                                            <Label Grid.Column="0"
+                                                                   Text="{Binding CurrentPositionText}"
+                                                                   FontSize="12"
+                                                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"/>
+                                                            <Label Grid.Column="1"
+                                                                   Text="{Binding TotalDurationText}"
+                                                                   FontSize="12"
+                                                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"/>
+                                                        </Grid>
+                                                    </VerticalStackLayout>
+                                                </Grid>
+                                            </Frame>
                                         </VerticalStackLayout>
-
-                                        <Frame Padding="10"
-                                               CornerRadius="10"
-                                               BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray900}}"
-                                               BorderColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
-                                               HasShadow="False">
-                                            <Grid ColumnDefinitions="Auto,*,Auto"
-                                                  ColumnSpacing="10">
-
-                                                <!-- Play/Pause Button -->
-                                                <Button Grid.Column="0"
-                                                        Text="{Binding PlayPauseIcon}"
-                                                        FontSize="22"
-                                                        WidthRequest="50"
-                                                        HeightRequest="50"
-                                                        CornerRadius="25"
-                                                        BackgroundColor="{StaticResource Primary}"
-                                                        TextColor="White"
-                                                        Command="{Binding TogglePlaybackCommand}"/>
-
-                                                <!-- Progress and Time -->
-                                                <VerticalStackLayout Grid.Column="1"
-                                                                     Spacing="5">
-                                                    <ProgressBar Progress="{Binding PlaybackProgress}"
-                                                                 HeightRequest="4"
-                                                                 BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
-                                                                 ProgressColor="{StaticResource Primary}"/>
-                                                    <Grid ColumnDefinitions="*,Auto">
-                                                        <Label Grid.Column="0"
-                                                               Text="{Binding CurrentPositionText}"
-                                                               FontSize="12"
-                                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"/>
-                                                        <Label Grid.Column="1"
-                                                               Text="{Binding TotalDurationText}"
-                                                               FontSize="12"
-                                                               TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"/>
-                                                    </Grid>
-                                                </VerticalStackLayout>
-                                            </Grid>
-                                        </Frame>
-
-                                        <!-- Hidden MediaElement for audio playback -->
-                                        <!-- <toolkit:MediaElement x:Name="AudioPlayer"
-                                                              IsVisible="False"
-                                                              ShouldAutoPlay="False"
-                                                              ShouldShowPlaybackControls="False"
-                                                              Source="{Binding TodaySession.LocalAudioPath}"/> -->
-                                    </VerticalStackLayout>
+                                    </Grid>
                                 </VerticalStackLayout>
-                            </Border>
-
-                        </Grid>
+                            </Grid>
+                        </Border>
 
                     </VerticalStackLayout>
 
@@ -593,24 +810,26 @@
                     <!-- If there's no session for today -->
                     <VerticalStackLayout Spacing="15"
                                          IsVisible="{Binding HasTodaySession, Converter={StaticResource InverseBoolConverter}}">
-                        <Label Text="Ready for Today's Meditation?"
-                               FontAttributes="Bold"
-                               FontSize="18"
-                               HorizontalOptions="Center"
-                               TextColor="Black"/>
 
-                        <Border Padding="20"
-                                BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColor}, Dark=#2A2A2A}"
-                                StrokeShape="RoundRectangle 12,12,12,12">
-                            <VerticalStackLayout Spacing="15">
+                        <!-- Consistent Border styling with other states -->
+                        <Border BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColorTransparent}, Dark=#2A2A2A}"
+                                Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
+                                StrokeShape="RoundRectangle 20,20,20,20"
+                                Padding="20"
+                                MinimumHeightRequest="320">
+                            <VerticalStackLayout Spacing="15"
+                                                 VerticalOptions="Center">
                                 <Label Text="Notes for your session (optional)"
                                        FontSize="14"
-                                       FontAttributes="Bold"/>
+                                       FontAttributes="Bold"
+                                       Padding="0,0,0,0"
+                                       Margin="0,0,0,-10"/>
 
                                 <Border Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
                                         BackgroundColor="{AppThemeBinding Light=#F8F8F8, Dark=#333333}"
-                                        StrokeShape="RoundRectangle 12,12,12,12"
-                                        Padding="5">
+                                        StrokeShape="RoundRectangle 20,20,20,18"
+                                        Padding="5"
+                                        Margin="-10,0">
                                     <Editor Text="{Binding SessionNotes}"
                                             Placeholder="How are you feeling? Any specific focus areas?"
                                             PlaceholderColor="#A0A0A0"
@@ -621,12 +840,12 @@
 
                                 <Button Text="Create Today's Meditation"
                                         Command="{Binding RequestNewSessionCommand}"
-                                        BackgroundColor="#5B7FFF"
+                                        BackgroundColor="{StaticResource ActionBlue}"
                                         TextColor="White"
                                         HeightRequest="50"
                                         CornerRadius="25"
                                         FontSize="16"
-                                        BorderColor="#5B7FFF"
+                                        BorderColor="{StaticResource ActionBlue}"
                                         BorderWidth="1"
                                         Margin="0,10,0,0"/>
                             </VerticalStackLayout>

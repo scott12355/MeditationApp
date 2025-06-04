@@ -1,5 +1,6 @@
 using MeditationApp.Services;
 using MeditationApp.ViewModels;
+using System;
 
 namespace MeditationApp.Views;
 
@@ -21,8 +22,10 @@ public partial class SplashPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        if (_hasNavigated) return;
-
+        
+        // Reset navigation state to handle logout/login cycles
+        _hasNavigated = false;
+        
         await SplashContent.FadeTo(1, 500, Easing.CubicOut);
         await CheckAuthenticationAndNavigate();
     }
@@ -51,9 +54,30 @@ public partial class SplashPage : ContentPage
                 return;
             }
 
-            // Load today's session
+            // Load today's session with timeout
             LoadingLabel.Text = "Loading today's session...";
-            await _todayViewModel.EnsureDataLoaded();
+            
+            using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30))) // 30 second timeout
+            {
+                try
+                {
+                    Console.WriteLine("SplashPage: Starting EnsureDataLoaded with 30s timeout");
+                    await _todayViewModel.EnsureDataLoaded().WaitAsync(cts.Token);
+                    Console.WriteLine("SplashPage: EnsureDataLoaded completed successfully");
+                }
+                catch (TimeoutException)
+                {
+                    Console.WriteLine("SplashPage: Data loading timed out after 30 seconds, proceeding anyway");
+                    LoadingLabel.Text = "Loading took longer than expected, continuing...";
+                    await Task.Delay(1000);
+                }
+                catch (OperationCanceledException)
+                {
+                    Console.WriteLine("SplashPage: Data loading was cancelled due to timeout, proceeding anyway");
+                    LoadingLabel.Text = "Loading took longer than expected, continuing...";
+                    await Task.Delay(1000);
+                }
+            }
             
             // Navigate to main app
             LoadingLabel.Text = "Welcome back!";

@@ -10,6 +10,7 @@ using CommunityToolkit.Maui.Core.Primitives;
 using MeditationApp.Utils;
 using System.ComponentModel;
 using Microsoft.Maui.Storage;
+using System;
 
 namespace MeditationApp.ViewModels;
 
@@ -81,6 +82,7 @@ public partial class TodayViewModel : ObservableObject
     public string CurrentPositionText => _audioPlayerService.CurrentPositionText;
     public string TotalDurationText => _audioPlayerService.TotalDurationText;
     public string PlayPauseIcon => _audioPlayerService.PlayPauseIcon;
+    public string PlayPauseIconImage => IsPlaying ? "pause" : "play";
     
     // Delegate metadata properties to the AudioPlayerService
     public string UserName => _audioPlayerService.UserName;
@@ -143,6 +145,7 @@ public partial class TodayViewModel : ObservableObject
             case nameof(AudioPlayerService.IsPlaying):
                 OnPropertyChanged(nameof(IsPlaying));
                 OnPropertyChanged(nameof(PlayPauseIcon));
+                OnPropertyChanged(nameof(PlayPauseIconImage));
                 break;
             case nameof(AudioPlayerService.PlaybackPosition):
                 OnPropertyChanged(nameof(PlaybackPosition));
@@ -168,7 +171,52 @@ public partial class TodayViewModel : ObservableObject
     /// <summary>
     /// Ensures today's session data is loaded before showing the UI.
     /// </summary>
-    public Task EnsureDataLoaded() => _initializationTask ?? Task.CompletedTask;
+    public Task EnsureDataLoaded()
+    {
+        if (_initializationTask == null)
+        {
+            Debug.WriteLine("[EnsureDataLoaded] Creating new initialization task");
+            _initializationTask = LoadTodayDataAsync();
+        }
+        return _initializationTask;
+    }
+
+    /// <summary>
+    /// Resets the ViewModel state for logout/login cycles
+    /// </summary>
+    public void Reset()
+    {
+        Debug.WriteLine("[Reset] Resetting TodayViewModel state");
+        
+        // Cancel and clear the old initialization task
+        _initializationTask = null;
+        
+        // Reset state flags
+        _isInitialLoad = true;
+        _isLoadingData = false;
+        
+        // Clear current session and insights
+        TodaySession = null;
+        HasTodaySession = false;
+        _currentInsights = null;
+        HasExistingInsights = false;
+        
+        // Reset UI properties
+        SessionNotes = string.Empty;
+        SelectedMood = null;
+        InsightsDate = DateTime.Now.Date;
+        CurrentDate = DateTime.Now.Date;
+        
+        // Reset loading states
+        IsLoading = false;
+        IsSyncingInsights = false;
+        
+        // Reset refresh tracking
+        _refreshAttemptCount = 0;
+        _lastRefreshAttempt = DateTime.MinValue;
+        
+        Debug.WriteLine("[Reset] TodayViewModel state reset completed");
+    }
 
     private async Task LoadTodayDataAsync()
     {
@@ -231,6 +279,8 @@ public partial class TodayViewModel : ObservableObject
                     "OK");
             }
         }
+
+        OnPropertyChanged(nameof(PlayPauseIconImage));
     }
 
     private async Task LoadAudioWithMetadata()
@@ -816,13 +866,48 @@ public partial class TodayViewModel : ObservableObject
                 return;
             }
 
-            // Start both syncs in parallel
+            // Start both syncs in parallel with timeout and debugging
+            Debug.WriteLine("[LoadTodayData] Starting parallel tasks");
             var sessionsTask = LoadSessionsAsync(userId);
             var insightsTask = LoadDailyInsightsAsync(userId);
             var fullSyncTask = SyncAllInsightsAsync();
             
-            // Wait for today's data first
-            await Task.WhenAll(sessionsTask, insightsTask);
+            // Add timeout to prevent infinite hang
+            using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20)))
+            {
+                try
+                {
+                    Debug.WriteLine("[LoadTodayData] Waiting for sessions and insights tasks with 20s timeout");
+                    
+                    // Create a task that completes when both core tasks finish
+                    var coreTask = Task.WhenAll(sessionsTask, insightsTask);
+                    
+                    // Wait with timeout
+                    await coreTask.WaitAsync(cts.Token);
+                    Debug.WriteLine("[LoadTodayData] Core tasks completed successfully");
+                }
+                catch (OperationCanceledException)
+                {
+                    Debug.WriteLine("[LoadTodayData] Tasks timed out after 20 seconds, checking individual task status");
+                    
+                    // Check which task is hanging
+                    if (sessionsTask.IsCompleted)
+                        Debug.WriteLine("[LoadTodayData] - Sessions task: COMPLETED");
+                    else
+                        Debug.WriteLine("[LoadTodayData] - Sessions task: HANGING");
+                        
+                    if (insightsTask.IsCompleted)
+                        Debug.WriteLine("[LoadTodayData] - Insights task: COMPLETED");
+                    else
+                        Debug.WriteLine("[LoadTodayData] - Insights task: HANGING");
+                    
+                    // Fall back to local data
+                    Debug.WriteLine("[LoadTodayData] Falling back to local data due to timeout");
+                    await LoadLocalSessionsForToday();
+                    await LoadLocalInsights();
+                    return;
+                }
+            }
             
             // Process today's insights result
             var insightsResult = await insightsTask;
@@ -1291,15 +1376,7 @@ public partial class TodayViewModel : ObservableObject
                 catch (Exception navEx)
                 {
                     Debug.WriteLine($"Navigation error during logout: {navEx.Message}");
-                    // Try alternative navigation if first attempt fails
-                    try
-                    {
-                        await Shell.Current.GoToAsync("SignUpPage", animate: true);
-                    }
-                    catch (Exception fallbackEx)
-                    {
-                        Debug.WriteLine($"Fallback navigation also failed: {fallbackEx.Message}");
-                    }
+
                 }
             });
         }
