@@ -348,7 +348,7 @@
                                HasShadow="False"
                                VerticalOptions="Center"
                                HorizontalOptions="Center"
-                               BorderColor="{StaticResource GlassyBorder}">
+                               BorderColor="{StaticResource ActionBlue}">
                             <Frame.IsVisible>
                                 <MultiBinding Converter="{StaticResource MoodSelectorVisibilityConverter}"
                                               ConverterParameter="collapsed">
