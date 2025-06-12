@@ -3,13 +3,10 @@ using Plugin.Maui.Audio;
 using MediaManager;
 using MediaManager.Media;
 using MediaManager.Queue;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.IO;
-using System.Timers;
-using System.Threading.Tasks;
-using System.Linq;
+
+using TagFile = TagLib.File;
 
 namespace MeditationApp.Services;
 
@@ -34,6 +31,9 @@ public class AudioPlayerService : INotifyPropertyChanged
 
     // Timer for position updates
     private System.Timers.Timer? _positionTimer;
+    
+    // Flag to prevent MediaManager from overriding our extracted metadata
+    private bool _hasCustomMetadata = false;
 
     public event EventHandler? MediaOpened;
     public event EventHandler? MediaEnded;
@@ -150,6 +150,7 @@ public class AudioPlayerService : INotifyPropertyChanged
         {
             if (_title != value)
             {
+                System.Diagnostics.Debug.WriteLine($"Title changing from '{_title}' to '{value}'");
                 _title = value;
                 OnPropertyChanged();
             }
@@ -220,7 +221,8 @@ public class AudioPlayerService : INotifyPropertyChanged
             // Enable lock screen controls
             _mediaManager.Notification.ShowNavigationControls = true;
             _mediaManager.Notification.ShowPlayPauseControls = true;
-            _mediaManager.MediaItemChanged += OnMediaItemChanged;
+            
+            System.Diagnostics.Debug.WriteLine("MediaManager initialized - using custom metadata extraction");
         }
         catch (Exception ex)
         {
@@ -242,14 +244,35 @@ public class AudioPlayerService : INotifyPropertyChanged
 
     private void OnMediaItemChanged(object? sender, MediaManager.Media.MediaItemEventArgs e)
     {
+        System.Diagnostics.Debug.WriteLine($"OnMediaItemChanged triggered - _hasCustomMetadata: {_hasCustomMetadata}");
+        
+        // If we have custom metadata, completely ignore MediaManager's metadata
+        if (_hasCustomMetadata)
+        {
+            System.Diagnostics.Debug.WriteLine("Ignoring MediaManager metadata - preserving extracted MP3 metadata");
+            return;
+        }
+        
+        // Only use MediaManager metadata if we don't have custom metadata
         MainThread.BeginInvokeOnMainThread(() =>
         {
             if (e.MediaItem != null)
             {
-                Title = e.MediaItem.Title ?? string.Empty;
-                Artist = e.MediaItem.Artist ?? string.Empty;
-                Album = e.MediaItem.Album ?? string.Empty;
-                AlbumArt = e.MediaItem.Image?.ToString() ?? string.Empty;
+                var mediaTitle = e.MediaItem.Title ?? string.Empty;
+                var mediaArtist = e.MediaItem.Artist ?? string.Empty;
+                var mediaAlbum = e.MediaItem.Album ?? string.Empty;
+                var mediaImage = e.MediaItem.Image?.ToString() ?? string.Empty;
+                
+                System.Diagnostics.Debug.WriteLine($"Using MediaManager metadata - Title: {mediaTitle}, Artist: {mediaArtist}, Album: {mediaAlbum}");
+                
+                Title = mediaTitle;
+                Artist = mediaArtist;
+                Album = mediaAlbum;
+                AlbumArt = mediaImage;
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("OnMediaItemChanged: MediaItem is null");
             }
         });
     }
@@ -301,6 +324,9 @@ public class AudioPlayerService : INotifyPropertyChanged
         {
             await StopAsync();
             
+            // Reset custom metadata flag for URL playback (allow MediaManager to handle it)
+            _hasCustomMetadata = false;
+            
             // Use MediaManager for better lock screen support
             await _mediaManager.Play(url);
             
@@ -318,6 +344,54 @@ public class AudioPlayerService : INotifyPropertyChanged
         }
     }
 
+    private async Task ExtractAndSetMetadata(string filePath)
+    {
+        try
+        {
+            // Extract metadata from MP3 file
+            var (title, artist, album, albumArtData) = ExtractMp3Metadata(filePath);
+            
+            // Use extracted metadata or fall back to current values
+            var metadataTitle = !string.IsNullOrEmpty(title) ? title : _title;
+            var metadataArtist = !string.IsNullOrEmpty(artist) ? artist : _artist;
+            var metadataAlbum = !string.IsNullOrEmpty(album) ? album : _album;
+            
+            // Handle album art
+            string albumArtPath = _albumArt; // Default to current album art
+            if (albumArtData.Length > 0)
+            {
+                try
+                {
+                    // Save album art to cache directory
+                    var albumArtFileName = $"{Path.GetFileNameWithoutExtension(filePath)}_albumart.jpg";
+                    albumArtPath = Path.Combine(FileSystem.CacheDirectory, albumArtFileName);
+                    await File.WriteAllBytesAsync(albumArtPath, albumArtData);
+                    System.Diagnostics.Debug.WriteLine($"Saved album art to: {albumArtPath}");
+                }
+                catch (Exception artEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error saving album art: {artEx.Message}");
+                    albumArtPath = _albumArt; // Fall back to current album art
+                }
+            }
+            
+            // Update metadata properties directly - this is our source of truth
+            Title = metadataTitle;
+            Artist = metadataArtist;
+            Album = metadataAlbum;
+            AlbumArt = albumArtPath;
+            
+            // Prevent MediaManager from overriding our metadata
+            _hasCustomMetadata = true;
+            
+            System.Diagnostics.Debug.WriteLine($"Set extracted metadata - Title: {Title}, Artist: {Artist}, Album: {Album}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error extracting and setting metadata: {ex.Message}");
+        }
+    }
+
     public async Task<bool> PlayFromFileAsync(string filePath)
     {
         try
@@ -330,14 +404,22 @@ public class AudioPlayerService : INotifyPropertyChanged
 
             await StopAsync();
             
-            // Use MediaManager for better lock screen support
-            await _mediaManager.Play(filePath);
+            // Extract and set metadata BEFORE playing
+            await ExtractAndSetMetadata(filePath);
             
-            // Set metadata after playing starts for lock screen display
-            SetMediaMetadata(_title, _artist, _album, _albumArt);
+            // Note: MediaManager may show warnings about unrecognized metadata keys - this is normal
+            // Our TagLibSharp extraction handles metadata correctly regardless of these warnings
+            System.Diagnostics.Debug.WriteLine($"Playing file with extracted metadata - Title: '{Title}', Artist: '{Artist}'");
+            
+            // Ensure custom metadata flag is set before playing
+            _hasCustomMetadata = true;
+            
+            // Now play the file with MediaManager
+            await _mediaManager.Play(filePath);
             
             IsPlaying = true;
             MediaOpened?.Invoke(this, EventArgs.Empty);
+            
             return true;
         }
         catch (Exception ex)
@@ -381,6 +463,9 @@ public class AudioPlayerService : INotifyPropertyChanged
             IsPlaying = false;
             PlaybackPosition = TimeSpan.Zero;
             PlaybackProgress = 0;
+            
+            // Clear custom metadata flag when stopping to allow fresh metadata on next play
+            _hasCustomMetadata = false;
         }
         catch (Exception ex)
         {
@@ -413,13 +498,93 @@ public class AudioPlayerService : INotifyPropertyChanged
         UserName = userName;
         SessionDate = sessionDate;
         
-        // Set metadata to display session date and user name instead of session ID
-        Title = sessionDate.ToString("dddd, MMMM dd, yyyy");
-        Artist = userName;
-        Album = "Lucen - Daily Meditations";
-        AlbumArt = GetAppIconPath();
-        
-        System.Diagnostics.Debug.WriteLine($"Audio metadata set - User: {userName}, Date: {sessionDate:yyyy-MM-dd}");
+        // Extract and use MP3 metadata directly
+        try
+        {
+            var (extractedTitle, extractedArtist, extractedAlbum, albumArtData) = ExtractMp3Metadata(filePath);
+            
+            // Use extracted metadata if available, otherwise use session info
+            Title = !string.IsNullOrEmpty(extractedTitle) ? extractedTitle : sessionDate.ToString("dddd, MMMM dd, yyyy");
+            Artist = !string.IsNullOrEmpty(extractedArtist) ? extractedArtist : userName;
+            Album = !string.IsNullOrEmpty(extractedAlbum) ? extractedAlbum : "Lucen - Daily Meditations";
+            
+            // Handle album art
+            if (albumArtData.Length > 0)
+            {
+                try
+                {
+                    // Save album art to cache directory
+                    var albumArtFileName = $"{Path.GetFileNameWithoutExtension(filePath)}_albumart.jpg";
+                    var albumArtPath = Path.Combine(FileSystem.CacheDirectory, albumArtFileName);
+                    File.WriteAllBytes(albumArtPath, albumArtData);
+                    AlbumArt = albumArtPath;
+                    System.Diagnostics.Debug.WriteLine($"Using extracted album art: {albumArtPath}");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error saving album art: {ex.Message}");
+                    AlbumArt = GetAppIconPath(); // Fall back to app icon
+                }
+            }
+            else
+            {
+                AlbumArt = GetAppIconPath(); // Default to app icon
+            }
+            
+            // Mark that we have custom metadata
+            _hasCustomMetadata = true;
+            
+            System.Diagnostics.Debug.WriteLine($"Audio metadata set - Title: {Title}, Artist: {Artist}, Album: {Album}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error in SetAudioSourceWithMetadata: {ex.Message}");
+            // Fallback to session info
+            Title = sessionDate.ToString("dddd, MMMM dd, yyyy");
+            Artist = userName;
+            Album = "Lucen - Daily Meditations";
+            AlbumArt = GetAppIconPath();
+            _hasCustomMetadata = true;
+        }
+    }
+
+    // Simplified metadata loading - just extract metadata without complex logic
+    public void LoadMetadataFromFile(string filePath)
+    {
+        try
+        {
+            var (title, artist, album, albumArtData) = ExtractMp3Metadata(filePath);
+            
+            if (!string.IsNullOrEmpty(title)) Title = title;
+            if (!string.IsNullOrEmpty(artist)) Artist = artist;
+            if (!string.IsNullOrEmpty(album)) Album = album;
+            
+            // Handle album art
+            if (albumArtData.Length > 0)
+            {
+                try
+                {
+                    var albumArtFileName = $"{Path.GetFileNameWithoutExtension(filePath)}_albumart.jpg";
+                    var albumArtPath = Path.Combine(FileSystem.CacheDirectory, albumArtFileName);
+                    File.WriteAllBytes(albumArtPath, albumArtData);
+                    AlbumArt = albumArtPath;
+                    System.Diagnostics.Debug.WriteLine($"Loaded album art from MP3: {albumArtPath}");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error saving extracted album art: {ex.Message}");
+                }
+            }
+            
+            // Mark that we have custom metadata
+            _hasCustomMetadata = true;
+            
+            System.Diagnostics.Debug.WriteLine($"Loaded metadata from MP3 - Title: {Title}, Artist: {Artist}, Album: {Album}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading metadata from file: {ex.Message}");
+        }
     }
 
     private string GetAppIconPath()
@@ -508,6 +673,74 @@ public class AudioPlayerService : INotifyPropertyChanged
         {
             System.Diagnostics.Debug.WriteLine($"Error getting platform app icon path: {ex.Message}");
             return string.Empty;
+        }
+    }
+
+    public (string title, string artist, string album, byte[] albumArt) ExtractMp3Metadata(string filePath)
+    {
+        try
+        {
+            if (!File.Exists(filePath))
+            {
+                System.Diagnostics.Debug.WriteLine($"File not found for metadata extraction: {filePath}");
+                return (string.Empty, string.Empty, string.Empty, Array.Empty<byte>());
+            }
+
+            using var tagFile = TagFile.Create(filePath);
+            
+            var title = tagFile.Tag.Title ?? string.Empty;
+            var artist = tagFile.Tag.FirstPerformer ?? string.Empty;
+            var album = tagFile.Tag.Album ?? string.Empty;
+            var albumArt = Array.Empty<byte>();
+
+            System.Diagnostics.Debug.WriteLine($"Raw extracted title before processing: '{title}'");
+
+            // Clean up title by removing UUID patterns and common prefixes
+            if (!string.IsNullOrEmpty(title))
+            {
+                var originalTitle = title;
+                
+                // Remove .mp3 extension if present
+                if (title.EndsWith(".mp3", StringComparison.OrdinalIgnoreCase))
+                {
+                    title = title.Substring(0, title.Length - 4);
+                    System.Diagnostics.Debug.WriteLine($"Stripped .mp3 extension - '{originalTitle}' → '{title}'");
+                }
+                
+                // Remove UUID patterns (e.g., "12345678-1234-1234-1234-123456789abc_" or just "12345678-1234-1234-1234-123456789abc")
+                var uuidPattern = @"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}[_-]?";
+                var cleanedTitle = System.Text.RegularExpressions.Regex.Replace(title, uuidPattern, string.Empty);
+                
+                if (cleanedTitle != title)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Stripped UUID prefix - '{title}' → '{cleanedTitle}'");
+                    title = cleanedTitle;
+                }
+                
+                // Remove any remaining leading underscores or dashes
+                title = title.TrimStart('_', '-', ' ');
+                
+                if (title != originalTitle)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Final title cleanup - Original: '{originalTitle}' → Final: '{title}'");
+                }
+            }
+
+            // Extract album art if available
+            if (tagFile.Tag.Pictures?.Length > 0)
+            {
+                albumArt = tagFile.Tag.Pictures[0].Data.Data;
+                System.Diagnostics.Debug.WriteLine($"Extracted album art: {albumArt.Length} bytes");
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Final extracted MP3 metadata - Title: '{title}', Artist: '{artist}', Album: '{album}'");
+            
+            return (title, artist, album, albumArt);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error extracting MP3 metadata from {filePath}: {ex.Message}");
+            return (string.Empty, string.Empty, string.Empty, Array.Empty<byte>());
         }
     }
 

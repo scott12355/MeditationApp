@@ -64,9 +64,10 @@ namespace MeditationApp.Services
 
                 Debug.WriteLine($"Starting download for session {session.Uuid}");
 
-                // Generate a local filename
-                var fileName = $"{session.Uuid}_{session.Timestamp:yyyyMMdd_HHmmss}.mp3";
-                var localPath = Path.Combine(_audioDirectory, fileName);
+                // Extract the file name from the presigned URL and decode it
+                var downloadFileName = Path.GetFileName(new Uri(presignedUrl).AbsolutePath);
+                downloadFileName = Uri.UnescapeDataString(downloadFileName);
+                var localPath = Path.Combine(_audioDirectory, downloadFileName);
                 Debug.WriteLine($"Will save to: {localPath}");
 
                 // Download the file
@@ -78,7 +79,12 @@ namespace MeditationApp.Services
                 await response.Content.CopyToAsync(fileStream);
                 Debug.WriteLine($"File downloaded and saved to {localPath}");
 
-                // Get file size
+                // Extra check: verify file exists and log size
+                if (!File.Exists(localPath))
+                {
+                    Debug.WriteLine($"ERROR: File was not saved at {localPath}");
+                    return false;
+                }
                 var downloadedFileInfo = new FileInfo(localPath);
                 Debug.WriteLine($"Downloaded file details - Size: {downloadedFileInfo.Length} bytes, Last modified: {downloadedFileInfo.LastWriteTime}");
                 

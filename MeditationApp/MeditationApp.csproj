@@ -72,6 +72,7 @@
         <PackageReference Include="Plugin.Maui.Audio" Version="3.0.1" />
         <PackageReference Include="Plugin.MediaManager" Version="1.2.2" />
         <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+        <PackageReference Include="TagLibSharp" Version="2.3.0" />
     </ItemGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
