@@ -25,16 +25,16 @@
         ContentTemplate="{DataTemplate views:ProfilePage}"
         Route="ProfilePage"/>
 
-    <!-- Main tabbed interface -->
-    <TabBar Route="MainTabs"
-            Shell.TabBarTitleColor="{StaticResource Secondary}"
-            Shell.TabBarBackgroundColor="{StaticResource GlassyWhite}">
-        <Tab Title="Today">
-            <ShellContent ContentTemplate="{DataTemplate views:TodayPage}"/>
-        </Tab>
-        <Tab Title="Calendar">
-            <ShellContent ContentTemplate="{DataTemplate views:CalendarPage}"/>
-        </Tab>
-    </TabBar>
+    <!-- Main app page -->
+    <ShellContent
+        Title="Today"
+        ContentTemplate="{DataTemplate views:TodayPage}"
+        Route="MainApp"/>
+
+    <!-- Past Sessions page -->
+    <ShellContent
+        Title="Past Sessions"
+        ContentTemplate="{DataTemplate views:CalendarPage}"
+        Route="PastSessionsPage"/>
 
 </Shell>

@@ -718,6 +718,12 @@ public partial class TodayViewModel : ObservableObject
         IsMoodSelectorExpanded = !IsMoodSelectorExpanded;
     }
 
+    [RelayCommand]
+    private async Task NavigateToPastSessions()
+    {
+        await Shell.Current.GoToAsync("PastSessionsPage");
+    }
+
     partial void OnSessionNotesChanged(string value)
     {
         Debug.WriteLine($"[Notes] Notes changed to: {value}");

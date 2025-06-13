@@ -84,7 +84,7 @@ public partial class SplashPage : ContentPage
             await Task.Delay(600);
             
             _hasNavigated = true;
-            await Shell.Current.GoToAsync("//MainTabs", true);
+            await Shell.Current.GoToAsync("//MainApp", true);
         }
         catch (Exception ex)
         {

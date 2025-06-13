@@ -29,4 +29,9 @@ public partial class CalendarPage : ContentPage
     {
         await Shell.Current.GoToAsync("SettingsPage");
     }
+
+    private async void OnBackToTodayClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("..");
+    }
 }

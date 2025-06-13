@@ -63,6 +63,11 @@
 
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
         <!-- Decorative abstract shapes for modern look -->
         <Ellipse x:Name="Orb1"
                  WidthRequest="300"
@@ -293,7 +298,7 @@
         </Ellipse>
 
         <!-- Main content -->
-        <ScrollView>
+        <ScrollView Grid.Row="0">
             <VerticalStackLayout Padding="20"
                                  Spacing="20">
 
@@ -307,8 +312,6 @@
                     <!--        Style="{StaticResource Headline}" -->
                     <!--        HorizontalOptions="Center"/> -->
                 </VerticalStackLayout>
-
-
 
                 <!-- Mood Selector -->
                 <VerticalStackLayout Spacing="10"
@@ -849,22 +852,126 @@
                                             VerticalOptions="Start"/>
                                 </Border>
 
-                                <Button Text="Create Today's Meditation"
-                                        Command="{Binding RequestNewSessionCommand}"
-                                        BackgroundColor="{StaticResource ActionBlue}"
-                                        TextColor="White"
-                                        HeightRequest="50"
-                                        CornerRadius="25"
-                                        FontSize="16"
-                                        BorderColor="{StaticResource ActionBlue}"
-                                        BorderWidth="1"
-                                        Margin="0,10,0,0"/>
+                                <!-- Create Today's Meditation Button with glassmorphism styling -->
+                                <Frame Padding="0"
+                                       CornerRadius="25"
+                                       HasShadow="True"
+                                       Margin="0,10,0,0"
+                                       HorizontalOptions="Fill"
+                                       HeightRequest="50"
+                                       BackgroundColor="{StaticResource GlassyBlue}"
+                                       BorderColor="{StaticResource GlassyBorder}">
+                                    <Frame.Shadow>
+                                        <Shadow Brush="Black"
+                                                Offset="0,4"
+                                                Radius="12"
+                                                Opacity="0.15"/>
+                                    </Frame.Shadow>
+                                    <Button Text="Create Today's Meditation"
+                                            Command="{Binding RequestNewSessionCommand}"
+                                            BackgroundColor="Transparent"
+                                            TextColor="{StaticResource Primary}"
+                                            FontSize="16"
+                                            FontAttributes="Bold"
+                                            HorizontalOptions="Fill"
+                                            VerticalOptions="Fill"
+                                            BorderColor="Transparent">
+                                        <VisualStateManager.VisualStateGroups>
+                                            <VisualStateGroupList>
+                                                <VisualStateGroup x:Name="CommonStates">
+                                                    <VisualState x:Name="Normal">
+                                                        <VisualState.Setters>
+                                                            <Setter Property="Scale"
+                                                                    Value="1.0"/>
+                                                            <Setter Property="Opacity"
+                                                                    Value="1.0"/>
+                                                        </VisualState.Setters>
+                                                    </VisualState>
+                                                    <VisualState x:Name="Pressed">
+                                                        <VisualState.Setters>
+                                                            <Setter Property="Scale"
+                                                                    Value="0.95"/>
+                                                            <Setter Property="Opacity"
+                                                                    Value="0.8"/>
+                                                        </VisualState.Setters>
+                                                    </VisualState>
+                                                </VisualStateGroup>
+                                            </VisualStateGroupList>
+                                        </VisualStateManager.VisualStateGroups>
+                                        <Button.Behaviors>
+                                            <toolkit:AnimationBehavior>
+                                                <toolkit:AnimationBehavior.AnimationType>
+                                                    <toolkit:FadeAnimation Length="200"/>
+                                                </toolkit:AnimationBehavior.AnimationType>
+                                            </toolkit:AnimationBehavior>
+                                        </Button.Behaviors>
+                                    </Button>
+                                </Frame>
                             </VerticalStackLayout>
                         </Border>
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
+
             </VerticalStackLayout>
         </ScrollView>
+
+        <!-- Past Sessions Button anchored to bottom -->
+        <Frame Grid.Row="1"
+               Padding="0"
+               CornerRadius="30"
+               HasShadow="True"
+               Margin="20,10,20,20"
+               HorizontalOptions="Fill"
+               HeightRequest="60"
+               BackgroundColor="{StaticResource GlassyBlue}"
+               BorderColor="{StaticResource GlassyBorder}">
+            <Frame.Shadow>
+                <Shadow Brush="Black"
+                        Offset="0,4"
+                        Radius="12"
+                        Opacity="0.15"/>
+            </Frame.Shadow>
+            <Button Text="📚 Past Sessions"
+                    Command="{Binding NavigateToPastSessionsCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource Primary}"
+                    FontSize="18"
+                    FontAttributes="Bold"
+                    HorizontalOptions="Fill"
+                    VerticalOptions="Fill"
+                    BorderColor="Transparent">
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal">
+                                <VisualState.Setters>
+                                    <Setter Property="Scale"
+                                            Value="1.0"/>
+                                    <Setter Property="Opacity"
+                                            Value="1.0"/>
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Property="Scale"
+                                            Value="0.95"/>
+                                    <Setter Property="Opacity"
+                                            Value="0.8"/>
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </VisualStateManager.VisualStateGroups>
+                <Button.Behaviors>
+                    <toolkit:AnimationBehavior>
+                        <toolkit:AnimationBehavior.AnimationType>
+                            <toolkit:FadeAnimation Length="200"/>
+                        </toolkit:AnimationBehavior.AnimationType>
+                    </toolkit:AnimationBehavior>
+                </Button.Behaviors>
+            </Button>
+        </Frame>
+
     </Grid>
 </ContentPage>
