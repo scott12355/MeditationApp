@@ -674,19 +674,26 @@
                     <VerticalStackLayout Spacing="15"
                                          IsVisible="{Binding HasTodaySession}">
 
-                        <!-- Consistent Border for all session states -->
-                        <Border BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColorTransparent}, Dark=#2A2A2A}"
-                                Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
-                                StrokeShape="RoundRectangle 20,20,20,20"
-                                Padding="12,12"
-                                MinimumHeightRequest="320">
+                        <!-- Enhanced Frame with glassmorphism styling for session states -->
+                        <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                               BorderColor="{StaticResource GlassyBorder}"
+                               CornerRadius="24"
+                               Padding="24"
+                               HasShadow="True"
+                               MinimumHeightRequest="320">
+                            <Frame.Shadow>
+                                <Shadow Brush="Black"
+                                        Offset="0,8"
+                                        Radius="20"
+                                        Opacity="0.12"/>
+                            </Frame.Shadow>
 
                             <Grid>
                                 <!-- REQUESTED State Content -->
                                 <VerticalStackLayout Spacing="15"
                                                      IsVisible="{Binding TodaySession.Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=REQUESTED}">
                                     <Label x:Name="GeneratingStatusLabel"
-                                           Text="Generating your meditation..."
+                                           Text="✨ Crafting your personalised meditation..."
                                            FontAttributes="Bold"
                                            FontSize="18"
                                            HorizontalOptions="Center"
@@ -704,7 +711,7 @@
                                 <!-- DOWNLOADING State Content -->
                                 <VerticalStackLayout Spacing="15"
                                                      IsVisible="{Binding IsDownloading}">
-                                    <Label Text="Downloading your meditation..."
+                                    <Label Text="📥 Preparing your meditation experience..."
                                            FontAttributes="Bold"
                                            FontSize="18"
                                            HorizontalOptions="Center"
@@ -739,22 +746,68 @@
                                            VerticalOptions="Center"
                                            HeightRequest="150"/>
 
-                                    <Button Text="Try Again"
-                                            Command="{Binding RequestNewSessionCommand}"
-                                            BackgroundColor="{StaticResource Primary}"
-                                            TextColor="White"
-                                            CornerRadius="25"
-                                            HeightRequest="50"
-                                            WidthRequest="200"
-                                            HorizontalOptions="Center"
-                                            IsEnabled="{Binding IsRequestingSession, Converter={StaticResource InverseBoolConverter}}"
-                                            FontAttributes="Bold"/>
+                                    <!-- Enhanced Try Again Button with glassmorphism styling -->
+                                    <Frame Padding="0"
+                                           CornerRadius="25"
+                                           HasShadow="True"
+                                           HorizontalOptions="Center"
+                                           HeightRequest="50"
+                                           WidthRequest="200"
+                                           BackgroundColor="{StaticResource Primary}"
+                                           BorderColor="Transparent">
+                                        <Frame.Shadow>
+                                            <Shadow Brush="{StaticResource Primary}"
+                                                    Offset="0,6"
+                                                    Radius="15"
+                                                    Opacity="0.25"/>
+                                        </Frame.Shadow>
+                                        <Button Text="🔄 Try Again"
+                                                Command="{Binding RequestNewSessionCommand}"
+                                                BackgroundColor="Transparent"
+                                                TextColor="White"
+                                                FontSize="16"
+                                                FontAttributes="Bold"
+                                                HorizontalOptions="Fill"
+                                                VerticalOptions="Fill"
+                                                BorderColor="Transparent"
+                                                IsEnabled="{Binding IsRequestingSession, Converter={StaticResource InverseBoolConverter}}">
+                                            <VisualStateManager.VisualStateGroups>
+                                                <VisualStateGroupList>
+                                                    <VisualStateGroup x:Name="CommonStates">
+                                                        <VisualState x:Name="Normal">
+                                                            <VisualState.Setters>
+                                                                <Setter Property="Scale"
+                                                                        Value="1.0"/>
+                                                                <Setter Property="Opacity"
+                                                                        Value="1.0"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                        <VisualState x:Name="Pressed">
+                                                            <VisualState.Setters>
+                                                                <Setter Property="Scale"
+                                                                        Value="0.96"/>
+                                                                <Setter Property="Opacity"
+                                                                        Value="0.85"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                </VisualStateGroupList>
+                                            </VisualStateManager.VisualStateGroups>
+                                            <Button.Behaviors>
+                                                <toolkit:AnimationBehavior>
+                                                    <toolkit:AnimationBehavior.AnimationType>
+                                                        <toolkit:FadeAnimation Length="200"/>
+                                                    </toolkit:AnimationBehavior.AnimationType>
+                                                </toolkit:AnimationBehavior>
+                                            </Button.Behaviors>
+                                        </Button>
+                                    </Frame>
                                 </VerticalStackLayout>
 
                                 <!-- COMPLETED State Content -->
                                 <VerticalStackLayout Spacing="15"
                                                      IsVisible="{Binding TodaySession.Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=COMPLETED}">
-                                    <Label Text="Today's Session"
+                                    <Label Text="🎧 Your Daily Meditation"
                                            FontAttributes="Bold"
                                            FontSize="18"
                                            HorizontalOptions="Center"
@@ -816,7 +869,7 @@
                                     </Grid>
                                 </VerticalStackLayout>
                             </Grid>
-                        </Border>
+                        </Frame>
 
                     </VerticalStackLayout>
 
@@ -825,53 +878,82 @@
                     <VerticalStackLayout Spacing="15"
                                          IsVisible="{Binding HasTodaySession, Converter={StaticResource InverseBoolConverter}}">
 
-                        <!-- Consistent Border styling with other states -->
-                        <Border BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColorTransparent}, Dark=#2A2A2A}"
-                                Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
-                                StrokeShape="RoundRectangle 20,20,20,20"
-                                Padding="20"
-                                MinimumHeightRequest="320">
-                            <VerticalStackLayout Spacing="15"
+                        <!-- Enhanced Frame with glassmorphism styling matching buttons -->
+                        <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                               BorderColor="{StaticResource GlassyBorder}"
+                               CornerRadius="24"
+                               Padding="24"
+                               HasShadow="True"
+                               MinimumHeightRequest="320">
+                            <Frame.Shadow>
+                                <Shadow Brush="Black"
+                                        Offset="0,8"
+                                        Radius="20"
+                                        Opacity="0.12"/>
+                            </Frame.Shadow>
+
+                            <VerticalStackLayout Spacing="20"
                                                  VerticalOptions="Center">
-                                <Label Text="Notes for your session (optional)"
-                                       FontSize="14"
-                                       FontAttributes="Bold"
-                                       Padding="0,0,0,0"
-                                       Margin="0,0,0,-10"/>
+                                <!-- Header with icon -->
+                                <VerticalStackLayout Spacing="8"
+                                                     HorizontalOptions="Center">
+                                    <Label Text="🧘‍♀️"
+                                           FontSize="32"
+                                           HorizontalOptions="Center"/>
+                                    <Label Text="Create Your Daily Session"
+                                           FontSize="22"
+                                           FontAttributes="Bold"
+                                           HorizontalOptions="Center"
+                                           TextColor="Black"/>
+                                    <Label Text="Share your thoughts and we'll craft a personalized meditation"
+                                           FontSize="14"
+                                           HorizontalOptions="Center"
+                                           HorizontalTextAlignment="Center"
+                                           TextColor="#666666"
+                                           MaximumWidthRequest="280"/>
+                                </VerticalStackLayout>
 
-                                <Border Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
-                                        BackgroundColor="{AppThemeBinding Light=#F8F8F8, Dark=#333333}"
-                                        StrokeShape="RoundRectangle 20,20,20,18"
-                                        Padding="5"
-                                        Margin="-10,0">
-                                    <Editor Text="{Binding SessionNotes}"
-                                            Placeholder="How are you feeling? Any specific focus areas?"
-                                            PlaceholderColor="#A0A0A0"
-                                            HeightRequest="100"
-                                            BackgroundColor="Transparent"
-                                            VerticalOptions="Start"/>
-                                </Border>
+                                <!-- Notes input with enhanced styling -->
+                                <VerticalStackLayout Spacing="8">
+                                    <Label Text="Session Notes"
+                                           FontSize="16"
+                                           FontAttributes="Bold"
+                                           TextColor="Black"/>
 
-                                <!-- Create Today's Meditation Button with glassmorphism styling -->
+                                    <Frame BackgroundColor="{StaticResource GlassyBlue}"
+                                           BorderColor="{StaticResource GlassyBorder}"
+                                           CornerRadius="18"
+                                           Padding="16"
+                                           HasShadow="False">
+                                        <Editor Text="{Binding SessionNotes}"
+                                                Placeholder="How are you feeling today? Any specific focus areas you'd like to explore?"
+                                                PlaceholderColor="#A0A0A0"
+                                                HeightRequest="100"
+                                                BackgroundColor="Transparent"
+                                                FontSize="16"
+                                                VerticalOptions="Start"/>
+                                    </Frame>
+                                </VerticalStackLayout>
+
+                                <!-- Enhanced Create Button with glassmorphism styling -->
                                 <Frame Padding="0"
                                        CornerRadius="25"
                                        HasShadow="True"
-                                       Margin="0,10,0,0"
                                        HorizontalOptions="Fill"
-                                       HeightRequest="50"
-                                       BackgroundColor="{StaticResource GlassyBlue}"
-                                       BorderColor="{StaticResource GlassyBorder}">
+                                       HeightRequest="56"
+                                       BackgroundColor="{StaticResource Primary}"
+                                       BorderColor="Transparent">
                                     <Frame.Shadow>
-                                        <Shadow Brush="Black"
-                                                Offset="0,4"
-                                                Radius="12"
-                                                Opacity="0.15"/>
+                                        <Shadow Brush="{StaticResource Primary}"
+                                                Offset="0,6"
+                                                Radius="15"
+                                                Opacity="0.25"/>
                                     </Frame.Shadow>
-                                    <Button Text="Create Today's Meditation"
+                                    <Button Text="✨ Create My Meditation"
                                             Command="{Binding RequestNewSessionCommand}"
                                             BackgroundColor="Transparent"
-                                            TextColor="{StaticResource Primary}"
-                                            FontSize="16"
+                                            TextColor="White"
+                                            FontSize="18"
                                             FontAttributes="Bold"
                                             HorizontalOptions="Fill"
                                             VerticalOptions="Fill"
@@ -890,9 +972,9 @@
                                                     <VisualState x:Name="Pressed">
                                                         <VisualState.Setters>
                                                             <Setter Property="Scale"
-                                                                    Value="0.95"/>
+                                                                    Value="0.96"/>
                                                             <Setter Property="Opacity"
-                                                                    Value="0.8"/>
+                                                                    Value="0.85"/>
                                                         </VisualState.Setters>
                                                     </VisualState>
                                                 </VisualStateGroup>
@@ -908,7 +990,7 @@
                                     </Button>
                                 </Frame>
                             </VerticalStackLayout>
-                        </Border>
+                        </Frame>
                     </VerticalStackLayout>
 
                 </VerticalStackLayout>
