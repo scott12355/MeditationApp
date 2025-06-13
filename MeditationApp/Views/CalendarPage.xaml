@@ -125,49 +125,7 @@
                                                VerticalOptions="Center"/>
                                     </Grid>
 
-                                    <!-- Session Count -->
-                                    <Label Grid.Row="1"
-                                           Text="{Binding SessionCount}"
-                                           FontSize="16"
-                                           FontAttributes="Bold"
-                                           TextColor="{StaticResource ActionBlue}"
-                                           Margin="0,0,0,12"/>
-
-                                    <!-- Session Pills -->
-                                    <StackLayout Grid.Row="2"
-                                                 Orientation="Horizontal"
-                                                 Spacing="8"
-                                                 Margin="0,0,0,8"
-                                                 IsVisible="{Binding Sessions.Count, Converter={StaticResource IntToBoolConverter}}">
-                                        <CollectionView ItemsSource="{Binding Sessions}"
-                                                        ItemsLayout="HorizontalList"
-                                                        HeightRequest="30">
-                                            <CollectionView.ItemTemplate>
-                                                <DataTemplate x:DataType="models:MeditationSession">
-                                                    <Border BackgroundColor="{StaticResource GlassyBlue}"
-                                                            Stroke="{StaticResource ActionBlue}"
-                                                            StrokeThickness="1"
-                                                            StrokeShape="RoundRectangle 14"
-                                                            Padding="10,6"
-                                                            Margin="0,0,6,0">
-                                                        <Label Text="{Binding Timestamp, StringFormat='{0:HH:mm}'}"
-                                                               FontSize="12"
-                                                               FontAttributes="Bold"
-                                                               TextColor="{StaticResource ActionBlue}"/>
-                                                    </Border>
-                                                </DataTemplate>
-                                            </CollectionView.ItemTemplate>
-                                        </CollectionView>
-                                    </StackLayout>
-
-                                    <!-- Notes Preview -->
-                                    <Label Grid.Row="3"
-                                           Text="{Binding Notes}"
-                                           FontSize="14"
-                                           TextColor="#666666"
-                                           LineBreakMode="TailTruncation"
-                                           MaxLines="2"
-                                           IsVisible="{Binding HasNotes}"/>
+                                    
                                 </Grid>
                             </Border>
                         </Grid>

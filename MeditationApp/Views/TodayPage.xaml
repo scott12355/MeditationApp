@@ -46,18 +46,7 @@
     </ContentPage.Resources>
 
     <ContentPage.Background>
-        <LinearGradientBrush StartPoint="0,0"
-                             EndPoint="0,1">
-            <GradientStop Color="#F6F9FF"
-                          Offset="0.0"/>
-            <!-- Very soft light blue, calming -->
-            <GradientStop Color="#E2ECFF"
-                          Offset="0.4"/>
-            <!-- Soft light blue, peaceful -->
-            <GradientStop Color="#F7F0E9"
-                          Offset="1.0"/>
-            <!-- Warm peach, grounding -->
-        </LinearGradientBrush>
+        <SolidColorBrush Color="#EFEBD3"/>
     </ContentPage.Background>
 
 
@@ -897,8 +886,9 @@
                                 <!-- Header with icon -->
                                 <VerticalStackLayout Spacing="8"
                                                      HorizontalOptions="Center">
-                                    <Label Text="🧘‍♀️"
-                                           FontSize="32"
+                                    <Image Source="logo.png"
+                                           WidthRequest="64"
+                                           HeightRequest="64"
                                            HorizontalOptions="Center"/>
                                     <Label Text="Create Your Daily Session"
                                            FontSize="22"
