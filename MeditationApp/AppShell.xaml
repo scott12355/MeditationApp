@@ -37,4 +37,10 @@
         ContentTemplate="{DataTemplate views:CalendarPage}"
         Route="PastSessionsPage"/>
 
+    <!-- Onboarding pages -->
+    <ShellContent
+        Title="Onboarding 1"
+        ContentTemplate="{DataTemplate views:OnboardingPage1}"
+        Route="OnboardingPage1"/>
+
 </Shell>

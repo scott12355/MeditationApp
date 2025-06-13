@@ -15,6 +15,7 @@ public partial class TodayPage : ContentPage
     // private MediaElement? _audioPlayer; // Will be initialized in OnAppearing
     private IDispatcherTimer animationTimer; // Timer for the orb animation
     private Animation textPulseAnimation; // Animation for the text label
+    private DateTime _lastBackgroundTap = DateTime.MinValue; // Prevent rapid tapping
 
     public TodayPage(TodayViewModel viewModel)
     {
@@ -219,4 +220,26 @@ public partial class TodayPage : ContentPage
              GeneratingStatusLabel.Scale = 1.0; // Reset scale
         }
     }
+
+    // Handle background tap to dismiss keyboard
+    private void OnBackgroundTapped(object sender, EventArgs e)
+    {
+        // Prevent rapid tapping
+        var now = DateTime.Now;
+        if ((now - _lastBackgroundTap).TotalMilliseconds < 300)
+            return;
+        
+        _lastBackgroundTap = now;
+        DismissKeyboard();
+    }
+
+    // Dismiss keyboard programmatically
+    private void DismissKeyboard()
+    {
+        if (SessionNotesEditor != null)
+        {
+            SessionNotesEditor.Unfocus();
+        }
+    }
+
 }

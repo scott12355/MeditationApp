@@ -4,6 +4,7 @@ using MeditationApp.Services;
 using MeditationApp.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Storage;
 
 namespace MeditationApp;
 
@@ -18,12 +19,22 @@ public partial class App : Application
         _notificationService = notificationService;
         _serviceProvider = serviceProvider;
 
-        MainPage = new AppShell();
+        // Check if first launch
+        if (!Preferences.Get("HasLaunchedBefore", false))
+        {
+            MainPage = new AppShell();
+            Shell.Current.GoToAsync("//OnboardingPage1");
+        }
+        else
+        {
+            MainPage = new AppShell();
+        }
         RequestNotificationPermission();
 
         // Register routes
         Routing.RegisterRoute("LoginPage", typeof(LoginPage));
         Routing.RegisterRoute("SplashPage", typeof(SplashPage));
+        Routing.RegisterRoute("OnboardingPage1", typeof(Views.OnboardingPage1));
     }
 
     private async void RequestNotificationPermission()

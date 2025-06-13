@@ -52,6 +52,9 @@
 
 
     <Grid>
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
+        </Grid.GestureRecognizers>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -287,9 +290,16 @@
         </Ellipse>
 
         <!-- Main content -->
-        <ScrollView Grid.Row="0">
+        <ScrollView Grid.Row="0"
+                    x:Name="MainScrollView">
+            <ScrollView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
+            </ScrollView.GestureRecognizers>
             <VerticalStackLayout Padding="20"
                                  Spacing="20">
+                <VerticalStackLayout.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
+                </VerticalStackLayout.GestureRecognizers>
 
                 <!-- Header Section -->
                 <VerticalStackLayout Spacing="10">
@@ -874,6 +884,9 @@
                                Padding="24"
                                HasShadow="True"
                                MinimumHeightRequest="320">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
+                            </Frame.GestureRecognizers>
                             <Frame.Shadow>
                                 <Shadow Brush="Black"
                                         Offset="0,8"
@@ -883,9 +896,15 @@
 
                             <VerticalStackLayout Spacing="20"
                                                  VerticalOptions="Center">
+                                <VerticalStackLayout.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
+                                </VerticalStackLayout.GestureRecognizers>
                                 <!-- Header with icon -->
                                 <VerticalStackLayout Spacing="8"
                                                      HorizontalOptions="Center">
+                                    <VerticalStackLayout.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
+                                    </VerticalStackLayout.GestureRecognizers>
                                     <Image Source="logo.png"
                                            WidthRequest="64"
                                            HeightRequest="64"
@@ -895,7 +914,7 @@
                                            FontAttributes="Bold"
                                            HorizontalOptions="Center"
                                            TextColor="Black"/>
-                                    <Label Text="Share your thoughts and we'll craft a personalized meditation"
+                                    <Label Text="Share your thoughts and we'll craft a personalised meditation"
                                            FontSize="14"
                                            HorizontalOptions="Center"
                                            HorizontalTextAlignment="Center"
@@ -905,17 +924,25 @@
 
                                 <!-- Notes input with enhanced styling -->
                                 <VerticalStackLayout Spacing="8">
+                                    <VerticalStackLayout.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
+                                    </VerticalStackLayout.GestureRecognizers>
                                     <Label Text="Session Notes"
                                            FontSize="16"
                                            FontAttributes="Bold"
-                                           TextColor="Black"/>
+                                           TextColor="Black">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
+                                        </Label.GestureRecognizers>
+                                    </Label>
 
                                     <Frame BackgroundColor="{StaticResource GlassyBlue}"
                                            BorderColor="{StaticResource GlassyBorder}"
                                            CornerRadius="18"
                                            Padding="16"
                                            HasShadow="False">
-                                        <Editor Text="{Binding SessionNotes}"
+                                        <Editor x:Name="SessionNotesEditor"
+                                                Text="{Binding SessionNotes}"
                                                 Placeholder="How are you feeling today? Any specific focus areas you'd like to explore?"
                                                 PlaceholderColor="#A0A0A0"
                                                 HeightRequest="100"
@@ -998,6 +1025,9 @@
                HeightRequest="60"
                BackgroundColor="{StaticResource GlassyBlue}"
                BorderColor="{StaticResource GlassyBorder}">
+            <Frame.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
+            </Frame.GestureRecognizers>
             <Frame.Shadow>
                 <Shadow Brush="Black"
                         Offset="0,4"
