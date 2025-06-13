@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:MeditationApp.ViewModels"
              xmlns:models="clr-namespace:MeditationApp.Models"
+             xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
              x:Class="MeditationApp.Views.CalendarPage"
              Title="Past Sessions">
 
@@ -12,178 +13,346 @@
     </ContentPage.ToolbarItems>
 
     <ContentPage.Background>
-        <LinearGradientBrush StartPoint="0,0"
-                             EndPoint="0,1">
-            <GradientStop Color="#F6F9FF"
-                          Offset="0.0"/>
-            <GradientStop Color="#E2ECFF"
-                          Offset="0.4"/>
-            <GradientStop Color="#F7F0E9"
-                          Offset="1.0"/>
-        </LinearGradientBrush>
+        <SolidColorBrush Color="#EFEBD3"/>
     </ContentPage.Background>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Header Section -->
-        <VerticalStackLayout Grid.Row="0"
-                             Padding="20,10,20,0"
-                             Spacing="5">
-            <Label Text="Your Meditation Journey"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   TextColor="Black"/>
-            <Label Text="Explore your past meditation sessions"
-                   FontSize="16"
-                   HorizontalOptions="Center"
-                   TextColor="#666666"
-                   Margin="0,0,0,10"/>
-        </VerticalStackLayout>
+        <!-- Decorative abstract shapes for modern look (matching TodayPage) -->
+        <Ellipse x:Name="Orb1"
+                 WidthRequest="250"
+                 HeightRequest="250"
+                 Fill="#15BBDEFB"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"
+                 Margin="-100,-100,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="20"
+                                                     FloatRangeY="15"
+                                                     Duration="10000"
+                                                     Delay="0"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
 
-        <!-- Content -->
-        <Grid Grid.Row="1"
-              BackgroundColor="Transparent">
+        <Ellipse x:Name="Orb2"
+                 WidthRequest="180"
+                 HeightRequest="180"
+                 Fill="#1BE1BEE7"
+                 HorizontalOptions="End"
+                 VerticalOptions="Start"
+                 Margin="0,-70,-70,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="25"
+                                                     FloatRangeY="20"
+                                                     Duration="12000"
+                                                     Delay="2000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
 
-            <!-- Loading Indicator -->
-            <ActivityIndicator IsVisible="{Binding IsLoading}"
-                               IsRunning="{Binding IsLoading}"
-                               Color="{AppThemeBinding Light=#007ACC, Dark=#4FC3F7}"
-                               VerticalOptions="Center"
-                               HorizontalOptions="Center"/>
+        <Ellipse x:Name="Orb3"
+                 WidthRequest="200"
+                 HeightRequest="200"
+                 Fill="#27FFCCBC"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"
+                 Margin="0,0,-80,-80"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="30"
+                                                     FloatRangeY="25"
+                                                     Duration="15000"
+                                                     Delay="4000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
 
-            <!-- Sessions List -->
-            <CollectionView ItemsSource="{Binding DaysWithSessions}"
-                            IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
-                            BackgroundColor="Transparent"
-                            Margin="0,10,0,0">
+        <Ellipse x:Name="Orb4"
+                 WidthRequest="120"
+                 HeightRequest="120"
+                 Fill="#19B3E5FC"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Margin="-150,150,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="15"
+                                                     FloatRangeY="12"
+                                                     Duration="8000"
+                                                     Delay="6000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
 
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="viewmodels:DaySessionData">
-                        <Grid Padding="16,8">
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SimpleCalendarViewModel}}, Path=NavigateToDayCommand}"
-                                                      CommandParameter="{Binding .}"/>
-                            </Grid.GestureRecognizers>
+        <Ellipse x:Name="Orb5"
+                 WidthRequest="140"
+                 HeightRequest="140"
+                 Fill="#20FFAB91"
+                 HorizontalOptions="Start"
+                 VerticalOptions="End"
+                 Margin="-50,0,0,-50"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="22"
+                                                     FloatRangeY="18"
+                                                     Duration="11000"
+                                                     Delay="3000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
 
-                            <!-- Day Card -->
-                            <Border BackgroundColor="{StaticResource GlassyWhite}"
-                                    Stroke="{StaticResource GlassyBorder}"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 20"
-                                    Padding="24">
-                                <Border.Shadow>
-                                    <Shadow Brush="Black"
-                                            Opacity="0.08"
-                                            Radius="12"
-                                            Offset="0,4"/>
-                                </Border.Shadow>
+        <Ellipse x:Name="Orb6"
+                 WidthRequest="90"
+                 HeightRequest="90"
+                 Fill="#22FFD54F"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Start"
+                 Margin="120,-30,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="14"
+                                                     FloatRangeY="10"
+                                                     Duration="9000"
+                                                     Delay="8000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
 
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-
-                                    <!-- Date Header -->
-                                    <Grid Grid.Row="0"
-                                          Margin="0,0,0,8">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <StackLayout Grid.Column="0"
-                                                     Orientation="Vertical"
-                                                     Spacing="2">
-                                            <Label Text="{Binding DisplayDate}"
-                                                   FontSize="20"
-                                                   FontAttributes="Bold"
-                                                   TextColor="Black"/>
-                                            <Label Text="{Binding RelativeDate}"
-                                                   FontSize="14"
-                                                   TextColor="#666666"/>
-                                        </StackLayout>
-
-                                        <Label Grid.Column="1"
-                                               Text="{Binding MoodEmoji}"
-                                               FontSize="24"
-                                               Margin="8,0"
-                                               IsVisible="{Binding HasMood}"/>
-
-                                        <Label Grid.Column="2"
-                                               Text="›"
-                                               FontSize="20"
-                                               TextColor="{StaticResource ActionBlue}"
-                                               VerticalOptions="Center"/>
-                                    </Grid>
-
-                                    
-                                </Grid>
-                            </Border>
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-
-                <!-- Empty State -->
-                <CollectionView.EmptyView>
-                    <StackLayout VerticalOptions="Center"
-                                 HorizontalOptions="Center"
-                                 Padding="40"
+        <!-- Main content with ScrollView -->
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="20"
                                  Spacing="20">
-                        <Frame BackgroundColor="{StaticResource GlassyWhite}"
-                               BorderColor="{StaticResource GlassyBorder}"
-                               CornerRadius="80"
-                               WidthRequest="160"
-                               HeightRequest="160"
-                               HorizontalOptions="Center"
-                               HasShadow="True">
-                            <Label Text="🧘‍♀️"
-                                   FontSize="64"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center"/>
-                        </Frame>
-                        <VerticalStackLayout Spacing="8"
-                                HorizontalOptions="Center">
-                            <Label Text="Your meditation journey starts here"
-                                   FontSize="20"
-                                   FontAttributes="Bold"
-                                   HorizontalOptions="Center"
-                                   TextColor="Black"/>
-                            <Label Text="Complete your first meditation session to see it appear here"
-                                   FontSize="16"
-                                   HorizontalOptions="Center"
-                                   HorizontalTextAlignment="Center"
-                                   TextColor="#666666"
-                                   MaximumWidthRequest="280"/>
+
+                <!-- Header Section -->
+                <VerticalStackLayout Spacing="10"
+                                     Margin="0,20,0,0">
+                    <Label Text="Your Meditation Journey"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"
+                           TextColor="Black"/>
+                    <Label Text="Explore your past meditation sessions"
+                           FontSize="16"
+                           HorizontalOptions="Center"
+                           TextColor="#666666"
+                           Margin="0,0,0,10"/>
+                </VerticalStackLayout>
+
+                <!-- Loading Indicator with glassmorphism styling -->
+                <Frame IsVisible="{Binding IsLoading}"
+                       BackgroundColor="{StaticResource GlassyWhite}"
+                       BorderColor="{StaticResource GlassyBorder}"
+                       CornerRadius="24"
+                       Padding="40"
+                       HasShadow="True"
+                       HorizontalOptions="Center">
+                    <Frame.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="0,8"
+                                Radius="20"
+                                Opacity="0.12"/>
+                    </Frame.Shadow>
+                    <VerticalStackLayout Spacing="15"
+                                         HorizontalOptions="Center">
+                        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                                           Color="{StaticResource Primary}"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="Center"/>
+                        <Label Text="Loading your meditation history..."
+                               FontSize="16"
+                               TextColor="Black"
+                               HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Sessions List with enhanced styling -->
+                <CollectionView ItemsSource="{Binding DaysWithSessions}"
+                                IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                                BackgroundColor="Transparent"
+                                Margin="0,0,0,20">
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="viewmodels:DaySessionData">
+                            <Grid Padding="0,8">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:SimpleCalendarViewModel}}, Path=NavigateToDayCommand}"
+                                                          CommandParameter="{Binding .}"/>
+                                </Grid.GestureRecognizers>
+
+                                <!-- Enhanced Day Card with glassmorphism -->
+                                <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                                       BorderColor="{StaticResource GlassyBorder}"
+                                       CornerRadius="20"
+                                       Padding="24"
+                                       HasShadow="True"
+                                       Margin="8,4">
+                                    <Frame.Shadow>
+                                        <Shadow Brush="Black"
+                                                Opacity="0.08"
+                                                Radius="12"
+                                                Offset="0,4"/>
+                                    </Frame.Shadow>
+
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Date Header -->
+                                        <Grid Grid.Row="0"
+                                              Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackLayout Grid.Column="0"
+                                                         Orientation="Vertical"
+                                                         Spacing="2">
+                                                <Label Text="{Binding DisplayDate}"
+                                                       FontSize="20"
+                                                       FontAttributes="Bold"
+                                                       TextColor="Black"/>
+                                                <Label Text="{Binding RelativeDate}"
+                                                       FontSize="14"
+                                                       TextColor="#666666"/>
+                                            </StackLayout>
+
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding MoodEmoji}"
+                                                   FontSize="24"
+                                                   Margin="8,0"
+                                                   IsVisible="{Binding HasMood}"/>
+
+                                            <Label Grid.Column="2"
+                                                   Text="›"
+                                                   FontSize="20"
+                                                   TextColor="{StaticResource ActionBlue}"
+                                                   VerticalOptions="Center"/>
+                                        </Grid>
+                                        <!-- Session preview info -->
+                                        <StackLayout Grid.Row="1"
+                                                     Spacing="4"
+                                                     IsVisible="{Binding Sessions.Count, Converter={StaticResource IntToBoolConverter}}">
+                                            <Label Text="✨ Meditation completed"
+                                                   FontSize="14"
+                                                   TextColor="{StaticResource Primary}"
+                                                   FontAttributes="Italic"/>
+                                        </StackLayout>
+                                    </Grid>
+                                </Frame>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+
+                    <!-- Empty State with enhanced glassmorphism styling -->
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout VerticalOptions="Center"
+                                             HorizontalOptions="Center"
+                                             Padding="40"
+                                             Spacing="20">
+                            <!-- Enhanced glassmorphism frame for empty state -->
+                            <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                                   BorderColor="{StaticResource GlassyBorder}"
+                                   CornerRadius="24"
+                                   Padding="30"
+                                   HasShadow="True"
+                                   HorizontalOptions="Center">
+                                <Frame.Shadow>
+                                    <Shadow Brush="Black"
+                                            Offset="0,8"
+                                            Radius="20"
+                                            Opacity="0.12"/>
+                                </Frame.Shadow>
+                                <VerticalStackLayout Spacing="20"
+                                                     HorizontalOptions="Center">
+                                    <!-- Icon container -->
+                                    <Frame BackgroundColor="{StaticResource GlassyBlue}"
+                                           BorderColor="{StaticResource GlassyBorder}"
+                                           CornerRadius="40"
+                                           WidthRequest="80"
+                                           HeightRequest="80"
+                                           HorizontalOptions="Center"
+                                           HasShadow="False"
+                                           Padding="0">
+                                        <Label Text="🧘‍♀️"
+                                               FontSize="40"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                                    </Frame>
+
+                                    <VerticalStackLayout Spacing="8"
+                                                         HorizontalOptions="Center">
+                                        <Label Text="Your meditation journey starts here"
+                                               FontSize="20"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="Center"
+                                               TextColor="Black"/>
+                                        <Label Text="Complete your first meditation session to see it appear here"
+                                               FontSize="16"
+                                               HorizontalOptions="Center"
+                                               HorizontalTextAlignment="Center"
+                                               TextColor="#666666"
+                                               MaximumWidthRequest="280"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Enhanced button with glassmorphism styling -->
+                                    <Frame Padding="0"
+                                           CornerRadius="25"
+                                           HasShadow="True"
+                                           HorizontalOptions="Center"
+                                           HeightRequest="50"
+                                           WidthRequest="200"
+                                           BackgroundColor="{StaticResource Primary}"
+                                           BorderColor="Transparent">
+                                        <Frame.Shadow>
+                                            <Shadow Brush="{StaticResource Primary}"
+                                                    Offset="0,6"
+                                                    Radius="15"
+                                                    Opacity="0.25"/>
+                                        </Frame.Shadow>
+                                        <Button Text="✨ Start Meditation"
+                                                Clicked="OnBackToTodayClicked"
+                                                BackgroundColor="Transparent"
+                                                TextColor="White"
+                                                FontSize="16"
+                                                FontAttributes="Bold"
+                                                HorizontalOptions="Fill"
+                                                VerticalOptions="Fill"
+                                                BorderColor="Transparent">
+                                            <VisualStateManager.VisualStateGroups>
+                                                <VisualStateGroupList>
+                                                    <VisualStateGroup x:Name="CommonStates">
+                                                        <VisualState x:Name="Normal">
+                                                            <VisualState.Setters>
+                                                                <Setter Property="Scale"
+                                                                        Value="1.0"/>
+                                                                <Setter Property="Opacity"
+                                                                        Value="1.0"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                        <VisualState x:Name="Pressed">
+                                                            <VisualState.Setters>
+                                                                <Setter Property="Scale"
+                                                                        Value="0.95"/>
+                                                                <Setter Property="Opacity"
+                                                                        Value="0.8"/>
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                </VisualStateGroupList>
+                                            </VisualStateManager.VisualStateGroups>
+                                        </Button>
+                                    </Frame>
+                                </VerticalStackLayout>
+                            </Frame>
                         </VerticalStackLayout>
-                        <Button Text="Start Meditation"
-                                BackgroundColor="{StaticResource ActionBlue}"
-                                TextColor="White"
-                                HeightRequest="50"
-                                CornerRadius="25"
-                                FontSize="16"
-                                FontAttributes="Bold"
-                                WidthRequest="200"
-                                Clicked="OnBackToTodayClicked"
-                                Margin="0,10,0,0">
-                            <Button.Shadow>
-                                <Shadow Brush="Black"
-                                        Opacity="0.2"
-                                        Radius="8"
-                                        Offset="0,2"/>
-                            </Button.Shadow>
-                        </Button>
-                    </StackLayout>
-                </CollectionView.EmptyView>
-            </CollectionView>
-        </Grid>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
     </Grid>
 </ContentPage>

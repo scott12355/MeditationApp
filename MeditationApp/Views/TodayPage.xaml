@@ -874,14 +874,14 @@
 
 
                     <!-- If there's no session for today -->
-                    <VerticalStackLayout Spacing="15"
+                    <VerticalStackLayout Spacing="5"
                                          IsVisible="{Binding HasTodaySession, Converter={StaticResource InverseBoolConverter}}">
 
                         <!-- Enhanced Frame with glassmorphism styling matching buttons -->
                         <Frame BackgroundColor="{StaticResource GlassyWhite}"
                                BorderColor="{StaticResource GlassyBorder}"
                                CornerRadius="24"
-                               Padding="24"
+                               Padding="20"
                                HasShadow="True"
                                MinimumHeightRequest="320">
                             <Frame.GestureRecognizers>
@@ -894,7 +894,7 @@
                                         Opacity="0.12"/>
                             </Frame.Shadow>
 
-                            <VerticalStackLayout Spacing="20"
+                            <VerticalStackLayout Spacing="5"
                                                  VerticalOptions="Center">
                                 <VerticalStackLayout.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
@@ -906,9 +906,10 @@
                                         <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
                                     </VerticalStackLayout.GestureRecognizers>
                                     <Image Source="logo.png"
-                                           WidthRequest="64"
-                                           HeightRequest="64"
-                                           HorizontalOptions="Center"/>
+                                           WidthRequest="50"
+                                           HeightRequest="50"
+                                           HorizontalOptions="Center"
+                                           Margin="0,0,0,-10"/>
                                     <Label Text="Create Your Daily Session"
                                            FontSize="22"
                                            FontAttributes="Bold"
@@ -919,27 +920,22 @@
                                            HorizontalOptions="Center"
                                            HorizontalTextAlignment="Center"
                                            TextColor="#666666"
+                                           Margin="0,0,0,5"
                                            MaximumWidthRequest="280"/>
                                 </VerticalStackLayout>
 
                                 <!-- Notes input with enhanced styling -->
-                                <VerticalStackLayout Spacing="8">
+                                <VerticalStackLayout Spacing="10">
                                     <VerticalStackLayout.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
                                     </VerticalStackLayout.GestureRecognizers>
-                                    <Label Text="Session Notes"
-                                           FontSize="16"
-                                           FontAttributes="Bold"
-                                           TextColor="Black">
-                                        <Label.GestureRecognizers>
-                                            <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
-                                        </Label.GestureRecognizers>
-                                    </Label>
+                                   
 
                                     <Frame BackgroundColor="{StaticResource GlassyBlue}"
                                            BorderColor="{StaticResource GlassyBorder}"
                                            CornerRadius="18"
-                                           Padding="16"
+                                           Padding="5"
+                                           Margin="0,0,0,10"
                                            HasShadow="False">
                                         <Editor x:Name="SessionNotesEditor"
                                                 Text="{Binding SessionNotes}"

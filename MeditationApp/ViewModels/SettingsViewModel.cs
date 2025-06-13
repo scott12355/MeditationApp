@@ -1,12 +1,15 @@
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using System.Threading;
+using System.Threading.Tasks;
 using MeditationApp.Services;
 using Microsoft.Maui.Storage;
 
 namespace MeditationApp.ViewModels;
 
-public class SettingsViewModel : INotifyPropertyChanged
+public class SettingsViewModel : INotifyPropertyChanged, IDisposable
 {
     private const string NotificationsEnabledKey = "notifications_enabled";
     private const string ReminderTimeKey = "reminder_time";
@@ -19,6 +22,10 @@ public class SettingsViewModel : INotifyPropertyChanged
     private bool _notificationsEnabled = true;
     private TimeSpan _reminderTime = new TimeSpan(19, 30, 0);
     private bool _isNotificationPermissionGranted = false;
+    
+    // Auto-save debounce management
+    private CancellationTokenSource? _autoSaveCts;
+    private const int AutoSaveDelayMs = 1000; // 1 second delay
 
     public string UserName
     {
@@ -47,6 +54,8 @@ public class SettingsViewModel : INotifyPropertyChanged
         {
             _notificationsEnabled = value;
             OnPropertyChanged();
+            // Auto-save with debounce when notification setting is changed
+            TriggerAutoSave();
         }
     }
 
@@ -57,6 +66,8 @@ public class SettingsViewModel : INotifyPropertyChanged
         {
             _reminderTime = value;
             OnPropertyChanged();
+            // Auto-save with debounce when time is updated
+            TriggerAutoSave();
         }
     }
 
@@ -129,9 +140,10 @@ public class SettingsViewModel : INotifyPropertyChanged
             }
 
             // Show confirmation
-            if (Application.Current?.Windows?.FirstOrDefault()?.Page != null)
+            var mainPage = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (mainPage != null)
             {
-                await Application.Current.Windows.First().Page.DisplayAlert(
+                await mainPage.DisplayAlert(
                     "Settings Saved",
                     "Your notification preferences have been updated.",
                     "OK");
@@ -140,14 +152,82 @@ public class SettingsViewModel : INotifyPropertyChanged
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error saving settings: {ex.Message}");
-            if (Application.Current?.Windows?.FirstOrDefault()?.Page != null)
+            var mainPage = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (mainPage != null)
             {
-                await Application.Current.Windows.First().Page.DisplayAlert(
+                await mainPage.DisplayAlert(
                     "Error",
                     "There was an error saving your settings. Please try again.",
                     "OK");
             }
         }
+    }
+
+    /// <summary>
+    /// Auto-saves time settings when the reminder time is changed
+    /// </summary>
+    private async Task AutoSaveTimeSettings()
+    {
+        try
+        {
+            // Save settings to SecureStorage
+            await SecureStorage.Default.SetAsync(NotificationsEnabledKey, NotificationsEnabled.ToString());
+            await SecureStorage.Default.SetAsync(ReminderTimeKey, ReminderTime.ToString());
+
+            if (NotificationsEnabled)
+            {
+                // Schedule the notification with the new time
+                await _notificationService.ScheduleDailyNotification(ReminderTime);
+            }
+            else
+            {
+                // Cancel all notifications if disabled
+                await _notificationService.CancelAllNotifications();
+            }
+
+            System.Diagnostics.Debug.WriteLine($"Settings auto-saved: Notifications={NotificationsEnabled}, Time={ReminderTime}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error auto-saving settings: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Triggers auto-save with debounce to avoid too many save operations
+    /// </summary>
+    private void TriggerAutoSave()
+    {
+        // Cancel any existing auto-save operation
+        _autoSaveCts?.Cancel();
+        _autoSaveCts?.Dispose();
+        _autoSaveCts = new CancellationTokenSource();
+
+        var token = _autoSaveCts.Token;
+
+        // Start the debounced auto-save
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(AutoSaveDelayMs, token);
+                
+                // If not cancelled, proceed with save
+                if (!token.IsCancellationRequested)
+                {
+                    await AutoSaveTimeSettings();
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                // Debounce was cancelled, which is expected behavior
+                System.Diagnostics.Debug.WriteLine("Auto-save debounce cancelled - new change detected");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error in debounced auto-save: {ex.Message}");
+            }
+        }, token);
     }
 
     private async Task OnLogout()
@@ -176,5 +256,12 @@ public class SettingsViewModel : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public void Dispose()
+    {
+        _autoSaveCts?.Cancel();
+        _autoSaveCts?.Dispose();
+        _autoSaveCts = null;
     }
 }

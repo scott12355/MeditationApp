@@ -243,24 +243,6 @@ public partial class ProfilePage : ContentPage
         await Shell.Current.GoToAsync("LoginPage", animate: true);
     }
 
-    private async void OnSignOutClicked(object sender, EventArgs e)
-    {
-        try
-        {
-            StatusLabel.Text = "Signing out...";
-            SignOutButton.IsEnabled = false;
-
-            await _hybridAuthService.SignOutAsync();
-            await Shell.Current.GoToAsync("..", animate: true);
-            await Shell.Current.GoToAsync("LoginPage", animate: true);
-        }
-        catch (Exception ex)
-        {
-            StatusLabel.Text = $"Error: {ex.Message}";
-            SignOutButton.IsEnabled = true;
-        }
-    }
-
     /// <summary>
     /// Helper method to determine if an error message indicates refresh token expiry
     /// </summary>

@@ -4,88 +4,127 @@
              x:Class="MeditationApp.Views.ProfilePage"
              Title="My Profile">
 
-    <ScrollView>
-        <VerticalStackLayout
-            Spacing="25"
-            Padding="30,0"
-            VerticalOptions="Center">
+    <ContentPage.Background>
+        <SolidColorBrush Color="#EFEBD3"/>
+    </ContentPage.Background>
 
-            <Image
-                Source="dotnet_bot.png"
-                HeightRequest="150"
-                HorizontalOptions="Center"/>
+    <Grid>
+        <!-- Floating Orbs -->
+        <Ellipse x:Name="Orb1"
+                 WidthRequest="250"
+                 HeightRequest="250"
+                 Fill="#15BBDEFB"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"
+                 Margin="-100,-100,0,0"/>
 
-            <Label
-                Text="My Profile"
-                SemanticProperties.HeadingLevel="Level1"
-                FontSize="32"
-                HorizontalOptions="Center"/>
+        <Ellipse x:Name="Orb2"
+                 WidthRequest="180"
+                 HeightRequest="180"
+                 Fill="#1087CEEB"
+                 HorizontalOptions="End"
+                 VerticalOptions="Center"
+                 Margin="0,0,-50,0"/>
 
-            <!-- Offline Mode Indicator -->
-            <Frame x:Name="OfflineIndicator"
-                   BackgroundColor="Orange"
-                   BorderColor="DarkOrange"
-                   CornerRadius="5"
-                   Padding="10,5"
-                   HorizontalOptions="Center"
-                   IsVisible="False">
-                <Label Text="📱 Offline Mode - Limited functionality"
-                       TextColor="White"
-                       FontSize="12"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"/>
-            </Frame>
+        <Ellipse x:Name="Orb3"
+                 WidthRequest="150"
+                 HeightRequest="150"
+                 Fill="#15F0E68C"
+                 HorizontalOptions="Start"
+                 VerticalOptions="End"
+                 Margin="-75,0,0,-75"/>
 
-            <Border Stroke="LightGray"
-                    StrokeThickness="1"
-                    Padding="15">
-                <VerticalStackLayout Spacing="15">
-                    <HorizontalStackLayout>
-                        <Label Text="Username: "
-                               FontAttributes="Bold"
-                               WidthRequest="100"/>
-                        <Label x:Name="UsernameLabel"
-                               Text="Loading..."/>
-                    </HorizontalStackLayout>
+        <ScrollView>
+            <VerticalStackLayout
+                Spacing="25"
+                Padding="30,40"
+                VerticalOptions="Center">
 
-                    <HorizontalStackLayout>
-                        <Label Text="Email: "
-                               FontAttributes="Bold"
-                               WidthRequest="100"/>
-                        <Label x:Name="EmailLabel"
-                               Text="Loading..."/>
-                    </HorizontalStackLayout>
+                <Image
+                    Source="logo.png"
+                    HeightRequest="120"
+                    HorizontalOptions="Center"/>
 
-                    <HorizontalStackLayout>
-                        <Label Text="First Name: "
-                               FontAttributes="Bold"
-                               WidthRequest="100"/>
-                        <Label x:Name="FirstNameLabel"
-                               Text="Loading..."/>
-                    </HorizontalStackLayout>
+                <Label
+                    Text="My Profile"
+                    SemanticProperties.HeadingLevel="Level1"
+                    FontSize="32"
+                    HorizontalOptions="Center"
+                    TextColor="#1A1A1A"
+                    FontAttributes="Bold"/>
 
-                    <HorizontalStackLayout>
-                        <Label Text="Last Name: "
-                               FontAttributes="Bold"
-                               WidthRequest="100"/>
-                        <Label x:Name="LastNameLabel"
-                               Text="Loading..."/>
-                    </HorizontalStackLayout>
-                </VerticalStackLayout>
-            </Border>
+                <!-- Offline Mode Indicator -->
+                <Frame x:Name="OfflineIndicator"
+                       BackgroundColor="{StaticResource GlassyWhite}"
+                       BorderColor="{StaticResource GlassyBorder}"
+                       CornerRadius="15"
+                       Padding="15,10"
+                       HorizontalOptions="Center"
+                       IsVisible="False"
+                       HasShadow="True">
+                    <Label Text="Offline Mode - Limited functionality"
+                           TextColor="#1A1A1A"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                </Frame>
 
-            <Button
-                x:Name="SignOutButton"
-                Text="Sign Out"
-                SemanticProperties.Hint="Signs out of your account"
-                Clicked="OnSignOutClicked"
-                HorizontalOptions="Fill"/>
+                <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                       BorderColor="{StaticResource GlassyBorder}"
+                       CornerRadius="20"
+                       Padding="20"
+                       HasShadow="True"
+                       Margin="0,10">
+                    <VerticalStackLayout Spacing="15">
+                        <HorizontalStackLayout>
+                            <Label Text="Username: "
+                                   FontAttributes="Bold"
+                                   WidthRequest="100"
+                                   TextColor="#1A1A1A"/>
+                            <Label x:Name="UsernameLabel"
+                                   Text="Loading..."
+                                   TextColor="#2C2C2C"/>
+                        </HorizontalStackLayout>
 
-            <Label
-                x:Name="StatusLabel"
-                Text=""
-                HorizontalOptions="Center"/>
+                        <HorizontalStackLayout>
+                            <Label Text="Email: "
+                                   FontAttributes="Bold"
+                                   WidthRequest="100"
+                                   TextColor="#1A1A1A"/>
+                            <Label x:Name="EmailLabel"
+                                   Text="Loading..."
+                                   TextColor="#2C2C2C"/>
+                        </HorizontalStackLayout>
 
-        </VerticalStackLayout>
-    </ScrollView>
+                        <HorizontalStackLayout>
+                            <Label Text="First Name: "
+                                   FontAttributes="Bold"
+                                   WidthRequest="100"
+                                   TextColor="#1A1A1A"/>
+                            <Label x:Name="FirstNameLabel"
+                                   Text="Loading..."
+                                   TextColor="#2C2C2C"/>
+                        </HorizontalStackLayout>
+
+                        <HorizontalStackLayout>
+                            <Label Text="Last Name: "
+                                   FontAttributes="Bold"
+                                   WidthRequest="100"
+                                   TextColor="#1A1A1A"/>
+                            <Label x:Name="LastNameLabel"
+                                   Text="Loading..."
+                                   TextColor="#2C2C2C"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
+                </Frame>
+
+                <Label
+                    x:Name="StatusLabel"
+                    Text=""
+                    HorizontalOptions="Center"
+                    TextColor="#1A1A1A"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
 </ContentPage>
