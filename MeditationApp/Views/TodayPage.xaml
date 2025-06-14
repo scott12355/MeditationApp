@@ -838,7 +838,8 @@
                                            BackgroundColor="{StaticResource GlassyBlue}"
                                            BorderColor="{StaticResource GlassyBorder}"
                                            HasShadow="True"
-                                           VerticalOptions="End">
+                                           VerticalOptions="End"
+                                           IsVisible="{Binding IsPlaying}">
                                         <Frame.GestureRecognizers>
                                             <TapGestureRecognizer Command="{Binding ShowAudioPlayerSheetCommand}"/>
                                         </Frame.GestureRecognizers>
@@ -1181,15 +1182,15 @@
             <!-- Bottom Sheet Content - Enhanced Audio Controls -->
             <Border
                 StrokeShape="RoundRectangle 32"
-                Margin="16,0,16,16"
+                Margin="16,20,16,16"
                 Padding="0">
-                <Border.Effects>
-                    <uranium:BlurEffect Mode="Light"
-                                        AccentOpacity="0.5"/>
-                </Border.Effects>
                 <VerticalStackLayout Spacing="20"
-                                     Padding="20,0"
+                                     Padding="20,10"
                                      Margin="0">
+                    <VerticalStackLayout.Effects>
+                        <uranium:BlurEffect Mode="Light"
+                                            AccentOpacity="0.5"/>
+                    </VerticalStackLayout.Effects>
                     <!-- Progress Bar with enhanced styling -->
                     <VerticalStackLayout Spacing="10">
                         <ProgressBar Progress="{Binding PlaybackProgress}"
