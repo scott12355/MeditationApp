@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+<uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:MeditationApp.Models"
              xmlns:converters="clr-namespace:MeditationApp.Converters"
              xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
+             xmlns:controls="clr-namespace:MeditationApp.Controls"
+             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              x:Class="MeditationApp.Views.DayDetailPage"
              Shell.NavBarIsVisible="True">
 
-    <ContentPage.Resources>
+    <uranium:UraniumContentPage.Resources>
         <ResourceDictionary>
             <converters:MeditationSessionStatusToColorConverter x:Key="MeditationSessionStatusToColorConverter"/>
             <converters:StatusToDisplayStringConverter x:Key="StatusToDisplayStringConverter"/>
@@ -16,24 +19,18 @@
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <converters:BoolToPlayPauseConverter x:Key="BoolToPlayPauseConverter"/>
         </ResourceDictionary>
-    </ContentPage.Resources>
+    </uranium:UraniumContentPage.Resources>
 
-    <ContentPage.Background>
-        <LinearGradientBrush StartPoint="0,0"
-                             EndPoint="0,1">
-            <GradientStop Color="#F6F9FF"
-                          Offset="0.0"/>
-            <!-- Very soft light blue, calming -->
-            <GradientStop Color="#E2ECFF"
-                          Offset="0.4"/>
-            <!-- Soft light blue, peaceful -->
-            <GradientStop Color="#F7F0E9"
-                          Offset="1.0"/>
-            <!-- Warm peach, grounding -->
-        </LinearGradientBrush>
-    </ContentPage.Background>
+    <uranium:UraniumContentPage.Background>
+        <SolidColorBrush Color="#EFEBD3"/>
+    </uranium:UraniumContentPage.Background>
 
-    <Grid>
+    <Grid BackgroundColor="#EFEBD3">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
         <!-- Decorative abstract shapes for modern look -->
         <Ellipse x:Name="Orb1"
                  WidthRequest="250"
@@ -132,207 +129,418 @@
         </Ellipse>
 
         <!-- Main content -->
-        <ScrollView>
-            <VerticalStackLayout Padding="20"
+        <ScrollView Grid.Row="0"
+                    x:Name="MainScrollView">
+            <VerticalStackLayout Padding="20,20,20,180"
                                  Spacing="20">
-                <!-- Date Header -->
-                <Label Text="{Binding FormattedDate}"
-                       FontSize="28"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"
-                       TextColor="Black"/>
+
+                <!-- Header Section -->
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{Binding FormattedDate}"
+                           Style="{StaticResource SubHeadline}"
+                           HorizontalOptions="Center"
+                           TextColor="Black"/>
+                </VerticalStackLayout>
 
                 <!-- Sessions Section -->
-                <Border BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColorTransparent}, Dark=#2A2A2A}"
-                        Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
-                        StrokeShape="RoundRectangle 20,20,20,20"
-                        Padding="20">
-                    <VerticalStackLayout Spacing="15">
-                        <Label Text="Meditation Sessions"
-                               FontSize="18"
-                               FontAttributes="Bold"
-                               TextColor="Black"/>
+                <VerticalStackLayout Spacing="15"
+                                     IsVisible="{Binding HasNoSessions, Converter={StaticResource InverseBoolConverter}}">
+                    
+                    <!-- Enhanced Frame with glassmorphism styling for sessions -->
+                    <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                           BorderColor="{StaticResource GlassyBorder}"
+                           CornerRadius="24"
+                           Padding="24"
+                           HasShadow="True"
+                           MinimumHeightRequest="200">
+                        <Frame.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="0,8"
+                                    Radius="20"
+                                    Opacity="0.12"/>
+                        </Frame.Shadow>
+                        <Frame.Effects>
+                            <uranium:BlurEffect Mode="Light"
+                                                AccentOpacity="0.1"/>
+                        </Frame.Effects>
 
-                        <CollectionView ItemsSource="{Binding Sessions}"
-                                        SelectedItem="{Binding SelectedSession, Mode=TwoWay}">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="models:MeditationSession">
-                                    <Frame BackgroundColor="{StaticResource GlassyWhite}"
-                                           BorderColor="{StaticResource GlassyBorder}"
-                                           CornerRadius="15"
-                                           Padding="15"
-                                           Margin="0,5"
-                                           HasShadow="False">
-                                        <Grid RowDefinitions="Auto,Auto,Auto"
-                                              ColumnDefinitions="*,Auto,Auto"
-                                              RowSpacing="10"
-                                              ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="15">
+                            <Label Text="Meditation Sessions"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="Black"/>
 
-                                            <!-- Session Info Row -->
-                                            <VerticalStackLayout Grid.Row="0"
-                                                                 Grid.Column="0"
-                                                                 Spacing="4">
-                                                <Label Text="{Binding Timestamp, StringFormat='Session at {0:HH:mm}'}"
-                                                       FontSize="16"
-                                                       FontAttributes="Bold"
-                                                       TextColor="Black"/>
-                                                <Label Text="{Binding Timestamp, StringFormat='{0:dddd, MMMM dd, yyyy}'}"
-                                                       FontSize="12"
-                                                       TextColor="Gray"/>
-                                            </VerticalStackLayout>
+                            <CollectionView ItemsSource="{Binding Sessions}"
+                                            SelectedItem="{Binding SelectedSession, Mode=TwoWay}"
+                                            >
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="models:MeditationSession" >
+                                        <Frame BackgroundColor="{StaticResource GlassyBlue}"
+                                               BorderColor="{StaticResource GlassyBorder}"
+                                               CornerRadius="18"
+                                               Padding="20"
+                                               Margin="0,8"
+                                               
+                                               HasShadow="False">
+                                            <Grid RowDefinitions="Auto,Auto"
+                                                  ColumnDefinitions="*,Auto,Auto"
+                                                  RowSpacing="12"
+                                                  
+                                                  ColumnSpacing="15">
 
-                                            <!-- Status -->
-                                            <Label Grid.Row="0"
-                                                   Grid.Column="1"
-                                                   Text="{Binding Status, Converter={StaticResource StatusToDisplayStringConverter}}"
-                                                   FontSize="12"
-                                                   FontAttributes="Bold"
-                                                   VerticalOptions="Center"
-                                                   TextColor="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
+                                                <!-- Session Info Row -->
+                                                <VerticalStackLayout Grid.Row="0"
+                                                                     Grid.Column="0"
+                                                                     Spacing="4">
+                                                    <Label Text="{Binding Timestamp, StringFormat='Session at {0:HH:mm}'}"
+                                                           FontSize="16"
+                                                           FontAttributes="Bold"
+                                                           TextColor="Black"/>
+                                                    <Label Text="{Binding Timestamp, StringFormat='{0:dddd, MMMM dd, yyyy}'}"
+                                                           FontSize="12"
+                                                           TextColor="Gray"/>
+                                                </VerticalStackLayout>
 
-                                            <!-- Download Progress Indicator -->
-                                            <ActivityIndicator Grid.Row="0"
-                                                               Grid.Column="2"
-                                                               IsRunning="{Binding IsDownloading}"
-                                                               IsVisible="{Binding IsDownloading}"
-                                                               Color="{StaticResource ActionBlue}"
-                                                               WidthRequest="50"
-                                                               HeightRequest="50"/>
+                                                
+                                                <!-- Download Progress Indicator -->
+                                                <ActivityIndicator Grid.Row="0"
+                                                                   Grid.Column="2"
+                                                                   IsRunning="{Binding IsDownloading}"
+                                                                   IsVisible="{Binding IsDownloading}"
+                                                                   Color="{StaticResource ActionBlue}"
+                                                                   WidthRequest="40"
+                                                                   HeightRequest="40"/>
 
-                                            <!-- Audio Player Controls (always visible for completed sessions) -->
-                                            <Frame Grid.Row="1"
-                                                   Grid.ColumnSpan="3"
-                                                   BackgroundColor="{StaticResource GlassyBlue}"
-                                                   BorderColor="{StaticResource GlassyBorder}"
-                                                   CornerRadius="15"
-                                                   Padding="15"
-                                                   HasShadow="False"
-                                                   IsVisible="{Binding Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=COMPLETED}">
-                                                <Grid ColumnDefinitions="Auto,*"
-                                                      ColumnSpacing="12">
-                                                    <!-- Play/Pause Button -->
-                                                    <ImageButton Grid.Column="0"
-                                                                 Source="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PlayPauseIconImage}"
-                                                                 WidthRequest="50"
-                                                                 HeightRequest="50"
-                                                                 BackgroundColor="{StaticResource GlassyGray}"
-                                                                 Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PlaySessionCommand}"
-                                                                 CommandParameter="{Binding .}"
-                                                                 BorderWidth="1"
-                                                                 BorderColor="{StaticResource Gray300}"
-                                                                 CornerRadius="25"/>
+                                                <!-- Audio Player Controls (always visible for completed sessions) -->
+                                                <Frame Grid.Row="1"
+                                                       Grid.ColumnSpan="3"
+                                                       BackgroundColor="{StaticResource GlassyWhite}"
+                                                       BorderColor="{StaticResource GlassyBorder}"
+                                                       CornerRadius="20"
+                                                       Padding="0"
+                                                       HasShadow="True"
+                                                       IsVisible="{Binding Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=COMPLETED}">
+                                                    <Frame.Effects>
+                                                        <uranium:BlurEffect Mode="Light"
+                                                                            AccentOpacity="0.3"/>
+                                                    </Frame.Effects>
+                                                    <Frame.Shadow>
+                                                        <Shadow Brush="Black"
+                                                                Offset="0,4"
+                                                                Radius="12"
+                                                                Opacity="0.15"/>
+                                                    </Frame.Shadow>
+                                                    
+                                                    <!-- Enhanced Play Button -->
+                                                    <Button Text="Play Meditation"
+                                                            FontSize="16"
+                                                            FontAttributes="Bold"
+                                                            BackgroundColor="{StaticResource Primary}"
+                                                            TextColor="White"
+                                                            Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PlaySessionCommand}"
+                                                            CommandParameter="{Binding .}"
+                                                            BorderColor="Transparent"
+                                                            CornerRadius="20"
+                                                            HeightRequest="50"
+                                                            Margin="0">
+                                                        <Button.Shadow>
+                                                            <Shadow Brush="{StaticResource Primary}"
+                                                                    Offset="0,4"
+                                                                    Radius="10"
+                                                                    Opacity="0.25"/>
+                                                        </Button.Shadow>
+                                                        <VisualStateManager.VisualStateGroups>
+                                                            <VisualStateGroupList>
+                                                                <VisualStateGroup x:Name="CommonStates">
+                                                                    <VisualState x:Name="Normal">
+                                                                        <VisualState.Setters>
+                                                                            <Setter Property="Scale"
+                                                                                    Value="1.0"/>
+                                                                            <Setter Property="Opacity"
+                                                                                    Value="1.0"/>
+                                                                        </VisualState.Setters>
+                                                                    </VisualState>
+                                                                    <VisualState x:Name="Pressed">
+                                                                        <VisualState.Setters>
+                                                                            <Setter Property="Scale"
+                                                                                    Value="0.96"/>
+                                                                            <Setter Property="Opacity"
+                                                                                    Value="0.85"/>
+                                                                        </VisualState.Setters>
+                                                                    </VisualState>
+                                                                </VisualStateGroup>
+                                                            </VisualStateGroupList>
+                                                        </VisualStateManager.VisualStateGroups>
+                                                    </Button>
+                                                </Frame>
+                                            </Grid>
+                                        </Frame>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </VerticalStackLayout>
+                    </Frame>
+                </VerticalStackLayout>
 
-                                                    <!-- Progress and Time -->
-                                                    <VerticalStackLayout Grid.Column="1"
-                                                                         Spacing="5">
-                                                        <ProgressBar Progress="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.PlaybackProgress}"
-                                                                     HeightRequest="4"
-                                                                     BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
-                                                                     ProgressColor="{StaticResource ActionBlue}"/>
-                                                        <Grid ColumnDefinitions="*,Auto">
-                                                            <Label Grid.Column="0"
-                                                                   Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.CurrentPositionText}"
-                                                                   FontSize="12"
-                                                                   TextColor="Gray"/>
-                                                            <Label Grid.Column="1"
-                                                                   Text="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.TotalDurationText}"
-                                                                   FontSize="12"
-                                                                   TextColor="Gray"/>
-                                                        </Grid>
-                                                    </VerticalStackLayout>
-                                                </Grid>
-                                            </Frame>
+                <!-- No Sessions Message -->
+                <VerticalStackLayout Spacing="15"
+                                     IsVisible="{Binding HasNoSessions}">
+                    <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                           BorderColor="{StaticResource GlassyBorder}"
+                           CornerRadius="24"
+                           Padding="24"
+                           HasShadow="True"
+                           MinimumHeightRequest="200">
+                        <Frame.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="0,8"
+                                    Radius="20"
+                                    Opacity="0.12"/>
+                        </Frame.Shadow>
+                        <Frame.Effects>
+                            <uranium:BlurEffect Mode="Light"
+                                                AccentOpacity="0.1"/>
+                        </Frame.Effects>
 
-                                            <!-- Download Status -->
-                                            <Label Grid.Row="2"
-                                                   Grid.ColumnSpan="3"
-                                                   Text="{Binding DownloadStatus}"
-                                                   FontSize="11"
-                                                   TextColor="Gray"
-                                                   IsVisible="{Binding IsDownloading}"
-                                                   HorizontalOptions="Center"/>
-                                        </Grid>
-                                    </Frame>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-
-                        <Label Text="No meditation sessions recorded for this day"
-                               FontSize="14"
-                               TextColor="Gray"
-                               HorizontalOptions="Center"
-                               IsVisible="{Binding HasNoSessions}"/>
-                    </VerticalStackLayout>
-                </Border>
+                        <VerticalStackLayout Spacing="15"
+                                             VerticalOptions="Center">
+                            <Label Text="No Sessions Today"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="Black"/>
+                            <Label Text="No meditation sessions recorded for this day"
+                                   FontSize="14"
+                                   TextColor="Gray"
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center"/>
+                        </VerticalStackLayout>
+                    </Frame>
+                </VerticalStackLayout>
 
                 <!-- Notes Section -->
-                <Border BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColorTransparent}, Dark=#2A2A2A}"
-                        Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
-                        StrokeShape="RoundRectangle 20,20,20,20"
-                        Padding="20">
-                    <VerticalStackLayout Spacing="15">
-                        <Label Text="Daily Notes"
-                               FontSize="18"
-                               FontAttributes="Bold"
-                               TextColor="Black"/>
+                <VerticalStackLayout Spacing="15"
+                                     IsVisible="{Binding HasNoNotes, Converter={StaticResource InverseBoolConverter}}">
+                    <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                           BorderColor="{StaticResource GlassyBorder}"
+                           CornerRadius="24"
+                           Padding="24"
+                           HasShadow="True"
+                           MinimumHeightRequest="150">
+                        <Frame.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="0,8"
+                                    Radius="20"
+                                    Opacity="0.12"/>
+                        </Frame.Shadow>
+                        <Frame.Effects>
+                            <uranium:BlurEffect Mode="Light"
+                                                AccentOpacity="0.1"/>
+                        </Frame.Effects>
 
-                        <!-- View Mode for Notes: Always visible -->
-                        <VerticalStackLayout x:Name="ViewNotesContainer"
-                                             Spacing="8">
-                            <!-- Display Notes Label (only visible if notes exist) -->
-                            <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                        <VerticalStackLayout Spacing="15">
+                            <Label Text="Daily Notes"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="Black"/>
+
+                            <Frame BackgroundColor="{StaticResource GlassyBlue}"
                                    BorderColor="{StaticResource GlassyBorder}"
-                                   CornerRadius="15"
-                                   Padding="15"
-                                   HasShadow="False"
-                                   IsVisible="{Binding HasNoNotes, Converter={StaticResource InverseBoolConverter}}">
+                                   CornerRadius="18"
+                                   Padding="20"
+                                   HasShadow="False">
                                 <Label Text="{Binding Notes}"
                                        FontSize="14"
                                        TextColor="Black"
                                        HorizontalOptions="Fill"
                                        LineBreakMode="WordWrap"/>
                             </Frame>
+                        </VerticalStackLayout>
+                    </Frame>
+                </VerticalStackLayout>
 
-                            <!-- No Notes Message (only visible if no notes exist) -->
+                <!-- No Notes Message -->
+                <VerticalStackLayout Spacing="15"
+                                     IsVisible="{Binding HasNoNotes}">
+                    <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                           BorderColor="{StaticResource GlassyBorder}"
+                           CornerRadius="24"
+                           Padding="24"
+                           HasShadow="True"
+                           MinimumHeightRequest="150">
+                        <Frame.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="0,8"
+                                    Radius="20"
+                                    Opacity="0.12"/>
+                        </Frame.Shadow>
+                        <Frame.Effects>
+                            <uranium:BlurEffect Mode="Light"
+                                                AccentOpacity="0.1"/>
+                        </Frame.Effects>
+
+                        <VerticalStackLayout Spacing="15"
+                                             VerticalOptions="Center">
+                            <Label Text="Daily Notes"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="Black"/>
                             <Label Text="No notes recorded for this day"
                                    FontSize="14"
                                    TextColor="Gray"
-                                   IsVisible="{Binding HasNoNotes}"
-                                   HorizontalOptions="Center"/>
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center"/>
                         </VerticalStackLayout>
-                    </VerticalStackLayout>
-                </Border>
+                    </Frame>
+                </VerticalStackLayout>
 
                 <!-- Mood Section -->
-                <Border BackgroundColor="{AppThemeBinding Light={StaticResource BackgroundColorTransparent}, Dark=#2A2A2A}"
-                        Stroke="{AppThemeBinding Light=#E0E0E0, Dark=#444444}"
-                        StrokeShape="RoundRectangle 20,20,20,20"
-                        Padding="20"
-                        IsVisible="{Binding HasMood}">
-                    <VerticalStackLayout Spacing="15">
-                        <Label Text="Mood"
-                               FontSize="18"
-                               FontAttributes="Bold"
-                               TextColor="Black"/>
-                        <Frame BackgroundColor="{StaticResource GlassyWhite}"
-                               BorderColor="{StaticResource GlassyBorder}"
-                               CornerRadius="15"
-                               Padding="15"
-                               HasShadow="False">
-                            <StackLayout Orientation="Horizontal"
-                                         Spacing="15">
-                                <Label Text="{Binding MoodEmoji}"
-                                       FontSize="32"/>
-                                <Label Text="{Binding MoodDescription}"
-                                       FontSize="16"
-                                       VerticalOptions="Center"
-                                       TextColor="Black"/>
-                            </StackLayout>
-                        </Frame>
-                    </VerticalStackLayout>
-                </Border>
+                <VerticalStackLayout Spacing="15"
+                                     IsVisible="{Binding HasMood}">
+                    <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                           BorderColor="{StaticResource GlassyBorder}"
+                           CornerRadius="24"
+                           Padding="24"
+                           HasShadow="True"
+                           MinimumHeightRequest="150">
+                        <Frame.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="0,8"
+                                    Radius="20"
+                                    Opacity="0.12"/>
+                        </Frame.Shadow>
+                        <Frame.Effects>
+                            <uranium:BlurEffect Mode="Light"
+                                                AccentOpacity="0.1"/>
+                        </Frame.Effects>
+
+                        <VerticalStackLayout Spacing="15">
+                            <Label Text="Mood"
+                                   FontSize="20"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="Black"/>
+                            
+                            <Frame BackgroundColor="{StaticResource GlassyBlue}"
+                                   BorderColor="{StaticResource GlassyBorder}"
+                                   CornerRadius="18"
+                                   Padding="20"
+                                   HasShadow="False">
+                                <StackLayout Orientation="Horizontal"
+                                             Spacing="20"
+                                             HorizontalOptions="Center">
+                                    <Label Text="{Binding MoodEmoji}"
+                                           FontSize="40"/>
+                                    <VerticalStackLayout Spacing="5"
+                                                         VerticalOptions="Center">
+                                        <Label Text="{Binding MoodDescription}"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               TextColor="Black"/>
+                                        <Label Text="How you were feeling"
+                                               FontSize="12"
+                                               TextColor="Gray"/>
+                                    </VerticalStackLayout>
+                                </StackLayout>
+                            </Frame>
+                        </VerticalStackLayout>
+                    </Frame>
+                </VerticalStackLayout>
 
             </VerticalStackLayout>
         </ScrollView>
     </Grid>
-</ContentPage>
+
+    <!-- Audio Player Bottom Sheet -->
+    <uranium:UraniumContentPage.Attachments>
+        <material:BottomSheetView x:Name="AudioPlayerBottomSheet"
+                                  IsPresented="{Binding IsAudioPlayerSheetOpen, Mode=TwoWay}"
+                                  DisablePageWhenOpened="False"
+                                  CloseOnTapOutside="True"
+                                  BackgroundColor="Transparent">
+            <material:BottomSheetView.Header>
+                <!-- Custom Header with Handle and Metadata -->
+                <Border StrokeShape="RoundRectangle 32"
+                        Margin="16,10,16,0"
+                        Padding="0">
+                    <Border.GestureRecognizers>
+                        <PanGestureRecognizer PanUpdated="OnHeaderPanUpdated"/>
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout>
+                        <VerticalStackLayout.Effects>
+                            <uranium:BlurEffect Mode="Light"
+                                                AccentOpacity="0.9"/>
+                        </VerticalStackLayout.Effects>
+                        <!-- Handle Indicator -->
+                        <BoxView HeightRequest="5"
+                                 WidthRequest="48"
+                                 CornerRadius="2.5"
+                                 BackgroundColor="#33000000"
+                                 HorizontalOptions="Center"
+                                 Margin="0,10,0,8"/>
+                        <Grid RowDefinitions="Auto,Auto"
+                              Padding="20,0,20,0"
+                              Margin="0">
+                            <!-- Metadata Section -->
+                            <Grid Grid.Row="1"
+                                  ColumnDefinitions="*,Auto,Auto"
+                                  ColumnSpacing="15"
+                                  Padding="0">
+                                <!-- Session Info -->
+                                <VerticalStackLayout Grid.Column="0"
+                                                     Spacing="4"
+                                                     VerticalOptions="Center">
+                                    <Label Text="{Binding SessionDateText}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="Black"/>
+                                    <Label Text="Meditation Session"
+                                           FontSize="12"
+                                           TextColor="Gray"/>
+                                </VerticalStackLayout>
+
+                                <!-- Play/Pause Button -->
+                                <Button Grid.Column="1"
+                                        Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}, ConverterParameter=PlayPause}"
+                                        Command="{Binding TogglePlaybackCommand}"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        TextColor="White"
+                                        FontSize="20"
+                                        WidthRequest="50"
+                                        HeightRequest="50"
+                                        CornerRadius="25"
+                                        BorderColor="Transparent"
+                                        VerticalOptions="Center">
+                                    <Button.Shadow>
+                                        <Shadow Brush="Black"
+                                                Offset="0,2"
+                                                Radius="8"
+                                                Opacity="0.2"/>
+                                    </Button.Shadow>
+                                </Button>
+
+                                <!-- Close Button -->
+                                <Button Grid.Column="2"
+                                        Text="✕"
+                                        Command="{Binding HideAudioPlayerSheetCommand}"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{StaticResource Gray600}"
+                                        FontSize="18"
+                                        WidthRequest="40"
+                                        HeightRequest="40"
+                                        BorderColor="Transparent"
+                                        VerticalOptions="Center"/>
+                            </Grid>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+            </material:BottomSheetView.Header>
+            
+            <!-- Bottom Sheet Content -->
+            <controls:AudioPlayerBottomSheet/>
+        </material:BottomSheetView>
+    </uranium:UraniumContentPage.Attachments>
+</uranium:UraniumContentPage>

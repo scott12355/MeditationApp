@@ -7,10 +7,11 @@ using MeditationApp.Services;
 using MeditationApp.Models;
 using Microsoft.Maui.Controls;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace MeditationApp.ViewModels;
 
-public class DayDetailViewModel : INotifyPropertyChanged
+public partial class DayDetailViewModel : ObservableObject, IAudioPlayerViewModel
 {
     private DateTime _selectedDate = DateTime.Today;
     private readonly MeditationSessionDatabase _database;
@@ -22,6 +23,7 @@ public class DayDetailViewModel : INotifyPropertyChanged
     private string _notes = string.Empty;
     private int? _mood;
     private MeditationSession? _currentlyPlayingSession;
+    private DateTime? _playingSessionDate = null;
 
     public DayDetailViewModel(MeditationSessionDatabase database, CalendarDataService? calendarDataService = null, CognitoAuthService? cognitoAuthService = null, IAudioDownloadService? audioService = null, AudioPlayerService? audioPlayerService = null)
     {
@@ -35,6 +37,9 @@ public class DayDetailViewModel : INotifyPropertyChanged
         PlaySessionCommand = new Command<MeditationSession>(OnPlaySession);
         TogglePlaybackCommand = new RelayCommand(OnTogglePlayback);
         StopPlaybackCommand = new RelayCommand(OnStopPlayback);
+        SeekBackwardCommand = new RelayCommand(OnSeekBackward);
+        SeekForwardCommand = new RelayCommand(OnSeekForward);
+        HideAudioPlayerSheetCommand = new RelayCommand(OnHideAudioPlayerSheet);
         
         // Subscribe to audio player events
         if (_audioPlayerService != null)
@@ -153,6 +158,9 @@ public class DayDetailViewModel : INotifyPropertyChanged
     public ICommand PlaySessionCommand { get; }
     public ICommand TogglePlaybackCommand { get; }
     public ICommand StopPlaybackCommand { get; }
+    public ICommand SeekBackwardCommand { get; }
+    public ICommand SeekForwardCommand { get; }
+    public ICommand HideAudioPlayerSheetCommand { get; }
     
     // Audio playback properties (delegate to AudioPlayerService)
     public bool IsPlaying => _audioPlayerService?.IsPlaying ?? false;
@@ -163,7 +171,16 @@ public class DayDetailViewModel : INotifyPropertyChanged
     public string TotalDurationText => _audioPlayerService?.TotalDurationText ?? "0:00";
     public string PlayPauseIcon => _audioPlayerService?.PlayPauseIcon ?? "▶";
     public string PlayPauseIconImage => IsPlaying ? "pause" : "play";
-    
+
+    // IAudioPlayerViewModel properties
+    [ObservableProperty]
+    private bool _isAudioPlayerSheetOpen;
+
+    [ObservableProperty]
+    private bool _isBottomSheetExpanded;
+
+    public string SessionDateText => _playingSessionDate.HasValue ? _playingSessionDate.Value.ToString("dddd, MMMM d, yyyy") : FormattedDate;
+
     // Currently playing session tracking
     public MeditationSession? CurrentlyPlayingSession
     {
@@ -226,6 +243,11 @@ public class DayDetailViewModel : INotifyPropertyChanged
             CurrentlyPlayingSession.IsCurrentlyPlaying = false;
             CurrentlyPlayingSession = null;
         }
+        
+        // Clear playing session metadata
+        _playingSessionDate = null;
+        OnPropertyChanged(nameof(SessionDateText));
+        
         OnPropertyChanged(nameof(IsPlaying));
         OnPropertyChanged(nameof(PlayPauseIcon));
         OnPropertyChanged(nameof(PlayPauseIconImage));
@@ -255,6 +277,37 @@ public class DayDetailViewModel : INotifyPropertyChanged
         
         _ = _audioPlayerService.StopAsync();
         CurrentlyPlayingSession = null;
+    }
+
+    private void OnSeekBackward()
+    {
+        if (_audioPlayerService == null) return;
+        
+        var newPosition = _audioPlayerService.PlaybackPosition - TimeSpan.FromSeconds(15);
+        if (newPosition < TimeSpan.Zero)
+            newPosition = TimeSpan.Zero;
+            
+        _audioPlayerService.Seek(newPosition.TotalSeconds);
+    }
+
+    private void OnSeekForward()
+    {
+        if (_audioPlayerService == null) return;
+        
+        var newPosition = _audioPlayerService.PlaybackPosition + TimeSpan.FromSeconds(15);
+        if (newPosition > _audioPlayerService.PlaybackDuration)
+            newPosition = _audioPlayerService.PlaybackDuration;
+            
+        _audioPlayerService.Seek(newPosition.TotalSeconds);
+    }
+
+    private void OnHideAudioPlayerSheet()
+    {
+        IsAudioPlayerSheetOpen = false;
+        
+        // Clear playing session metadata when sheet is manually hidden
+        _playingSessionDate = null;
+        OnPropertyChanged(nameof(SessionDateText));
     }
 
     private void UpdateSessionPlayingState(MeditationSession session)
@@ -392,6 +445,11 @@ public class DayDetailViewModel : INotifyPropertyChanged
                 // Continue with default userName
             }
 
+            // Update the ViewModel properties with session-specific metadata
+            _playingSessionDate = session.Timestamp;
+            OnPropertyChanged(nameof(SessionDateText));
+            // Note: SessionDateText is already bound to FormattedDate, so we don't need to update it here
+
             // Set audio source with metadata
             _audioPlayerService.SetAudioSourceWithMetadata(
                 session.LocalAudioPath, 
@@ -402,6 +460,8 @@ public class DayDetailViewModel : INotifyPropertyChanged
         {
             Debug.WriteLine($"Error loading audio with metadata: {ex.Message}");
             // Fallback to basic audio loading if metadata fails
+            _playingSessionDate = session.Timestamp;
+            OnPropertyChanged(nameof(SessionDateText));
             _audioPlayerService.SetAudioSourceWithMetadata(session.LocalAudioPath, "User", session.Timestamp);
         }
     }
@@ -465,6 +525,11 @@ public class DayDetailViewModel : INotifyPropertyChanged
                     CurrentlyPlayingSession = null;
                     if (page != null)
                         await page.DisplayAlert("Error", "Failed to play the audio file.", "OK");
+                }
+                else
+                {
+                    // Show the audio player bottom sheet when playback starts successfully
+                    IsAudioPlayerSheetOpen = true;
                 }
             }
             else
@@ -626,10 +691,17 @@ public class DayDetailViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(TotalMeditationTime));
     }
 
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    partial void OnIsAudioPlayerSheetOpenChanged(bool value)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        if (value)
+        {
+            // When opening the sheet, set it as expanded
+            IsBottomSheetExpanded = true;
+        }
+        else
+        {
+            // When closing the sheet, collapse it first
+            IsBottomSheetExpanded = false;
+        }
     }
 }

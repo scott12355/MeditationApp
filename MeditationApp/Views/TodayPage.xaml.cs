@@ -223,15 +223,34 @@ public partial class TodayPage : UraniumContentPage
     }
 
     // Handle background tap to dismiss keyboard
-    private void OnBackgroundTapped(object sender, EventArgs e)
+    private void OnBackgroundTapped(object? sender, TappedEventArgs e)
     {
         // Prevent rapid tapping
-        var now = DateTime.Now;
-        if ((now - _lastBackgroundTap).TotalMilliseconds < 300)
+        if (DateTime.Now - _lastBackgroundTap < TimeSpan.FromMilliseconds(300))
             return;
-        
-        _lastBackgroundTap = now;
-        DismissKeyboard();
+        _lastBackgroundTap = DateTime.Now;
+
+        // Don't handle background taps if the audio player bottom sheet is open
+        if (_viewModel is IAudioPlayerViewModel audioViewModel && audioViewModel.IsAudioPlayerSheetOpen)
+            return;
+
+        // Collapse mood selector if expanded
+        if (_viewModel.IsMoodSelectorExpanded)
+        {
+            _viewModel.IsMoodSelectorExpanded = false;
+        }
+    }
+
+    private void OnHeaderPanUpdated(object? sender, PanUpdatedEventArgs e)
+    {
+        if (e.StatusType == GestureStatus.Completed && e.TotalY > 50)
+        {
+            // Swipe down detected, close the bottom sheet
+            if (BindingContext is IAudioPlayerViewModel audioViewModel)
+            {
+                audioViewModel.IsAudioPlayerSheetOpen = false;
+            }
+        }
     }
 
     // Dismiss keyboard programmatically

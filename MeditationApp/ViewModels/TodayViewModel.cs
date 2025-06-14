@@ -11,10 +11,11 @@ using MeditationApp.Utils;
 using System.ComponentModel;
 using Microsoft.Maui.Storage;
 using System;
+using System.Windows.Input;
 
 namespace MeditationApp.ViewModels;
 
-public partial class TodayViewModel : ObservableObject
+public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
 {
     [ObservableProperty]
     private DateTime _currentDate = DateTime.Now;
@@ -72,6 +73,9 @@ public partial class TodayViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isAudioPlayerSheetOpen = false;
+
+    [ObservableProperty]
+    private bool _isBottomSheetExpanded;
 
     // Add sync-related properties
     [ObservableProperty]
@@ -1808,44 +1812,6 @@ public partial class TodayViewModel : ObservableObject
         }
     }
 
-    // private void OnAudioPlayerServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
-    // {
-    //     // Forward audio-related property changes to update UI bindings
-    //     switch (e.PropertyName)
-    //     {
-    //         case nameof(AudioPlayerService.IsPlaying):
-    //             OnPropertyChanged(nameof(IsPlaying));
-    //             break;
-    //         case nameof(AudioPlayerService.PlaybackPosition):
-    //             OnPropertyChanged(nameof(PlaybackPosition));
-    //             break;
-    //         case nameof(AudioPlayerService.PlaybackDuration):
-    //             OnPropertyChanged(nameof(PlaybackDuration));
-    //             break;
-    //         case nameof(AudioPlayerService.PlaybackProgress):
-    //             OnPropertyChanged(nameof(PlaybackProgress));
-    //             break;
-    //         case nameof(AudioPlayerService.CurrentPositionText):
-    //             OnPropertyChanged(nameof(CurrentPositionText));
-    //             break;
-    //         case nameof(AudioPlayerService.TotalDurationText):
-    //             OnPropertyChanged(nameof(TotalDurationText));
-    //             break;
-    //         case nameof(AudioPlayerService.PlayPauseIcon):
-    //             OnPropertyChanged(nameof(PlayPauseIcon));
-    //             break;
-    //         case nameof(AudioPlayerService.UserName):
-    //             OnPropertyChanged(nameof(UserName));
-    //             break;
-    //         case nameof(AudioPlayerService.SessionDate):
-    //             OnPropertyChanged(nameof(SessionDate));
-    //             break;
-    //         case nameof(AudioPlayerService.SessionDateText):
-    //             OnPropertyChanged(nameof(SessionDateText));
-    //             break;
-    //     }
-    // }
-
     /// <summary>
     /// Triggers a background sync if conditions are met
     /// </summary>
@@ -1912,6 +1878,26 @@ public partial class TodayViewModel : ObservableObject
         finally
         {
             IsLoading = false;
+        }
+    }
+
+    // Explicit interface implementations for IAudioPlayerViewModel
+    ICommand IAudioPlayerViewModel.TogglePlaybackCommand => TogglePlaybackCommand;
+    ICommand IAudioPlayerViewModel.SeekBackwardCommand => SeekBackwardCommand;
+    ICommand IAudioPlayerViewModel.SeekForwardCommand => SeekForwardCommand;
+    ICommand IAudioPlayerViewModel.HideAudioPlayerSheetCommand => HideAudioPlayerSheetCommand;
+
+    partial void OnIsAudioPlayerSheetOpenChanged(bool value)
+    {
+        if (value)
+        {
+            // When opening the sheet, set it as expanded
+            IsBottomSheetExpanded = true;
+        }
+        else
+        {
+            // When closing the sheet, collapse it first
+            IsBottomSheetExpanded = false;
         }
     }
 }
