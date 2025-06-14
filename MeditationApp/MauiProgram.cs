@@ -9,6 +9,7 @@ using MeditationApp.Models;
 using CommunityToolkit.Maui;
 using Plugin.Maui.Audio;
 using MediaManager;
+using UraniumUI;
 #if IOS
 using Microsoft.Maui.Handlers;
 #endif
@@ -28,6 +29,8 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
+            .UseUraniumUI()
+            .UseUraniumUIBlurs()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

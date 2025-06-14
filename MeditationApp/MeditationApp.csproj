@@ -73,7 +73,9 @@
         <PackageReference Include="Plugin.MediaManager" Version="1.2.2" />
         <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
         <PackageReference Include="TagLibSharp" Version="2.3.0" />
-        <PackageReference Include="UraniumUI.Material" Version="2.10.2" />
+        <PackageReference Include="UraniumUI" Version="2.12.1" />
+        <PackageReference Include="UraniumUI.Blurs" Version="2.12.1" />
+        <PackageReference Include="UraniumUI.Material" Version="2.12.1" />
     </ItemGroup>
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">

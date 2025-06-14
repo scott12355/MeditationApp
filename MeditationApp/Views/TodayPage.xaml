@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:controls="clr-namespace:MeditationApp.Controls"
-             xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:converters="clr-namespace:MeditationApp.Converters"
-             x:Class="MeditationApp.Views.TodayPage"
-             Shell.NavBarIsVisible="False">
+<uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                            xmlns:controls="clr-namespace:MeditationApp.Controls"
+                            xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
+                            xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                            xmlns:converters="clr-namespace:MeditationApp.Converters"
+                            xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+                            xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+                            x:Class="MeditationApp.Views.TodayPage"
+                            Shell.NavBarIsVisible="False">
 
-    <ContentPage.Resources>
+    <uranium:UraniumContentPage.Resources>
         <!-- Converters -->
         <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
         <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
@@ -18,6 +20,7 @@
         <converters:StatusToBackgroundColorConverter x:Key="StatusToBackgroundColorConverter"/>
         <converters:StatusToBoolConverter x:Key="StatusToBoolConverter"/>
         <converters:StringToBoolConverter x:Key="StringToBoolConverter"/>
+        <converters:BoolToPlayPauseConverter x:Key="BoolToPlayPauseConverter"/>
 
 
         <!-- DataTemplates -->
@@ -43,15 +46,15 @@
                 </VerticalStackLayout>
             </Frame>
         </DataTemplate>
-    </ContentPage.Resources>
+    </uranium:UraniumContentPage.Resources>
 
-    <ContentPage.Background>
+    <uranium:UraniumContentPage.Background>
         <SolidColorBrush Color="#EFEBD3"/>
-    </ContentPage.Background>
+    </uranium:UraniumContentPage.Background>
 
 
 
-    <Grid>
+    <Grid BackgroundColor="#EFEBD3">
         <Grid.GestureRecognizers>
             <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
         </Grid.GestureRecognizers>
@@ -289,13 +292,16 @@
             </Ellipse.Behaviors>
         </Ellipse>
 
+
+
         <!-- Main content -->
         <ScrollView Grid.Row="0"
                     x:Name="MainScrollView">
+
             <ScrollView.GestureRecognizers>
                 <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
             </ScrollView.GestureRecognizers>
-            <VerticalStackLayout Padding="20"
+            <VerticalStackLayout Padding="20,20,20,120"
                                  Spacing="20">
                 <VerticalStackLayout.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
@@ -669,12 +675,13 @@
                 <!-- Today's Session Content -->
                 <VerticalStackLayout Spacing="20">
 
+
                     <!-- If there's a session for today -->
                     <VerticalStackLayout Spacing="15"
                                          IsVisible="{Binding HasTodaySession}">
 
                         <!-- Enhanced Frame with glassmorphism styling for session states -->
-                        <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                        <Frame BackgroundColor="Wheat"
                                BorderColor="{StaticResource GlassyBorder}"
                                CornerRadius="24"
                                Padding="24"
@@ -686,6 +693,10 @@
                                         Radius="20"
                                         Opacity="0.12"/>
                             </Frame.Shadow>
+                            <Frame.Effects>
+                                <uranium:BlurEffect Mode="Light"
+                                                    AccentOpacity="0.1"></uranium:BlurEffect>
+                            </Frame.Effects>
 
                             <Grid>
                                 <!-- REQUESTED State Content -->
@@ -806,7 +817,8 @@
                                 <!-- COMPLETED State Content -->
                                 <VerticalStackLayout Spacing="15"
                                                      IsVisible="{Binding TodaySession.Status, Converter={StaticResource StatusToBoolConverter}, ConverterParameter=COMPLETED}">
-                                    <Label Text="🎧 Your Daily Meditation"
+
+                                    <Label Text="Today's Meditation"
                                            FontAttributes="Bold"
                                            FontSize="18"
                                            HorizontalOptions="Center"
@@ -820,52 +832,59 @@
                                                   WidthRequest="150"
                                                   InputTransparent="True"/>
 
-                                    <!-- Media Player Section with fixed height -->
-                                    <Grid HeightRequest="80"
-                                          VerticalOptions="End">
-                                        <VerticalStackLayout Spacing="10">
-                                            <Frame Padding="10"
-                                                   CornerRadius="18"
-                                                   BackgroundColor="{StaticResource GlassyBlue}"
-                                                   BorderColor="{StaticResource GlassyBorder}"
-                                                   HasShadow="False"
-                                                   VerticalOptions="End">
-                                                <Grid ColumnDefinitions="Auto,*,Auto"
-                                                      ColumnSpacing="10">
+                                    <!-- Compact Media Player Trigger -->
+                                    <Frame Padding="15"
+                                           CornerRadius="20"
+                                           BackgroundColor="{StaticResource GlassyBlue}"
+                                           BorderColor="{StaticResource GlassyBorder}"
+                                           HasShadow="True"
+                                           VerticalOptions="End">
+                                        <Frame.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding ShowAudioPlayerSheetCommand}"/>
+                                        </Frame.GestureRecognizers>
+                                        <Frame.Shadow>
+                                            <Shadow Brush="Black"
+                                                    Offset="0,4"
+                                                    Radius="12"
+                                                    Opacity="0.15"/>
+                                        </Frame.Shadow>
+                                        <Grid ColumnDefinitions="Auto,*,Auto"
+                                              ColumnSpacing="15">
+                                            <!-- Play/Pause Button -->
+                                            <ImageButton Grid.Column="0"
+                                                         Source="{Binding PlayPauseIconImage}"
+                                                         WidthRequest="50"
+                                                         HeightRequest="50"
+                                                         BackgroundColor="{StaticResource Primary}"
+                                                         Command="{Binding TogglePlaybackCommand}"
+                                                         CornerRadius="25"
+                                                         BorderColor="Transparent"/>
 
-                                                    <!-- Play/Pause Button -->
-                                                    <ImageButton Grid.Column="0"
-                                                                 Source="{Binding PlayPauseIconImage}"
-                                                                 WidthRequest="50"
-                                                                 HeightRequest="50"
-                                                                 BackgroundColor="{StaticResource GlassyGray}"
-                                                                 Command="{Binding TogglePlaybackCommand}"
-                                                                 BorderWidth="1"
-                                                                 BorderColor="{StaticResource Gray300}"
-                                                                 CornerRadius="25"/>
+                                            <!-- Session Info -->
+                                            <VerticalStackLayout Grid.Column="1"
+                                                                 Spacing="2"
+                                                                 VerticalOptions="Center">
+                                                <Label Text="{Binding SessionDateText}"
+                                                       FontSize="16"
+                                                       FontAttributes="Bold"
+                                                       TextColor="Black"/>
+                                                <ProgressBar Progress="{Binding PlaybackProgress}"
+                                                             HeightRequest="3"
+                                                             BackgroundColor="{StaticResource Gray200}"
+                                                             ProgressColor="{StaticResource Primary}"/>
+                                                <Label Text="{Binding CurrentPositionText}"
+                                                       FontSize="12"
+                                                       TextColor="{StaticResource Gray600}"/>
+                                            </VerticalStackLayout>
 
-                                                    <!-- Progress and Time -->
-                                                    <VerticalStackLayout Grid.Column="1"
-                                                                         Spacing="5">
-                                                        <ProgressBar Progress="{Binding PlaybackProgress}"
-                                                                     HeightRequest="4"
-                                                                     BackgroundColor="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray800}}"
-                                                                     ProgressColor="{StaticResource Primary}"/>
-                                                        <Grid ColumnDefinitions="*,Auto">
-                                                            <Label Grid.Column="0"
-                                                                   Text="{Binding CurrentPositionText}"
-                                                                   FontSize="12"
-                                                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"/>
-                                                            <Label Grid.Column="1"
-                                                                   Text="{Binding TotalDurationText}"
-                                                                   FontSize="12"
-                                                                   TextColor="{AppThemeBinding Light={StaticResource Gray600}, Dark={StaticResource Gray400}}"/>
-                                                        </Grid>
-                                                    </VerticalStackLayout>
-                                                </Grid>
-                                            </Frame>
-                                        </VerticalStackLayout>
-                                    </Grid>
+                                            <!-- Expand Icon -->
+                                            <Label Grid.Column="2"
+                                                   Text="⬆"
+                                                   FontSize="18"
+                                                   TextColor="{StaticResource Primary}"
+                                                   VerticalOptions="Center"/>
+                                        </Grid>
+                                    </Frame>
                                 </VerticalStackLayout>
                             </Grid>
                         </Frame>
@@ -929,7 +948,7 @@
                                     <VerticalStackLayout.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
                                     </VerticalStackLayout.GestureRecognizers>
-                                   
+
 
                                     <Frame BackgroundColor="{StaticResource GlassyBlue}"
                                            BorderColor="{StaticResource GlassyBorder}"
@@ -1008,68 +1027,261 @@
 
                 </VerticalStackLayout>
 
+                <!-- Past Sessions Button -->
+                <Frame Padding="0"
+                       CornerRadius="30"
+                       HasShadow="True"
+                       Margin="0,10,0,0"
+                       HorizontalOptions="Fill"
+                       HeightRequest="60"
+                       BackgroundColor="{StaticResource GlassyBlue}"
+                       BorderColor="{StaticResource GlassyBorder}">
+                    <Frame.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
+                    </Frame.GestureRecognizers>
+                    <Frame.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="0,4"
+                                Radius="12"
+                                Opacity="0.15"/>
+                    </Frame.Shadow>
+                    <Button Text="Past Sessions"
+                            Command="{Binding NavigateToPastSessionsCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource Primary}"
+                            FontSize="18"
+                            FontAttributes="Bold"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Fill"
+                            BorderColor="Transparent">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroupList>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="Scale"
+                                                    Value="1.0"/>
+                                            <Setter Property="Opacity"
+                                                    Value="1.0"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Property="Scale"
+                                                    Value="0.95"/>
+                                            <Setter Property="Opacity"
+                                                    Value="0.8"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateGroupList>
+                        </VisualStateManager.VisualStateGroups>
+                        <Button.Behaviors>
+                            <toolkit:AnimationBehavior>
+                                <toolkit:AnimationBehavior.AnimationType>
+                                    <toolkit:FadeAnimation Length="200"/>
+                                </toolkit:AnimationBehavior.AnimationType>
+                            </toolkit:AnimationBehavior>
+                        </Button.Behaviors>
+                    </Button>
+                </Frame>
+
             </VerticalStackLayout>
         </ScrollView>
 
-        <!-- Past Sessions Button anchored to bottom -->
-        <Frame Grid.Row="1"
-               Padding="0"
-               CornerRadius="30"
-               HasShadow="True"
-               Margin="20,10,20,20"
-               HorizontalOptions="Fill"
-               HeightRequest="60"
-               BackgroundColor="{StaticResource GlassyBlue}"
-               BorderColor="{StaticResource GlassyBorder}">
-            <Frame.GestureRecognizers>
-                <TapGestureRecognizer Tapped="OnBackgroundTapped"/>
-            </Frame.GestureRecognizers>
-            <Frame.Shadow>
-                <Shadow Brush="Black"
-                        Offset="0,4"
-                        Radius="12"
-                        Opacity="0.15"/>
-            </Frame.Shadow>
-            <Button Text="📚 Past Sessions"
-                    Command="{Binding NavigateToPastSessionsCommand}"
-                    BackgroundColor="Transparent"
-                    TextColor="{StaticResource Primary}"
-                    FontSize="18"
-                    FontAttributes="Bold"
-                    HorizontalOptions="Fill"
-                    VerticalOptions="Fill"
-                    BorderColor="Transparent">
-                <VisualStateManager.VisualStateGroups>
-                    <VisualStateGroupList>
-                        <VisualStateGroup x:Name="CommonStates">
-                            <VisualState x:Name="Normal">
-                                <VisualState.Setters>
-                                    <Setter Property="Scale"
-                                            Value="1.0"/>
-                                    <Setter Property="Opacity"
-                                            Value="1.0"/>
-                                </VisualState.Setters>
-                            </VisualState>
-                            <VisualState x:Name="Pressed">
-                                <VisualState.Setters>
-                                    <Setter Property="Scale"
-                                            Value="0.95"/>
-                                    <Setter Property="Opacity"
-                                            Value="0.8"/>
-                                </VisualState.Setters>
-                            </VisualState>
-                        </VisualStateGroup>
-                    </VisualStateGroupList>
-                </VisualStateManager.VisualStateGroups>
-                <Button.Behaviors>
-                    <toolkit:AnimationBehavior>
-                        <toolkit:AnimationBehavior.AnimationType>
-                            <toolkit:FadeAnimation Length="200"/>
-                        </toolkit:AnimationBehavior.AnimationType>
-                    </toolkit:AnimationBehavior>
-                </Button.Behaviors>
-            </Button>
-        </Frame>
-
     </Grid>
-</ContentPage>
+
+    <!-- Audio Player Bottom Sheet -->
+    <uranium:UraniumContentPage.Attachments>
+        <material:BottomSheetView x:Name="AudioPlayerBottomSheet"
+                                  IsPresented="{Binding IsAudioPlayerSheetOpen, Mode=TwoWay}"
+                                  DisablePageWhenOpened="False"
+                                  CloseOnTapOutside="True"
+                                  BackgroundColor="Transparent">
+
+            <material:BottomSheetView.Header>
+
+                <!-- Custom Header with Handle and Metadata -->
+
+                <Border
+                    StrokeShape="RoundRectangle 32"
+                    Margin="16,10,16,0"
+                    Padding="0">
+                    <!-- semi-translucent, matches glassy look -->
+
+                    <VerticalStackLayout>
+                        <VerticalStackLayout.Effects>
+                            <uranium:BlurEffect Mode="Light"
+                                                AccentOpacity="0.9"/>
+                        </VerticalStackLayout.Effects>
+                        <!-- Handle Indicator -->
+                        <BoxView HeightRequest="5"
+                                 WidthRequest="48"
+                                 CornerRadius="2.5"
+                                 BackgroundColor="#33000000"
+                                 HorizontalOptions="Center"
+                                 Margin="0,10,0,8"/>
+                        <Grid RowDefinitions="Auto,Auto"
+                              Padding="20,0,20,0"
+                              Margin="0">
+
+
+                            <!-- Metadata Section -->
+                            <Grid Grid.Row="1"
+                                  ColumnDefinitions="*,Auto,Auto"
+                                  ColumnSpacing="15"
+                                  Padding="0">
+                                <!-- Session Info -->
+                                <VerticalStackLayout Grid.Column="0"
+                                                     Spacing="4">
+                                    <Label Text="{Binding SessionDateText}"
+                                           FontSize="18"
+                                           FontAttributes="Bold"
+                                           TextColor="Black"/>
+                                    <Label Text="{Binding UserName}"
+                                           FontSize="14"
+                                           TextColor="{StaticResource Gray600}"/>
+                                </VerticalStackLayout>
+
+                                <!-- Play/Pause Button -->
+                                <Button Grid.Column="1"
+                                        Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}, ConverterParameter=PlayPause}"
+                                        Command="{Binding TogglePlaybackCommand}"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        TextColor="White"
+                                        FontSize="20"
+                                        WidthRequest="50"
+                                        HeightRequest="50"
+                                        CornerRadius="25"
+                                        BorderColor="Transparent">
+                                    <Button.Shadow>
+                                        <Shadow Brush="Black"
+                                                Offset="0,2"
+                                                Radius="8"
+                                                Opacity="0.2"/>
+                                    </Button.Shadow>
+                                </Button>
+
+                                <!-- Close Button -->
+                                <Button Grid.Column="2"
+                                        Text="✕"
+                                        Command="{Binding HideAudioPlayerSheetCommand}"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{StaticResource Gray600}"
+                                        FontSize="18"
+                                        WidthRequest="40"
+                                        HeightRequest="40"
+                                        BorderColor="Transparent"/>
+                            </Grid>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+            </material:BottomSheetView.Header>
+
+            <!-- Bottom Sheet Content - Enhanced Audio Controls -->
+            <Border
+                StrokeShape="RoundRectangle 32"
+                Margin="16,0,16,16"
+                Padding="0">
+                <Border.Effects>
+                    <uranium:BlurEffect Mode="Light"
+                                        AccentOpacity="0.5"/>
+                </Border.Effects>
+                <VerticalStackLayout Spacing="20"
+                                     Padding="20,0"
+                                     Margin="0">
+                    <!-- Progress Bar with enhanced styling -->
+                    <VerticalStackLayout Spacing="10">
+                        <ProgressBar Progress="{Binding PlaybackProgress}"
+                                     HeightRequest="8"
+                                     BackgroundColor="{StaticResource Gray200}"
+                                     ProgressColor="{StaticResource Primary}"/>
+                        <Grid ColumnDefinitions="*,*">
+                            <Label Grid.Column="0"
+                                   Text="{Binding CurrentPositionText}"
+                                   FontSize="14"
+                                   TextColor="{StaticResource Gray600}"
+                                   HorizontalOptions="Start"/>
+                            <Label Grid.Column="1"
+                                   Text="{Binding TotalDurationText}"
+                                   FontSize="14"
+                                   TextColor="{StaticResource Gray600}"
+                                   HorizontalOptions="End"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                    <!-- Enhanced Control Buttons -->
+                    <HorizontalStackLayout Spacing="30"
+                                           HorizontalOptions="Center">
+                        <!-- Rewind 15s Button -->
+                        <Frame Padding="0"
+                               WidthRequest="60"
+                               HeightRequest="60"
+                               CornerRadius="30"
+                               BackgroundColor="#CCFFFFFF"
+                               BorderColor="#66FFFFFF"
+                               HasShadow="True">
+                            <Frame.Shadow>
+                                <Shadow Brush="Black"
+                                        Offset="0,2"
+                                        Radius="8"
+                                        Opacity="0.15"/>
+                            </Frame.Shadow>
+                            <Button Text="⏪"
+                                    FontSize="24"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{StaticResource Primary}"
+                                    WidthRequest="60"
+                                    HeightRequest="60"
+                                    BorderColor="Transparent"
+                                    Command="{Binding SeekBackwardCommand}"/>
+                        </Frame>
+                        <!-- Main Play/Pause Button -->
+                        <Frame Padding="0"
+                               WidthRequest="80"
+                               HeightRequest="80"
+                               CornerRadius="40"
+                               BackgroundColor="{StaticResource Primary}"
+                               BorderColor="Transparent"
+                               HasShadow="True">
+                            <Frame.Shadow>
+                                <Shadow Brush="{StaticResource Primary}"
+                                        Offset="0,6"
+                                        Radius="15"
+                                        Opacity="0.25"/>
+                            </Frame.Shadow>
+                            <ImageButton Source="{Binding PlayPauseIconImage}"
+                                         Command="{Binding TogglePlaybackCommand}"
+                                         BackgroundColor="Transparent"
+                                         WidthRequest="80"
+                                         HeightRequest="80"
+                                         BorderColor="Transparent"/>
+                        </Frame>
+                        <!-- Fast Forward 15s Button -->
+                        <Frame Padding="0"
+                               WidthRequest="60"
+                               HeightRequest="60"
+                               CornerRadius="30"
+                               BackgroundColor="#CCFFFFFF"
+                               BorderColor="#66FFFFFF"
+                               HasShadow="True">
+                            <Frame.Shadow>
+                                <Shadow Brush="Black"
+                                        Offset="0,2"
+                                        Radius="8"
+                                        Opacity="0.15"/>
+                            </Frame.Shadow>
+                            <Button Text="⏩"
+                                    FontSize="24"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{StaticResource Primary}"
+                                    WidthRequest="60"
+                                    HeightRequest="60"
+                                    BorderColor="Transparent"
+                                    Command="{Binding SeekForwardCommand}"/>
+                        </Frame>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </material:BottomSheetView>
+    </uranium:UraniumContentPage.Attachments>
+</uranium:UraniumContentPage>

@@ -6,10 +6,11 @@ using Microsoft.Maui.Controls;
 using MeditationApp.Drawing;
 using Microsoft.Maui.Graphics;
 using MeditationApp.Models; // Import the Models namespace for MeditationSessionStatus
+using UraniumUI.Pages;
 
 namespace MeditationApp.Views;
 
-public partial class TodayPage : ContentPage
+public partial class TodayPage : UraniumContentPage
 {
     private TodayViewModel _viewModel;
     // private MediaElement? _audioPlayer; // Will be initialized in OnAppearing

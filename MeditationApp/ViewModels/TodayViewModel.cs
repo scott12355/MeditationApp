@@ -70,6 +70,9 @@ public partial class TodayViewModel : ObservableObject
     [ObservableProperty]
     private bool _isMoodSelectorExpanded = false;
 
+    [ObservableProperty]
+    private bool _isAudioPlayerSheetOpen = false;
+
     // Add sync-related properties
     [ObservableProperty]
     private bool _isSyncing = false;
@@ -147,6 +150,9 @@ public partial class TodayViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(IsPlaying));
         OnPropertyChanged(nameof(PlayPauseIcon));
+        
+        // Hide the bottom sheet when audio ends
+        IsAudioPlayerSheetOpen = false;
     }
 
     private void OnAudioPlayerServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -287,7 +293,13 @@ public partial class TodayViewModel : ObservableObject
         {
             // Load audio with metadata before playing
             await LoadAudioWithMetadata();
-            await _audioPlayerService.PlayFromFileAsync(TodaySession.LocalAudioPath);
+            var success = await _audioPlayerService.PlayFromFileAsync(TodaySession.LocalAudioPath);
+            
+            // Show the audio player bottom sheet when playback starts
+            if (success)
+            {
+                IsAudioPlayerSheetOpen = true;
+            }
         }
         else
         {
@@ -722,6 +734,50 @@ public partial class TodayViewModel : ObservableObject
     private async Task NavigateToPastSessions()
     {
         await Shell.Current.GoToAsync("PastSessionsPage");
+    }
+
+    [RelayCommand]
+    private void ShowAudioPlayerSheet()
+    {
+        IsAudioPlayerSheetOpen = true;
+    }
+
+    [RelayCommand]
+    private void HideAudioPlayerSheet()
+    {
+        IsAudioPlayerSheetOpen = false;
+    }
+
+    [RelayCommand]
+    private void ToggleAudioPlayerSheet()
+    {
+        IsAudioPlayerSheetOpen = !IsAudioPlayerSheetOpen;
+    }
+
+    [RelayCommand]
+    private void SeekBackward()
+    {
+        if (_audioPlayerService.IsPlaying || _audioPlayerService.PlaybackPosition > TimeSpan.Zero)
+        {
+            var newPosition = _audioPlayerService.PlaybackPosition.Subtract(TimeSpan.FromSeconds(15));
+            if (newPosition < TimeSpan.Zero)
+                newPosition = TimeSpan.Zero;
+            
+            _audioPlayerService.Seek(newPosition.TotalSeconds);
+        }
+    }
+
+    [RelayCommand]
+    private void SeekForward()
+    {
+        if (_audioPlayerService.IsPlaying || _audioPlayerService.PlaybackPosition > TimeSpan.Zero)
+        {
+            var newPosition = _audioPlayerService.PlaybackPosition.Add(TimeSpan.FromSeconds(15));
+            if (newPosition > _audioPlayerService.PlaybackDuration)
+                newPosition = _audioPlayerService.PlaybackDuration;
+            
+            _audioPlayerService.Seek(newPosition.TotalSeconds);
+        }
     }
 
     partial void OnSessionNotesChanged(string value)
