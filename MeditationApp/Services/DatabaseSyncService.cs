@@ -196,7 +196,7 @@ namespace MeditationApp.Services
                                     var timestampDouble = tsElem.GetDouble();
                                     timestampMillis = Convert.ToInt64(timestampDouble);
                                 }
-                                timestampVal = DateTimeOffset.FromUnixTimeMilliseconds(timestampMillis).DateTime;
+                                timestampVal = DateTimeOffset.FromUnixTimeMilliseconds(timestampMillis).LocalDateTime;
                             }
                         }
 
@@ -302,7 +302,7 @@ namespace MeditationApp.Services
                         if (!insightElem.TryGetProperty("date", out var dateElem) || dateElem.ValueKind != System.Text.Json.JsonValueKind.Number)
                             continue;
 
-                        var date = DateTimeOffset.FromUnixTimeMilliseconds(dateElem.GetInt64()).DateTime.Date;
+                        var date = DateTimeOffset.FromUnixTimeMilliseconds(dateElem.GetInt64()).LocalDateTime.Date;
                         var notes = insightElem.TryGetProperty("notes", out var notesElem) ? notesElem.GetString() ?? string.Empty : string.Empty;
                         int? mood = insightElem.TryGetProperty("mood", out var moodElem) && moodElem.TryGetInt32(out var moodValue) ? moodValue : null;
 

@@ -172,16 +172,16 @@
                                    TextColor="Black"/>
 
                             <CollectionView ItemsSource="{Binding Sessions}"
-                                            SelectedItem="{Binding SelectedSession, Mode=TwoWay}"
-                                            >
+                                            SelectedItem="{Binding SelectedSession, Mode=TwoWay}">
+                                <CollectionView.ItemsLayout>
+                                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="16" />
+                                </CollectionView.ItemsLayout>
                                 <CollectionView.ItemTemplate>
                                     <DataTemplate x:DataType="models:MeditationSession" >
                                         <Frame BackgroundColor="{StaticResource GlassyBlue}"
                                                BorderColor="{StaticResource GlassyBorder}"
                                                CornerRadius="18"
                                                Padding="20"
-                                               Margin="0,8"
-                                               
                                                HasShadow="False">
                                             <Grid RowDefinitions="Auto,Auto"
                                                   ColumnDefinitions="*,Auto,Auto"
@@ -474,19 +474,13 @@
                             <uranium:BlurEffect Mode="Light"
                                                 AccentOpacity="0.9"/>
                         </VerticalStackLayout.Effects>
-                        <!-- Handle Indicator -->
-                        <BoxView HeightRequest="5"
-                                 WidthRequest="48"
-                                 CornerRadius="2.5"
-                                 BackgroundColor="#33000000"
-                                 HorizontalOptions="Center"
-                                 Margin="0,10,0,8"/>
+                        
                         <Grid RowDefinitions="Auto,Auto"
                               Padding="20,0,20,0"
                               Margin="0">
                             <!-- Metadata Section -->
                             <Grid Grid.Row="1"
-                                  ColumnDefinitions="*,Auto,Auto"
+                                  ColumnDefinitions="*,Auto,50"
                                   ColumnSpacing="15"
                                   Padding="0">
                                 <!-- Session Info -->
@@ -503,36 +497,18 @@
                                 </VerticalStackLayout>
 
                                 <!-- Play/Pause Button -->
-                                <Button Grid.Column="1"
-                                        Text="{Binding IsPlaying, Converter={StaticResource BoolToPlayPauseConverter}, ConverterParameter=PlayPause}"
-                                        Command="{Binding TogglePlaybackCommand}"
-                                        BackgroundColor="{StaticResource Primary}"
-                                        TextColor="White"
-                                        FontSize="20"
-                                        WidthRequest="50"
-                                        HeightRequest="50"
-                                        CornerRadius="25"
-                                        BorderColor="Transparent"
-                                        VerticalOptions="Center">
-                                    <Button.Shadow>
-                                        <Shadow Brush="Black"
-                                                Offset="0,2"
-                                                Radius="8"
-                                                Opacity="0.2"/>
-                                    </Button.Shadow>
-                                </Button>
+                                <ImageButton Source="{Binding PlayPauseIconImage}"
+                                             Command="{Binding TogglePlaybackCommand}"
+                                             BackgroundColor="Transparent"
+                                             Grid.Column="2"
+                                             WidthRequest="80"
+                                             HeightRequest="80"
+                                             BorderColor="Transparent"/>
+                                
+                              
+                                
 
-                                <!-- Close Button -->
-                                <Button Grid.Column="2"
-                                        Text="✕"
-                                        Command="{Binding HideAudioPlayerSheetCommand}"
-                                        BackgroundColor="Transparent"
-                                        TextColor="{StaticResource Gray600}"
-                                        FontSize="18"
-                                        WidthRequest="40"
-                                        HeightRequest="40"
-                                        BorderColor="Transparent"
-                                        VerticalOptions="Center"/>
+                          
                             </Grid>
                         </Grid>
                     </VerticalStackLayout>

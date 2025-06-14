@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using MeditationApp.Services;
 using MeditationApp.Models;
 using System.Diagnostics;
+using System.Linq;
 
 namespace MeditationApp.ViewModels;
 
@@ -164,9 +165,7 @@ public partial class SimpleCalendarViewModel : ObservableObject
             if (result.IsSuccess && (result.SessionsUpdated > 0 || result.InsightsUpdated > 0))
             {
                 Debug.WriteLine($"[SimpleCalendarViewModel] Background sync completed with updates: {result.SessionsUpdated} sessions, {result.InsightsUpdated} insights");
-                
-                // Refresh data if sync brought in new data
-                await LoadSessionDays();
+                // Don't call LoadSessionDays here to prevent infinite loops
             }
         }
         catch (Exception ex)

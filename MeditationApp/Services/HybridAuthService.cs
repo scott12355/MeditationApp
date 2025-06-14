@@ -316,6 +316,17 @@ public class HybridAuthService
             Console.WriteLine($"HybridAuthService: Error resetting DayDetailViewModel: {ex.Message}");
         }
         
+        // Reset CalendarPage loaded flag to ensure fresh data on next login
+        try
+        {
+            Views.CalendarPage.ResetLoadedFlag();
+            Console.WriteLine("HybridAuthService: CalendarPage loaded flag reset");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"HybridAuthService: Error resetting CalendarPage loaded flag: {ex.Message}");
+        }
+        
         Console.WriteLine("HybridAuthService: SignOut completed, all data cleared");
     }
 

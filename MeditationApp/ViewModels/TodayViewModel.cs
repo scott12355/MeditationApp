@@ -647,7 +647,7 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
                 }
                 
                 var timestamp = DateTimeOffset.FromUnixTimeMilliseconds(
-                    timestampMillis).DateTime;
+                    timestampMillis).LocalDateTime;
 
                 var status = MeditationSessionStatusHelper.ParseSessionStatus(sessionElem.GetProperty("status").GetString() ?? MeditationSessionStatus.REQUESTED.ToString());
                 var audioPath = sessionElem.TryGetProperty("audioPath", out var audioPathElem) ? audioPathElem.GetString() : null;
@@ -1017,7 +1017,7 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
             {
                 var today = DateTime.Now.Date;
                 var todayInsight = insightsElem.EnumerateArray()
-                    .FirstOrDefault(i => DateTime.Parse(i.GetProperty("date").GetString() ?? string.Empty).Date == today);
+                    .FirstOrDefault(i => DateTime.Parse(i.GetProperty("date").GetString() ?? string.Empty, null, System.Globalization.DateTimeStyles.RoundtripKind).Date == today);
 
                 if (todayInsight.ValueKind != JsonValueKind.Undefined)
                 {
@@ -1214,13 +1214,13 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
                             long millis;
                             if (tsElem.TryGetInt64(out millis))
                             {
-                                timestampVal = DateTimeOffset.FromUnixTimeMilliseconds(millis).DateTime;
+                                timestampVal = DateTimeOffset.FromUnixTimeMilliseconds(millis).LocalDateTime;
                             }
                             else
                             {
                                 double millisDouble = tsElem.GetDouble();
                                 millis = Convert.ToInt64(millisDouble);
-                                timestampVal = DateTimeOffset.FromUnixTimeMilliseconds(millis).DateTime;
+                                timestampVal = DateTimeOffset.FromUnixTimeMilliseconds(millis).LocalDateTime;
                             }
                         }
                         catch (Exception ex)
@@ -1603,6 +1603,9 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
         {
             Debug.WriteLine("[UpdateStatus] Session completed, starting auto-download");
             await DownloadSessionInternal();
+            
+            // Notify that new data is available (but don't force refresh to avoid loops)
+            Debug.WriteLine("[UpdateStatus] New session completed - calendar will refresh on next navigation");
         }
     }
 
@@ -1730,7 +1733,7 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
 
                 foreach (var insightElem in insights)
                 {
-                    var date = DateTime.Parse(insightElem.GetProperty("date").GetString() ?? string.Empty);
+                    var date = DateTime.Parse(insightElem.GetProperty("date").GetString() ?? string.Empty, null, System.Globalization.DateTimeStyles.RoundtripKind);
                     var notes = insightElem.GetProperty("notes").GetString() ?? string.Empty;
                     int? mood = null;
                     if (insightElem.TryGetProperty("mood", out var moodElem) && 
