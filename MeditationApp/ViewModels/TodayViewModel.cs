@@ -299,17 +299,23 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
             return;
         }
 
-        // If we're not playing, we need to ensure audio is loaded before playing
+        // If we're not playing, we need to ensure audio is loaded before playing or resuming
         if (TodaySession != null && TodaySession.IsDownloaded && !string.IsNullOrEmpty(TodaySession.LocalAudioPath))
         {
-            // Load audio with metadata before playing
-            await LoadAudioWithMetadata();
-            var success = await _audioPlayerService.PlayFromFileAsync(TodaySession.LocalAudioPath);
-
-            // Show the audio player bottom sheet when playback starts
-            if (success)
+            // If paused and not at start or end, resume
+            if (_audioPlayerService.PlaybackPosition > TimeSpan.Zero && _audioPlayerService.PlaybackPosition < _audioPlayerService.PlaybackDuration)
             {
+                _audioPlayerService.Resume();
                 IsAudioPlayerSheetOpen = true;
+            }
+            else
+            {
+                await LoadAudioWithMetadata();
+                var success = await _audioPlayerService.PlayFromFileAsync(TodaySession.LocalAudioPath);
+                if (success)
+                {
+                    IsAudioPlayerSheetOpen = true;
+                }
             }
         }
         else

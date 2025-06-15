@@ -266,7 +266,14 @@ public partial class DayDetailViewModel : ObservableObject, IAudioPlayerViewMode
             // If we have a currently playing session, resume it
             if (CurrentlyPlayingSession != null && !string.IsNullOrEmpty(CurrentlyPlayingSession.LocalAudioPath))
             {
-                _ = _audioPlayerService.PlayFromFileAsync(CurrentlyPlayingSession.LocalAudioPath);
+                if (_audioPlayerService.PlaybackPosition > TimeSpan.Zero && _audioPlayerService.PlaybackPosition < _audioPlayerService.PlaybackDuration)
+                {
+                    _audioPlayerService.Resume();
+                }
+                else
+                {
+                    _ = _audioPlayerService.PlayFromFileAsync(CurrentlyPlayingSession.LocalAudioPath);
+                }
             }
         }
     }
