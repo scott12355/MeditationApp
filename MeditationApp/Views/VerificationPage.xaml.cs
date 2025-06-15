@@ -1,9 +1,10 @@
 using MeditationApp.Services;
 using MeditationApp.ViewModels;
+using UraniumUI.Pages;
 
 namespace MeditationApp.Views;
 
-public partial class VerificationPage : ContentPage, IQueryAttributable
+public partial class VerificationPage : UraniumContentPage, IQueryAttributable
 {
     private readonly VerificationViewModel _viewModel;
 

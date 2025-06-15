@@ -1,9 +1,10 @@
 using MeditationApp.Services;
 using MeditationApp.ViewModels;
+using UraniumUI.Pages;
 
 namespace MeditationApp.Views;
 
-public partial class LoginPage : ContentPage
+public partial class LoginPage : UraniumContentPage
 {
     private readonly LoginViewModel _viewModel;
 

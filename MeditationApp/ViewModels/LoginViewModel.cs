@@ -23,13 +23,15 @@ public class LoginViewModel : BindableObject
 
     public ICommand LoginCommand { get; }
     public ICommand SignUpCommand { get; }
+    public ICommand ForgotPasswordCommand { get; }
 
     public LoginViewModel(HybridAuthService hybridAuthService)
     {
         _hybridAuthService = hybridAuthService;
         LoginCommand = new Command(async () => await OnLogin());
         SignUpCommand = new Command(async () => await OnSignUp());
-        
+        ForgotPasswordCommand = new Command(async () => await OnForgotPassword());
+
         // Check offline mode on initialization
         _ = Task.Run(async () => IsOfflineMode = await _hybridAuthService.IsOfflineModeAsync());
     }
@@ -45,15 +47,15 @@ public class LoginViewModel : BindableObject
                 Status = "Please enter both email and password";
                 return;
             }
-            
+
             LoadingText = "Signing you in...";
             Status = string.Empty;
-            
+
             var result = await _hybridAuthService.SignInAsync(Email, Password);
             if (result.IsSuccess)
             {
                 LoadingText = "Redirecting...";
-                
+
                 if (result.IsOfflineMode)
                 {
                     Status = "Signed in offline - some features may be limited";
@@ -63,7 +65,7 @@ public class LoginViewModel : BindableObject
                 {
                     await Task.Delay(500); // Brief delay to show success state
                 }
-                
+
                 // Ensure navigation happens on main thread
                 await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
@@ -98,6 +100,12 @@ public class LoginViewModel : BindableObject
     private async Task OnSignUp()
     {
         await Shell.Current.GoToAsync("SignUpPage", animate: true);
+    }
+
+    private async Task OnForgotPassword()
+    {
+        // TODO: Implement forgot password functionality
+        await Shell.Current.DisplayAlert("Forgot Password", "Password reset functionality will be implemented soon.", "OK");
     }
 
     public void ClearFields()

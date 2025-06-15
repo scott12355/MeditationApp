@@ -1,108 +1,290 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:controls="clr-namespace:MeditationApp.Controls"
-             x:Class="MeditationApp.Views.VerificationPage"
-             Shell.NavBarIsVisible="False"
-             Shell.TabBarIsVisible="False"
-             Title="Verify Account">
+<uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                            xmlns:controls="clr-namespace:MeditationApp.Controls"
+                            xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
+                            xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                            xmlns:converters="clr-namespace:MeditationApp.Converters"
+                            xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+                            xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+                            x:Class="MeditationApp.Views.VerificationPage"
+                            Shell.NavBarIsVisible="False"
+                            Title="Verify Account"
+                            BackgroundColor="#EFEBD3">
 
-    <ContentPage.Background>
-        <SolidColorBrush Color="{StaticResource BackgroundColor}"/>
-    </ContentPage.Background>
+    <uranium:UraniumContentPage.Background>
+        <SolidColorBrush Color="#EFEBD3"/>
+    </uranium:UraniumContentPage.Background>
 
-    <Grid RowDefinitions="*,Auto">
-        <VerticalStackLayout
-            Grid.Row="0"
-            Spacing="0"
-            Padding="30,20"
-            VerticalOptions="Start">
+    <uranium:UraniumContentPage.Resources>
+        <!-- Converters -->
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    </uranium:UraniumContentPage.Resources>
 
-            <Label
-                Text="{Binding WelcomeMessage}"
-                TextColor="{StaticResource PrimaryDarkText}"
-                SemanticProperties.HeadingLevel="Level1"
-                FontSize="32"
-                FontAttributes="Bold"
-                HorizontalOptions="Start"
-                Margin="0,0,0,10"/>
+    <Grid BackgroundColor="#EFEBD3">
+        <!-- Decorative abstract shapes for modern look inspired by Headspace -->
+        <Ellipse WidthRequest="300"
+                 HeightRequest="300"
+                 Fill="#15BBDEFB"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"
+                 Margin="-120,50,0,0"
+                 InputTransparent="True"/>
 
-            <Label
-                Text="{Binding EmailMessage}"
-                FontSize="16"
-                TextColor="{StaticResource SecondaryDarkText}"
-                HorizontalOptions="Start"
-                HorizontalTextAlignment="Start"
-                Margin="0,0,0,10"/>
+        <Ellipse WidthRequest="200"
+                 HeightRequest="200"
+                 Fill="#10E1BEE7"
+                 HorizontalOptions="End"
+                 VerticalOptions="Start"
+                 Margin="0,100,-80,0"
+                 InputTransparent="True"/>
 
-            <Label
-                Text="Please check your email for a verification code and enter it below"
-                FontSize="14"
-                TextColor="{StaticResource SecondaryDarkText}"
-                HorizontalOptions="Start"
-                HorizontalTextAlignment="Start"
-                Margin="0,0,0,30"/>
+        <Ellipse WidthRequest="250"
+                 HeightRequest="250"
+                 Fill="#15FFCCBC"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"
+                 Margin="0,0,-100,50"
+                 InputTransparent="True"/>
 
-            <!-- Loading Indicator -->
-            <controls:LoadingIndicator
-                IsLoading="{Binding IsBusy}"
-                LoadingText="{Binding LoadingText}"
-                Margin="0,0,0,0"/>
+        <Ellipse WidthRequest="150"
+                 HeightRequest="150"
+                 Fill="#10B3E5FC"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Margin="-200,0,0,0"
+                 InputTransparent="True"/>
 
+        <!-- Main content -->
+        <VerticalStackLayout Padding="30,20,30,30"
+                             Spacing="0"
+                             VerticalOptions="Start"
+                             MinimumHeightRequest="600">
 
-            <!-- Verification Code -->
-            <controls:CustomEntry
-                Style="{StaticResource ModernCustomEntryStyle}"
-                Text="{Binding Code}"
-                Placeholder="Verification Code"
-                Keyboard="Numeric"
-                MaxLength="6"
-                SemanticProperties.Hint="Enter the 6-digit verification code"/>
+            <!-- Logo and Welcome Section -->
+            <VerticalStackLayout Spacing="15"
+                                 HorizontalOptions="Center"
+                                 Margin="0,20,0,20">
+                
+                <!-- Logo Image -->
+                <Image Source="logo.png"
+                       HeightRequest="80"
+                       WidthRequest="80"
+                       HorizontalOptions="Center"
+                       Opacity="0.9"/>
 
-            <Button
-                Text="Verify Account"
-                Command="{Binding VerifyCommand}"
-                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
-                SemanticProperties.Hint="Verify your account"
-                HorizontalOptions="Fill"
-                Style="{StaticResource ButtonPrimary}"
-                Margin="0,20,0,10"/>
+                <!-- Welcome Text -->
+                <VerticalStackLayout Spacing="5"
+                                     HorizontalOptions="Center">
+                    <Label Text="{Binding WelcomeMessage}"
+                           TextColor="{StaticResource PrimaryDarkText}"
+                           FontSize="32"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Please check your email for a verification code"
+                           FontSize="14"
+                           TextColor="{StaticResource SecondaryDarkText}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
 
-            <Button
-                Text="Resend Code"
-                Command="{Binding ResendCodeCommand}"
-                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
-                SemanticProperties.Hint="Request a new verification code"
-                HorizontalOptions="Fill"
-                BackgroundColor="Transparent"
-                TextColor="#FF71BEF1"
-                BorderColor="#FF71BEF1"
-                BorderWidth="2"
-                FontAttributes="Bold"
-                FontSize="16"
-                CornerRadius="20"
-                Margin="0,5"/>
+            <!-- Verification Form Card -->
+            <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                   BorderColor="{StaticResource GlassyBorder}"
+                   CornerRadius="24"
+                   Padding="25,20"
+                   HasShadow="True"
+                   Margin="0,0,0,15">
+                <Frame.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="0,8"
+                            Radius="20"
+                            Opacity="0.12"/>
+                </Frame.Shadow>
+                <Frame.Effects>
+                    <uranium:BlurEffect Mode="Light"
+                                        AccentOpacity="0.1"/>
+                </Frame.Effects>
+
+                <VerticalStackLayout Spacing="20">
+
+                    <!-- Email Message -->
+                    <Label Text="{Binding EmailMessage}"
+                           FontSize="16"
+                           TextColor="{StaticResource SecondaryDarkText}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,0,0,10"/>
+
+                    <!-- Verification Code -->
+                    <material:TextField Title="Verification Code"
+                                       Text="{Binding Code}"
+                                       Keyboard="Numeric"
+                                       MaxLength="6"
+                                       AccentColor="{StaticResource Primary}"/>
+
+                    <!-- Status and Loading Indicator -->
+                    <Grid HorizontalOptions="Center"
+                          Margin="0,5,0,0">
+                        <Label Text="{Binding Status}"
+                               TextColor="Red"
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"
+                               IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"/>
+                        <controls:LoadingIndicator
+                            IsLoading="{Binding IsBusy}"
+                            LoadingText="{Binding LoadingText}"
+                            IsVisible="{Binding IsBusy}"/>
+                    </Grid>
+
+                    <!-- Verify Button -->
+                    <Frame Padding="0"
+                           CornerRadius="25"
+                           HasShadow="True"
+                           HorizontalOptions="Fill"
+                           HeightRequest="56"
+                           BackgroundColor="{StaticResource Primary}"
+                           BorderColor="Transparent">
+                        <Frame.Shadow>
+                            <Shadow Brush="{StaticResource Primary}"
+                                    Offset="0,6"
+                                    Radius="15"
+                                    Opacity="0.25"/>
+                        </Frame.Shadow>
+                        <Button Text="Verify Account"
+                                Command="{Binding VerifyCommand}"
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                                BackgroundColor="Transparent"
+                                TextColor="White"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                HorizontalOptions="Fill"
+                                VerticalOptions="Fill"
+                                BorderColor="Transparent">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroupList>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Property="Scale"
+                                                        Value="1.0"/>
+                                                <Setter Property="Opacity"
+                                                        Value="1.0"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Property="Scale"
+                                                        Value="0.96"/>
+                                                <Setter Property="Opacity"
+                                                        Value="0.85"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateGroupList>
+                            </VisualStateManager.VisualStateGroups>
+                            <Button.Behaviors>
+                                <toolkit:AnimationBehavior>
+                                    <toolkit:AnimationBehavior.AnimationType>
+                                        <toolkit:FadeAnimation Length="200"/>
+                                    </toolkit:AnimationBehavior.AnimationType>
+                                </toolkit:AnimationBehavior>
+                            </Button.Behaviors>
+                        </Button>
+                    </Frame>
+
+                    <!-- Resend Code Button -->
+                    <Frame Padding="0"
+                           CornerRadius="25"
+                           HasShadow="True"
+                           HorizontalOptions="Fill"
+                           HeightRequest="50"
+                           BackgroundColor="Transparent"
+                           BorderColor="{StaticResource Primary}">
+                        <Frame.Shadow>
+                            <Shadow Brush="Black"
+                                    Offset="0,4"
+                                    Radius="12"
+                                    Opacity="0.08"/>
+                        </Frame.Shadow>
+                        <Button Text="Resend Code"
+                                Command="{Binding ResendCodeCommand}"
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource Primary}"
+                                FontSize="16"
+                                FontAttributes="Bold"
+                                HorizontalOptions="Fill"
+                                VerticalOptions="Fill"
+                                BorderColor="Transparent">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroupList>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Property="Scale"
+                                                        Value="1.0"/>
+                                                <Setter Property="Opacity"
+                                                        Value="1.0"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Property="Scale"
+                                                        Value="0.96"/>
+                                                <Setter Property="Opacity"
+                                                        Value="0.85"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateGroupList>
+                            </VisualStateManager.VisualStateGroups>
+                            <Button.Behaviors>
+                                <toolkit:AnimationBehavior>
+                                    <toolkit:AnimationBehavior.AnimationType>
+                                        <toolkit:FadeAnimation Length="200"/>
+                                    </toolkit:AnimationBehavior.AnimationType>
+                                </toolkit:AnimationBehavior>
+                            </Button.Behaviors>
+                        </Button>
+                    </Frame>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Back to Login Section -->
+            <Frame BackgroundColor="#60E3F0FF"
+                   BorderColor="#40FFFFFF"
+                   CornerRadius="16"
+                   Padding="15,10"
+                   HasShadow="True"
+                   HorizontalOptions="Center">
+                <Frame.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="0,4"
+                            Radius="12"
+                            Opacity="0.06"/>
+                </Frame.Shadow>
+                <StackLayout Orientation="Horizontal"
+                             HorizontalOptions="Center">
+                    <Label Text="Need to go back? "
+                           TextColor="{StaticResource SecondaryDarkText}"
+                           FontSize="14"
+                           VerticalOptions="Center"/>
+                    <Label Text="Back to Login"
+                           TextColor="{StaticResource Primary}"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding BackToLoginCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </Frame>
 
         </VerticalStackLayout>
-
-        <!-- Back to login text anchored to bottom -->
-        <StackLayout Grid.Row="1"
-                     Orientation="Horizontal"
-                     HorizontalOptions="Center"
-                     Margin="0,0,0,30">
-            <Label Text="Need to go back? "
-                   TextColor="{StaticResource SecondaryDarkText}"
-                   FontSize="14"/>
-            <Label Text="Back to Login"
-                   TextColor="#FF71BEF1"
-                   FontSize="14"
-                   FontAttributes="Bold"
-                   SemanticProperties.Description="Tap to go back to login">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding BackToLoginCommand}"/>
-                </Label.GestureRecognizers>
-            </Label>
-        </StackLayout>
-
     </Grid>
-</ContentPage>
+</uranium:UraniumContentPage>

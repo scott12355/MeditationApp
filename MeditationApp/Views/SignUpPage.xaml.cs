@@ -1,10 +1,11 @@
 using MeditationApp.Services;
 using MeditationApp.ViewModels;
 using Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;
+using UraniumUI.Pages;
 
 namespace MeditationApp.Views;
 
-public partial class SignUpPage : ContentPage
+public partial class SignUpPage : UraniumContentPage
 {
     private readonly SignUpViewModel _viewModel;
 

@@ -1,162 +1,263 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:controls="clr-namespace:MeditationApp.Controls"
-             x:Class="MeditationApp.Views.SignUpPage"
-             NavigationPage.HasNavigationBar="True"
-             NavigationPage.HasBackButton="True"
-             Shell.NavBarIsVisible="False"
-             Shell.TabBarIsVisible="False"
-             Title="Sign Up">
+<uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                            xmlns:controls="clr-namespace:MeditationApp.Controls"
+                            xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
+                            xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+                            xmlns:converters="clr-namespace:MeditationApp.Converters"
+                            xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+                            xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+                            x:Class="MeditationApp.Views.SignUpPage"
+                            Shell.NavBarIsVisible="False"
+                            Title="Sign Up"
+                            BackgroundColor="#EFEBD3">
 
-    <ContentPage.Background>
-        <SolidColorBrush Color="{StaticResource BackgroundColor}"/>
-    </ContentPage.Background>
+    <uranium:UraniumContentPage.Background>
+        <SolidColorBrush Color="#EFEBD3"/>
+    </uranium:UraniumContentPage.Background>
 
-    <Grid RowDefinitions="*,Auto">
-        <ScrollView Grid.Row="0">
-            <VerticalStackLayout
-                Spacing="-10"
-                Padding="30,20"
-                VerticalOptions="Start"
-                HorizontalOptions="Fill">
+    <uranium:UraniumContentPage.Resources>
+        <!-- Converters -->
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    </uranium:UraniumContentPage.Resources>
 
-                <Label
-                    Text="Create Your Account"
-                    TextColor="{StaticResource PrimaryDarkText}"
-                    SemanticProperties.HeadingLevel="Level1"
-                    FontSize="32"
-                    FontAttributes="Bold"
-                    HorizontalOptions="Start"
-                    Margin="0,0,0,10"/>
+    <Grid BackgroundColor="#EFEBD3">
+        <!-- Decorative abstract shapes for modern look inspired by Headspace -->
+        <Ellipse WidthRequest="300"
+                 HeightRequest="300"
+                 Fill="#15BBDEFB"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"
+                 Margin="-120,50,0,0"
+                 InputTransparent="True"/>
 
-                <Label
-                    Text="Please fill in your details"
-                    FontSize="16"
-                    TextColor="{StaticResource SecondaryDarkText}"
-                    HorizontalOptions="Start"
-                    Margin="0,0,0,30"/>
+        <Ellipse WidthRequest="200"
+                 HeightRequest="200"
+                 Fill="#10E1BEE7"
+                 HorizontalOptions="End"
+                 VerticalOptions="Start"
+                 Margin="0,100,-80,0"
+                 InputTransparent="True"/>
 
-                <!-- Loading Indicator -->
-                <controls:LoadingIndicator
-                    IsLoading="{Binding IsBusy}"
-                    LoadingText="{Binding LoadingText}"
-                    Margin="0,0,0,10"/>
+        <Ellipse WidthRequest="250"
+                 HeightRequest="250"
+                 Fill="#15FFCCBC"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"
+                 Margin="0,0,-100,50"
+                 InputTransparent="True"/>
 
-                <!-- Name fields in a horizontal layout -->
-                <Grid ColumnDefinitions="*,10,*"
-                      RowDefinitions="Auto"
-                      HorizontalOptions="Fill">
-                    <controls:CustomEntry
-                        Grid.Column="0"
-                        Style="{StaticResource ModernCustomEntryStyle}"
-                        Text="{Binding FirstName}"
-                        Placeholder="First Name"
-                        SemanticProperties.Hint="Enter your first name"/>
+        <Ellipse WidthRequest="150"
+                 HeightRequest="150"
+                 Fill="#10B3E5FC"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Margin="-200,0,0,0"
+                 InputTransparent="True"/>
 
-                    <controls:CustomEntry
-                        Grid.Column="2"
-                        Style="{StaticResource ModernCustomEntryStyle}"
-                        Text="{Binding SecondName}"
-                        Placeholder="Last Name"
-                        SemanticProperties.Hint="Enter your last name"/>
-                </Grid>
+        <!-- Main content -->
+        <VerticalStackLayout Padding="30,20,30,30"
+                             Spacing="0"
+                             VerticalOptions="Start"
+                             MinimumHeightRequest="600">
 
-                <!-- Email -->
-                <controls:CustomEntry
-                    Style="{StaticResource ModernCustomEntryStyle}"
-                    Text="{Binding Email}"
-                    Placeholder="Email"
-                    Keyboard="Email"
-                    HasError="{Binding HasEmailError}"
-                    SemanticProperties.Hint="Enter your email address"/>
+            <!-- Logo and Welcome Section -->
+            <VerticalStackLayout Spacing="15"
+                                 HorizontalOptions="Center"
+                                 Margin="0,20,0,20">
+                
+                <!-- Logo Image -->
+                <Image Source="logo.png"
+                       HeightRequest="80"
+                       WidthRequest="80"
+                       HorizontalOptions="Center"
+                       Opacity="0.9"/>
 
-                <!-- Email Error Message -->
-                <Label
-                    Text="Please enter a valid email address"
-                    FontSize="12"
-                    TextColor="Red"
-                    HorizontalOptions="Start"
-                    Margin="5,2,0,0"
-                    IsVisible="{Binding HasEmailError}"/>
-
-                <!-- Password -->
-                <controls:CustomEntry
-                    Style="{StaticResource ModernCustomEntryStyle}"
-                    Text="{Binding Password}"
-                    Placeholder="Password"
-                    IsPassword="True"
-                    HasError="{Binding HasPasswordError}"
-                    SemanticProperties.Hint="Enter your password"/>
-
-                <!-- Password Error Message -->
-                <Label
-                    Text="{Binding PasswordErrorMessage}"
-                    FontSize="12"
-                    TextColor="Red"
-                    HorizontalOptions="Start"
-                    Margin="5,2,0,0"
-                    IsVisible="{Binding HasPasswordError}"/>
-
-
-                <!-- Confirm Password -->
-                <controls:CustomEntry
-                    Style="{StaticResource ModernCustomEntryStyle}"
-                    Text="{Binding ConfirmPassword}"
-                    Placeholder="Confirm Password"
-                    IsPassword="True"
-                    HasError="{Binding HasConfirmPasswordError}"
-                    SemanticProperties.Hint="Confirm your password"/>
-
-                <!-- Confirm Password Error Message -->
-                <Label
-                    Text="Passwords do not match"
-                    FontSize="12"
-                    TextColor="Red"
-                    HorizontalOptions="Start"
-                    Margin="5,2,0,0"
-                    IsVisible="{Binding HasConfirmPasswordError}"/>
-                <!-- Password Requirements -->
-                <!-- <Label -->
-                <!--     Text="Password must be at least 8 characters long and contain at least one special character" -->
-                <!--     FontSize="13" -->
-                <!--     TextColor="{StaticResource SecondaryDarkText}" -->
-                <!--     HorizontalOptions="Start" -->
-                <!--     Margin="5,5,0,0" -->
-                <!--     LineBreakMode="WordWrap" -->
-                <!--     SemanticProperties.Description="Password requirements information"/> -->
-
-
-                <Button
-                    Text="Create Account"
-                    Command="{Binding SignUpCommand}"
-                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
-                    SemanticProperties.Hint="Creates your account"
-                    HorizontalOptions="Fill"
-                    Style="{StaticResource ButtonPrimary}"
-                    Margin="0,70,0,10"/>
-
+                <!-- Welcome Text -->
+                <VerticalStackLayout Spacing="5"
+                                     HorizontalOptions="Center">
+                    <Label Text="Create Account"
+                           TextColor="{StaticResource PrimaryDarkText}"
+                           FontSize="32"
+                           FontAttributes="Bold"
+                           HorizontalOptions="Center"/>
+                    <Label Text="Please fill in your details"
+                           FontSize="14"
+                           TextColor="{StaticResource SecondaryDarkText}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
             </VerticalStackLayout>
-        </ScrollView>
 
-        <!-- Back to login text anchored to bottom -->
-        <StackLayout Grid.Row="1"
-                     Orientation="Horizontal"
-                     HorizontalOptions="Center"
-                     Margin="0,0,0,30">
-            <Label Text="Already have an account? "
-                   TextColor="{StaticResource SecondaryDarkText}"
-                   FontSize="14"/>
-            <Label Text="Sign in"
-                   TextColor="#FF71BEF1"
-                   FontSize="14"
-                   FontAttributes="Bold"
-                   SemanticProperties.Description="Tap to go back to login">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding BackToLoginCommand}"/>
-                </Label.GestureRecognizers>
-            </Label>
-        </StackLayout>
+            <!-- Sign Up Form Card -->
+            <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                   BorderColor="{StaticResource GlassyBorder}"
+                   CornerRadius="24"
+                   Padding="25,20"
+                   HasShadow="True"
+                   Margin="0,0,0,15">
+                <Frame.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="0,8"
+                            Radius="20"
+                            Opacity="0.12"/>
+                </Frame.Shadow>
+                <Frame.Effects>
+                    <uranium:BlurEffect Mode="Light"
+                                        AccentOpacity="0.1"/>
+                </Frame.Effects>
 
+                <VerticalStackLayout Spacing="20">
+
+                    <!-- Name fields in a horizontal layout -->
+                    <Grid ColumnDefinitions="*,10,*"
+                          RowDefinitions="Auto"
+                          HorizontalOptions="Fill">
+                        <material:TextField
+                            Grid.Column="0"
+                            Title="First Name"
+                            Text="{Binding FirstName}"
+                            AccentColor="{StaticResource Primary}"/>
+
+                        <material:TextField
+                            Grid.Column="2"
+                            Title="Last Name"
+                            Text="{Binding SecondName}"
+                            AccentColor="{StaticResource Primary}"/>
+                    </Grid>
+
+                    <!-- Email -->
+                    <material:TextField Title="Email"
+                                       Text="{Binding Email}"
+                                       Keyboard="Email"
+                                       AccentColor="{StaticResource Primary}"
+                                       AllowClear="True"/>
+
+                    <!-- Password -->
+                    <material:TextField Title="Password"
+                                       Text="{Binding Password}"
+                                       IsPassword="True"
+                                       AccentColor="{StaticResource Primary}">
+                        <material:TextField.Attachments>
+                            <material:TextFieldPasswordShowHideAttachment />
+                        </material:TextField.Attachments>
+                    </material:TextField>
+
+                    <!-- Confirm Password -->
+                    <material:TextField Title="Confirm Password"
+                                       Text="{Binding ConfirmPassword}"
+                                       IsPassword="True"
+                                       AccentColor="{StaticResource Primary}">
+                        <material:TextField.Attachments>
+                            <material:TextFieldPasswordShowHideAttachment />
+                        </material:TextField.Attachments>
+                    </material:TextField>
+
+                    <!-- Status and Loading Indicator -->
+                    <Grid HorizontalOptions="Center"
+                          Margin="0,5,0,0">
+                        <Label Text="{Binding Status}"
+                               TextColor="Red"
+                               FontSize="14"
+                               HorizontalOptions="Center"
+                               HorizontalTextAlignment="Center"
+                               IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"/>
+                        <controls:LoadingIndicator
+                            IsLoading="{Binding IsBusy}"
+                            LoadingText="{Binding LoadingText}"
+                            IsVisible="{Binding IsBusy}"/>
+                    </Grid>
+
+                    <!-- Sign Up Button -->
+                    <Frame Padding="0"
+                           CornerRadius="25"
+                           HasShadow="True"
+                           HorizontalOptions="Fill"
+                           HeightRequest="56"
+                           BackgroundColor="{StaticResource Primary}"
+                           BorderColor="Transparent">
+                        <Frame.Shadow>
+                            <Shadow Brush="{StaticResource Primary}"
+                                    Offset="0,6"
+                                    Radius="15"
+                                    Opacity="0.25"/>
+                        </Frame.Shadow>
+                        <Button Text="Create Account"
+                                Command="{Binding SignUpCommand}"
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                                BackgroundColor="Transparent"
+                                TextColor="White"
+                                FontSize="18"
+                                FontAttributes="Bold"
+                                HorizontalOptions="Fill"
+                                VerticalOptions="Fill"
+                                BorderColor="Transparent">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroupList>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal">
+                                            <VisualState.Setters>
+                                                <Setter Property="Scale"
+                                                        Value="1.0"/>
+                                                <Setter Property="Opacity"
+                                                        Value="1.0"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                        <VisualState x:Name="Pressed">
+                                            <VisualState.Setters>
+                                                <Setter Property="Scale"
+                                                        Value="0.96"/>
+                                                <Setter Property="Opacity"
+                                                        Value="0.85"/>
+                                            </VisualState.Setters>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                </VisualStateGroupList>
+                            </VisualStateManager.VisualStateGroups>
+                            <Button.Behaviors>
+                                <toolkit:AnimationBehavior>
+                                    <toolkit:AnimationBehavior.AnimationType>
+                                        <toolkit:FadeAnimation Length="200"/>
+                                    </toolkit:AnimationBehavior.AnimationType>
+                                </toolkit:AnimationBehavior>
+                            </Button.Behaviors>
+                        </Button>
+                    </Frame>
+
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Sign In Section -->
+            <Frame BackgroundColor="#60E3F0FF"
+                   BorderColor="#40FFFFFF"
+                   CornerRadius="16"
+                   Padding="15,10"
+                   HasShadow="True"
+                   HorizontalOptions="Center">
+                <Frame.Shadow>
+                    <Shadow Brush="Black"
+                            Offset="0,4"
+                            Radius="12"
+                            Opacity="0.06"/>
+                </Frame.Shadow>
+                <StackLayout Orientation="Horizontal"
+                             HorizontalOptions="Center">
+                    <Label Text="Already have an account? "
+                           TextColor="{StaticResource SecondaryDarkText}"
+                           FontSize="14"
+                           VerticalOptions="Center"/>
+                    <Label Text="Sign in"
+                           TextColor="{StaticResource Primary}"
+                           FontSize="14"
+                           FontAttributes="Bold"
+                           VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding BackToLoginCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </StackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
     </Grid>
-</ContentPage>
+</uranium:UraniumContentPage>

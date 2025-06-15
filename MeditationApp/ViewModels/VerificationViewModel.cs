@@ -37,7 +37,7 @@ public class VerificationViewModel : BindableObject
         _cognitoAuthService = cognitoAuthService;
         VerifyCommand = new Command(async () => await OnVerify());
         ResendCodeCommand = new Command(async () => await OnResendCode());
-        BackToLoginCommand = new Command(async () => await Shell.Current.GoToAsync("..", animate: true));
+        BackToLoginCommand = new Command(async () => await Shell.Current.GoToAsync("///LoginPage", animate: true));
     }
 
     private async Task OnVerify()
@@ -51,10 +51,10 @@ public class VerificationViewModel : BindableObject
                 Status = "Please enter the verification code";
                 return;
             }
-            
+
             LoadingText = "Verifying your account...";
             Status = string.Empty;
-            
+
             var result = await _cognitoAuthService.ConfirmSignUpAsync(Username, Code);
             if (result)
             {
@@ -68,10 +68,10 @@ public class VerificationViewModel : BindableObject
                         await SecureStorage.Default.SetAsync("access_token", response.AccessToken ?? string.Empty);
                         await SecureStorage.Default.SetAsync("id_token", response.IdToken ?? string.Empty);
                         await SecureStorage.Default.SetAsync("refresh_token", response.RefreshToken ?? string.Empty);
-                        
+
                         LoadingText = "Redirecting...";
                         await Task.Delay(500); // Brief delay to show success state
-                        
+
                         // Ensure navigation happens on main thread
                         await MainThread.InvokeOnMainThreadAsync(async () =>
                         {
@@ -120,7 +120,7 @@ public class VerificationViewModel : BindableObject
         {
             LoadingText = "Resending verification code...";
             Status = string.Empty;
-            
+
             var result = await _cognitoAuthService.ResendConfirmationCodeAsync(Username);
             if (result)
             {
