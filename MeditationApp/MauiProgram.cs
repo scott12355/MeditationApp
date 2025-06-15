@@ -72,7 +72,7 @@ public static class MauiProgram
 
         // Register local authentication service
         builder.Services.AddSingleton<LocalAuthService>();
-        
+
         // Register hybrid authentication service with all dependencies
         builder.Services.AddSingleton<HybridAuthService>(provider =>
         {
@@ -116,7 +116,8 @@ public static class MauiProgram
                 provider.GetRequiredService<IAudioDownloadService>(),
                 provider.GetRequiredService<SessionStatusPoller>(),
                 provider.GetRequiredService<AudioPlayerService>(),
-                provider.GetRequiredService<DatabaseSyncService>()
+                provider.GetRequiredService<DatabaseSyncService>(),
+                provider.GetRequiredService<MoodChartService>()
             )
         );
 
@@ -172,15 +173,23 @@ public static class MauiProgram
             return new DatabaseSyncService(database, graphQLService, localAuthService, calendarDataService, cognitoAuthService);
         });
 
+        // Register MoodChartService
+        builder.Services.AddSingleton<MoodChartService>(provider =>
+        {
+            var database = provider.GetRequiredService<MeditationSessionDatabase>();
+            var cognitoAuthService = provider.GetRequiredService<CognitoAuthService>();
+            return new MoodChartService(database, cognitoAuthService);
+        });
+
         // Register NotificationService
         builder.Services.AddSingleton<MeditationApp.Services.NotificationService>();
-        
+
         // Register Plugin.Maui.Audio
         builder.Services.AddSingleton(AudioManager.Current);
-        
+
         // Configure MediaManager for enhanced metadata support
         builder.Services.AddSingleton(CrossMediaManager.Current);
-        
+
         // Register SessionStatusPoller
         builder.Services.AddSingleton<SessionStatusPoller>(provider =>
         {
@@ -188,7 +197,7 @@ public static class MauiProgram
             var sessionDatabase = provider.GetRequiredService<MeditationSessionDatabase>();
             return new SessionStatusPoller(graphQLService, sessionDatabase);
         });
-        
+
         // Register AudioPlayerService with Plugin.Maui.Audio dependency
         builder.Services.AddSingleton<AudioPlayerService>(provider =>
         {

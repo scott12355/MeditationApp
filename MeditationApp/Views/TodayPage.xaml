@@ -296,21 +296,21 @@
         <ScrollView Grid.Row="0"
                     x:Name="MainScrollView">
             <VerticalStackLayout Padding="20,20,20,180"
-                                 Spacing="20">
+                                 Spacing="0">
                 <!-- Header Section -->
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="{Binding FormattedDate}"
-                           Style="{StaticResource SubHeadline}"
-                           HorizontalOptions="Center"
-                           TextColor="Black"/>
-                    <!-- <Label Text="{Binding WelcomeMessage}" -->
-                    <!--        Style="{StaticResource Headline}" -->
-                    <!--        HorizontalOptions="Center"/> -->
-                </VerticalStackLayout>
+                <!-- <VerticalStackLayout Spacing="10"> -->
+                <!--     ~1~ <Label Text="{Binding FormattedDate}" @1@ -->
+                <!--     ~1~        Style="{StaticResource SubHeadline}" @1@ -->
+                <!--     ~1~        HorizontalOptions="Center" @1@ -->
+                <!--     ~1~        TextColor="Black"/> @1@ -->
+                <!--     ~1~ <Label Text="{Binding WelcomeMessage}" @1@ -->
+                <!--     ~1~        Style="{StaticResource Headline}" @1@ -->
+                <!--     ~1~        HorizontalOptions="Center"/> @1@ -->
+                <!-- </VerticalStackLayout> -->
 
                 <!-- Mood Selector -->
                 <VerticalStackLayout Spacing="10"
-                                     Padding="0,0,0,-20">
+                                     Padding="0,0,0,-10">
                     <Label Text="How are you feeling today?"
                            HorizontalOptions="Center"
                            FontAttributes="Bold"
@@ -1041,6 +1041,9 @@
 
                 </VerticalStackLayout>
 
+                <!-- Mood Chart -->
+                <controls:MoodChartView MoodData="{Binding MoodData}"/>
+                
                 <!-- Past Sessions Button -->
                 <Frame Padding="0"
                        CornerRadius="30"

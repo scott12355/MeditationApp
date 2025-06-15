@@ -131,7 +131,7 @@ public partial class ProfilePage : ContentPage
                 LastName = lastName,
                 LastUpdated = DateTime.UtcNow
             };
-            
+
             // Store the updated profile locally
             var localService = new LocalAuthService();
             await localService.StoreUserProfileAsync(profile);
@@ -169,7 +169,7 @@ public partial class ProfilePage : ContentPage
                     {
                         await SecureStorage.Default.SetAsync("refresh_token", refreshResult.RefreshToken);
                     }
-                    
+
                     await LoadOnlineUserProfile(refreshResult.AccessToken ?? string.Empty);
                     return;
                 }
@@ -191,7 +191,7 @@ public partial class ProfilePage : ContentPage
                 await ClearTokensAndNavigateToLogin();
                 return;
             }
-            
+
             // Refresh failed - show offline data if available
             var localProfile = await _hybridAuthService.GetUserProfileAsync();
             if (localProfile != null)
@@ -217,7 +217,7 @@ public partial class ProfilePage : ContentPage
                 await ClearTokensAndNavigateToLogin();
                 return;
             }
-            
+
             // Show offline data if available
             var localProfile = await _hybridAuthService.GetUserProfileAsync();
             if (localProfile != null)
@@ -250,7 +250,7 @@ public partial class ProfilePage : ContentPage
     {
         if (string.IsNullOrEmpty(errorMessage))
             return false;
-            
+
         var message = errorMessage.ToLowerInvariant();
         return message.Contains("refresh token") && message.Contains("expired") ||
                message.Contains("refresh token") && message.Contains("invalid") ||

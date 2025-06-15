@@ -36,9 +36,9 @@
 
         <ScrollView>
             <VerticalStackLayout
-                Spacing="25"
-                Padding="30,40"
-                VerticalOptions="Center">
+                Spacing="20"
+                Padding="30,10"
+                VerticalOptions="Start">
 
                 <Image
                     Source="logo.png"
@@ -69,8 +69,8 @@
                            HorizontalOptions="Center"/>
                 </Frame>
 
-                <Frame BackgroundColor="{StaticResource GlassyWhite}"
-                       BorderColor="{StaticResource GlassyBorder}"
+                <Frame BackgroundColor="{StaticResource White}"
+                       BorderColor="{StaticResource GlassyWhite}"
                        CornerRadius="20"
                        Padding="20"
                        HasShadow="True"

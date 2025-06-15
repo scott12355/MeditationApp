@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:services="clr-namespace:MeditationApp.Services"
+             x:Class="MeditationApp.Controls.MoodChartView">
+    
+    <ContentView.Resources>
+        <ResourceDictionary>
+            <Color x:Key="ChartBackground">#F8F9FA</Color>
+            <Color x:Key="ChartBorder">#E9ECEF</Color>
+            <Color x:Key="ChartGrid">#DEE2E6</Color>
+            <Color x:Key="Mood1Color">#FF6B6B</Color>
+            <Color x:Key="Mood2Color">#FFA07A</Color>
+            <Color x:Key="Mood3Color">#FFD93D</Color>
+            <Color x:Key="Mood4Color">#6BCF7F</Color>
+            <Color x:Key="Mood5Color">#4ECDC4</Color>
+            <Color x:Key="NoDataColor">#E9ECEF</Color>
+        </ResourceDictionary>
+    </ContentView.Resources>
+
+    <Frame BackgroundColor="{StaticResource GlassyWhite}"
+           BorderColor="{StaticResource GlassyBorder}"
+           CornerRadius="20"
+           Padding="20"
+           HasShadow="True"
+           Margin="0,10">
+        <Frame.Shadow>
+            <Shadow Brush="Black"
+                    Offset="0,4"
+                    Radius="12"
+                    Opacity="0.1"/>
+        </Frame.Shadow>
+        
+        <VerticalStackLayout Spacing="15">
+            <Label Text="7-Day Mood Overview"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="Black"/>
+            
+            <GraphicsView x:Name="ChartGraphicsView"
+                         HeightRequest="200"
+                         BackgroundColor="Transparent"/>
+            
+            <!-- Day labels -->
+            <HorizontalStackLayout x:Name="DayLabelsContainer"
+                                   HorizontalOptions="Center"
+                                   Spacing="10"/>
+        </VerticalStackLayout>
+    </Frame>
+</ContentView> 
