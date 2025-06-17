@@ -497,6 +497,19 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
             return;
         }
 
+        // Check if there's already a completed session for today
+        if (TodaySession?.Status == MeditationSessionStatus.COMPLETED)
+        {
+            var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (page != null)
+            {
+                await page.DisplayAlert("Session Already Exists",
+                    "You already have a completed meditation session for today. You can play it using the button above.",
+                    "OK");
+            }
+            return;
+        }
+
         try
         {
             IsRequestingSession = true;
@@ -1318,7 +1331,40 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
             }
         }
 
-        TodaySession = sessions.FirstOrDefault();
+        // Prioritize completed sessions over failed ones when multiple sessions exist for today
+        MeditationSession? selectedSession = null;
+        if (sessions.Count > 1)
+        {
+            // If multiple sessions exist, prioritize by status: COMPLETED > REQUESTED > FAILED
+            var completedSession = sessions.FirstOrDefault(s => s.Status == MeditationSessionStatus.COMPLETED);
+            if (completedSession != null)
+            {
+                selectedSession = completedSession;
+                Debug.WriteLine($"[LoadLocal] Multiple sessions found, selected COMPLETED session: {completedSession.Uuid}");
+            }
+            else
+            {
+                var requestedSession = sessions.FirstOrDefault(s => s.Status == MeditationSessionStatus.REQUESTED);
+                if (requestedSession != null)
+                {
+                    selectedSession = requestedSession;
+                    Debug.WriteLine($"[LoadLocal] Multiple sessions found, selected REQUESTED session: {requestedSession.Uuid}");
+                }
+                else
+                {
+                    // If only failed sessions exist, use the first one
+                    selectedSession = sessions.FirstOrDefault();
+                    Debug.WriteLine($"[LoadLocal] Multiple sessions found, all failed, selected first: {selectedSession?.Uuid}");
+                }
+            }
+        }
+        else
+        {
+            // Single session or no sessions
+            selectedSession = sessions.FirstOrDefault();
+        }
+
+        TodaySession = selectedSession;
         HasTodaySession = TodaySession != null;
         Debug.WriteLine($"[LoadLocal] TodaySession set to: {(TodaySession != null ? $"UUID: {TodaySession.Uuid}, Status: {TodaySession.Status}" : "null")}");
 

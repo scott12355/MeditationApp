@@ -8,7 +8,14 @@
                             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                             x:Class="MeditationApp.Views.TodayPage"
+                            Title="Today"
                             Shell.NavBarIsVisible="False">
+    <ContentPage.Padding>
+        <OnPlatform x:TypeArguments="Thickness">
+            <On Platform="iOS" Value="0,0,0,-30" />
+            <On Platform="Android" Value="0,0,0,20" />
+        </OnPlatform>
+    </ContentPage.Padding>
 
     <uranium:UraniumContentPage.Resources>
         <!-- Converters -->
@@ -61,242 +68,13 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Decorative abstract shapes for modern look -->
-        <Ellipse x:Name="Orb1"
-                 WidthRequest="300"
-                 HeightRequest="300"
-                 Fill="#15BBDEFB"
-                 HorizontalOptions="Start"
-                 VerticalOptions="Start"
-                 Margin="-120,-120,0,0"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="25"
-                                                     FloatRangeY="20"
-                                                     Duration="10000"
-                                                     Delay="0"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-        <Ellipse x:Name="Orb2"
-                 WidthRequest="200"
-                 HeightRequest="200"
-                 Fill="#1BE1BEE7"
-                 HorizontalOptions="End"
-                 VerticalOptions="Start"
-                 Margin="0,-80,-80,0"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="30"
-                                                     FloatRangeY="25"
-                                                     Duration="12000"
-                                                     Delay="2000"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-        <Ellipse x:Name="Orb3"
-                 WidthRequest="250"
-                 HeightRequest="250"
-                 Fill="#27FFCCBC"
-                 HorizontalOptions="End"
-                 VerticalOptions="End"
-                 Margin="0,0,-100,-100"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="35"
-                                                     FloatRangeY="30"
-                                                     Duration="15000"
-                                                     Delay="4000"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-        <Ellipse x:Name="Orb4"
-                 WidthRequest="150"
-                 HeightRequest="150"
-                 Fill="#19B3E5FC"
-                 HorizontalOptions="Center"
-                 VerticalOptions="Center"
-                 Margin="-200,200,0,0"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="20"
-                                                     FloatRangeY="15"
-                                                     Duration="8000"
-                                                     Delay="6000"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-        <Ellipse x:Name="Orb5"
-                 WidthRequest="180"
-                 HeightRequest="180"
-                 Fill="#20FFAB91"
-                 HorizontalOptions="Start"
-                 VerticalOptions="End"
-                 Margin="-60,0,0,-60"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="28"
-                                                     FloatRangeY="22"
-                                                     Duration="11000"
-                                                     Delay="3000"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-        <Ellipse x:Name="Orb6"
-                 WidthRequest="120"
-                 HeightRequest="120"
-                 Fill="#22FFD54F"
-                 HorizontalOptions="Center"
-                 VerticalOptions="Start"
-                 Margin="150,-40,0,0"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="18"
-                                                     FloatRangeY="12"
-                                                     Duration="9000"
-                                                     Delay="8000"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-        <Ellipse x:Name="Orb7"
-                 WidthRequest="160"
-                 HeightRequest="160"
-                 Fill="#18FF8A65"
-                 HorizontalOptions="Center"
-                 VerticalOptions="Center"
-                 Margin="0,0,0,0"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="22"
-                                                     FloatRangeY="18"
-                                                     Duration="13000"
-                                                     Delay="5000"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-        <Ellipse x:Name="Orb8"
-                 WidthRequest="90"
-                 HeightRequest="90"
-                 Fill="#25C8E6C9"
-                 HorizontalOptions="Start"
-                 VerticalOptions="Start"
-                 Margin="50,100,0,0"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="15"
-                                                     FloatRangeY="10"
-                                                     Duration="7000"
-                                                     Delay="1000"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-        <Ellipse x:Name="Orb9"
-                 WidthRequest="110"
-                 HeightRequest="110"
-                 Fill="#20FFE082"
-                 HorizontalOptions="End"
-                 VerticalOptions="Center"
-                 Margin="0,100,-30,0"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="16"
-                                                     FloatRangeY="14"
-                                                     Duration="10500"
-                                                     Delay="3500"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-        <Ellipse x:Name="Orb10"
-                 WidthRequest="75"
-                 HeightRequest="75"
-                 Fill="#30F8BBD9"
-                 HorizontalOptions="Center"
-                 VerticalOptions="Start"
-                 Margin="-100,80,0,0"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="12"
-                                                     FloatRangeY="8"
-                                                     Duration="6500"
-                                                     Delay="7500"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-        <Ellipse x:Name="Orb11"
-                 WidthRequest="140"
-                 HeightRequest="140"
-                 Fill="#22B39DDB"
-                 HorizontalOptions="Start"
-                 VerticalOptions="Center"
-                 Margin="-50,-150,0,0"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="24"
-                                                     FloatRangeY="20"
-                                                     Duration="14000"
-                                                     Delay="2500"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-        <Ellipse x:Name="Orb12"
-                 WidthRequest="95"
-                 HeightRequest="95"
-                 Fill="#28FF7043"
-                 HorizontalOptions="End"
-                 VerticalOptions="End"
-                 Margin="0,-50,-150,0"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="14"
-                                                     FloatRangeY="11"
-                                                     Duration="8500"
-                                                     Delay="4500"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-
-
-        <Ellipse x:Name="Orb14"
-                 WidthRequest="125"
-                 HeightRequest="125"
-                 Fill="#1F81C784"
-                 HorizontalOptions="Start"
-                 VerticalOptions="End"
-                 Margin="120,0,0,-80"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="20"
-                                                     FloatRangeY="16"
-                                                     Duration="12500"
-                                                     Delay="1500"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-
-
-        <Ellipse x:Name="Orb16"
-                 WidthRequest="105"
-                 HeightRequest="105"
-                 Fill="#26E1BEE7"
-                 HorizontalOptions="Center"
-                 VerticalOptions="Center"
-                 Margin="-180,-100,0,0"
-                 InputTransparent="True">
-            <Ellipse.Behaviors>
-                <behaviors:FloatingAnimationBehavior FloatRangeX="17"
-                                                     FloatRangeY="13"
-                                                     Duration="9500"
-                                                     Delay="8500"/>
-            </Ellipse.Behaviors>
-        </Ellipse>
-
-
 
         <!-- Main content -->
         <ScrollView Grid.Row="0"
-                    x:Name="MainScrollView">
-            <VerticalStackLayout Padding="20,20,20,180"
-                                 Spacing="0">
+                    x:Name="MainScrollView"
+                    Padding="0">
+            <VerticalStackLayout Padding="20,0,20,3"
+                                 Spacing="20">
                 <!-- Header Section -->
                 <!-- <VerticalStackLayout Spacing="10"> -->
                 <!--     ~1~ <Label Text="{Binding FormattedDate}" @1@ -->
@@ -1114,16 +892,18 @@
                                   IsPresented="{Binding IsAudioPlayerSheetOpen, Mode=TwoWay}"
                                   DisablePageWhenOpened="False"
                                   CloseOnTapOutside="True"
-                                  BackgroundColor="Transparent">
+                                  BackgroundColor="Transparent"
+                                  Margin="0,0,0,10">
             <material:BottomSheetView.Header>
                 <!-- Custom Header with Handle and Metadata -->
                 <Border StrokeShape="RoundRectangle 32"
-                        Margin="16,10,16,0"
+                        Margin="16,0,16,0"
                         Padding="0">
                     <Border.GestureRecognizers>
                         <PanGestureRecognizer PanUpdated="OnHeaderPanUpdated"/>
                     </Border.GestureRecognizers>
-                    <VerticalStackLayout>
+                    <VerticalStackLayout
+                        Margin="0">
                         <VerticalStackLayout.Effects>
                             <uranium:BlurEffect Mode="Light"
                                                 AccentOpacity="0.9"/>

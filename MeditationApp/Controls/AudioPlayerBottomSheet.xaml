@@ -5,13 +5,20 @@
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:converters="clr-namespace:MeditationApp.Converters"
              x:Class="MeditationApp.Controls.AudioPlayerBottomSheet">
+    
+    <ContentView.Padding>
+        <OnPlatform x:TypeArguments="Thickness">
+            <On Platform="iOS" Value="0,0,0,0" />
+            <On Platform="Android" Value="0,0,0,0" />
+        </OnPlatform>
+    </ContentView.Padding>
 
     <ContentView.Resources>
         <converters:BoolToPlayPauseConverter x:Key="BoolToPlayPauseConverter"/>
     </ContentView.Resources>
 
     <VerticalStackLayout Spacing="20"
-                         Padding="20,10"
+                         Padding="20,20,20,0"
                          Margin="0,10,0,0"
                          MinimumHeightRequest="200"
                          BackgroundColor="{StaticResource GlassyWhite}"
