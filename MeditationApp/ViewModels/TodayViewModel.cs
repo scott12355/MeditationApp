@@ -748,9 +748,15 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
 
         if (int.TryParse(mood, out int moodValue))
         {
+            Debug.WriteLine($"[SelectMood] Selected mood: {moodValue}");
             SelectedMood = moodValue;
             IsMoodSelectorExpanded = false; // Collapse the selector after selection
             await SaveUserDailyInsights();
+            
+            Debug.WriteLine("[SelectMood] Refreshing mood chart data...");
+            // Refresh mood chart data immediately after saving the mood
+            await LoadMoodChartDataAsync();
+            Debug.WriteLine("[SelectMood] Mood chart data refreshed");
         }
     }
 
@@ -1911,15 +1917,16 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
     {
         try
         {
+            Debug.WriteLine("[LoadMoodChartDataAsync] Starting to load mood chart data...");
             var moodData = await _moodChartService.GetLastSevenDaysMoodDataAsync();
 
-            Debug.WriteLine($"[TodayViewModel] Loaded {moodData.Count} mood data points.");
+            Debug.WriteLine($"[LoadMoodChartDataAsync] Loaded {moodData.Count} mood data points.");
 
-            MoodData.Clear();
-            foreach (var dataPoint in moodData)
-            {
-                MoodData.Add(dataPoint);
-            }
+            // Create a new ObservableCollection to ensure the binding updates
+            var newMoodData = new ObservableCollection<MoodDataPoint>(moodData);
+            MoodData = newMoodData;
+            
+            Debug.WriteLine($"[LoadMoodChartDataAsync] Updated MoodData property with {MoodData.Count} items");
         }
         catch (Exception ex)
         {
