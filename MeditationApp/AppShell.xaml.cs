@@ -7,20 +7,35 @@ public partial class AppShell : Shell
         InitializeComponent();
 
         // Register routes for navigation
+        Routing.RegisterRoute("SplashPage", typeof(Views.SplashPage));
         Routing.RegisterRoute("LoginPage", typeof(Views.LoginPage));
         Routing.RegisterRoute("SignUpPage", typeof(Views.SignUpPage));
         Routing.RegisterRoute("VerificationPage", typeof(Views.VerificationPage));
         Routing.RegisterRoute("ProfilePage", typeof(Views.ProfilePage));
-        Routing.RegisterRoute("SettingsPage", typeof(Views.SettingsPage));
         Routing.RegisterRoute("DayDetailPage", typeof(Views.DayDetailPage));
-        Routing.RegisterRoute("PastSessionsPage", typeof(Views.CalendarPage));
 
         Navigating += OnNavigating;
     }
 
     private void OnNavigating(object? sender, ShellNavigatingEventArgs e)
     {
-        // No longer need TabBar visibility logic since we removed tabs
-        // Navigation is now handled through standard Shell navigation
+        // Enable flyout for main app pages, disable for splash/login/onboarding
+        var targetRoute = e.Target.Location.OriginalString;
+        
+        if (targetRoute.Contains("TodayPage") || 
+            targetRoute.Contains("CalendarPage"))
+        {
+            // Enable flyout for main app areas
+            FlyoutBehavior = FlyoutBehavior.Flyout;
+        }
+        else if (targetRoute.Contains("SplashPage") || 
+                 targetRoute.Contains("LoginPage") || 
+                 targetRoute.Contains("SignUpPage") ||
+                 targetRoute.Contains("VerificationPage") ||
+                 targetRoute.Contains("OnboardingPage"))
+        {
+            // Disable flyout for splash, login, and onboarding flows
+            FlyoutBehavior = FlyoutBehavior.Disabled;
+        }
     }
 }

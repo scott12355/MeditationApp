@@ -222,6 +222,11 @@ public partial class TodayPage : UraniumContentPage
         }
     }
 
+    private void OnHamburgerClicked(object sender, EventArgs e)
+    {
+        Shell.Current.FlyoutIsPresented = true;
+    }
+
     // Handle background tap to dismiss keyboard
     private void OnBackgroundTapped(object? sender, TappedEventArgs e)
     {

@@ -82,9 +82,8 @@ public partial class SplashPage : ContentPage
             // Navigate to main app
             LoadingLabel.Text = "Welcome back!";
             await Task.Delay(600);
-            
             _hasNavigated = true;
-            await Shell.Current.GoToAsync("//MainApp", true);
+            Application.Current.MainPage = new AppShell();
         }
         catch (Exception ex)
         {
