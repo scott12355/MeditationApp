@@ -521,26 +521,7 @@
                                     </Grid>
                                 </VerticalStackLayout>
 
-                                <!-- DOWNLOADING State Content -->
-                                <VerticalStackLayout Spacing="15"
-                                                     IsVisible="{Binding IsDownloading}">
-                                    <Label Text="📥 Preparing your meditation experience..."
-                                           FontAttributes="Bold"
-                                           FontSize="18"
-                                           HorizontalOptions="Center"
-                                           TextColor="Black"/>
-
-                                    <ActivityIndicator IsRunning="True"
-                                                       Color="{StaticResource Primary}"
-                                                       HorizontalOptions="Center"
-                                                       VerticalOptions="Center"
-                                                       HeightRequest="150"/>
-
-                                    <Label Text="{Binding DownloadStatus}"
-                                           FontSize="14"
-                                           HorizontalOptions="Center"
-                                           TextColor="Gray"/>
-                                </VerticalStackLayout>
+                                
 
                                 <!-- FAILED State Content -->
                                 <VerticalStackLayout Spacing="15"

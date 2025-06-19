@@ -8,6 +8,11 @@
              Shell.TabBarIsVisible="False"
              BackgroundColor="#EFEBD3">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
         <!-- Decorative abstract shapes for modern look -->
         <Ellipse WidthRequest="220"
                  HeightRequest="220"
@@ -38,11 +43,6 @@
                  Margin="-100,100,0,0"
                  InputTransparent="True"/>
 
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
         <!-- Centered content -->
         <StackLayout Grid.Row="0"
                      Spacing="20"
@@ -50,37 +50,46 @@
                      HorizontalOptions="Center"
                      Padding="30">
 
-            <!-- Progress indicator -->
-            <StackLayout Orientation="Horizontal"
-                    HorizontalOptions="Center"
-                    Spacing="8"
-                    Margin="0,0,0,20">
-                <Ellipse Fill="#BBBBBB"
-                        WidthRequest="10"
-                        HeightRequest="10"/>
-                <Ellipse Fill="#2B2B2B"
-                        WidthRequest="10"
-                        HeightRequest="10"/>
-            </StackLayout>
+
 
             <!-- Icon with same styling as logo -->
-            <Label Text="📖"
-                   FontSize="120"
+
+            <Image Source="book.png"
                    HorizontalOptions="Center"
-                   Opacity="0.97"/>
+                   VerticalOptions="Center"
+                   Scale="2"
+                   Margin="0,-90,0,0"
+                   Aspect="AspectFit"/>
 
             <Label Text="Use Lucen Like a Diary"
                    FontSize="24"
                    FontAttributes="Bold"
                    TextColor="#2B2B2B"
+                   Margin="0,20,0,50"
                    HorizontalOptions="Center"
                    HorizontalTextAlignment="Center"/>
 
-            <Label Text="Reflect on your thoughts and feelings before each session. The more you share about your current state of mind, the better Lucen can personalize your meditation experience to help you find peace and clarity."
-                   FontSize="18"
-                   TextColor="#2B2B2B"
-                   HorizontalOptions="Center"
-                   HorizontalTextAlignment="Center"/>
+            <Label>
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Reflect on your thoughts and feelings "/>
+                        <Span Text="before each session."
+                                FontAttributes="Bold"/>
+                        <Span Text="&#10;"/>
+                        <Span Text="&#10;Use Lucen like a diary. "/>
+                        <Span Text="Share your feelings and what you have been up to."/>
+                        <Span Text="&#10;&#10;Lucen can "/>
+                        <Span Text="personalise your meditation experience."
+                                FontAttributes="Bold"/>
+                    </FormattedString>
+                </Label.FormattedText>
+                <Label.FontSize>18</Label.FontSize>
+                <Label.TextColor>#2B2B2B</Label.TextColor>
+                <Label.HorizontalOptions>Center</Label.HorizontalOptions>
+
+                <Label.HorizontalTextAlignment>Center</Label.HorizontalTextAlignment>
+                <Label.LineHeight>1</Label.LineHeight>
+            </Label>
         </StackLayout>
 
         <!-- Button anchored to bottom -->

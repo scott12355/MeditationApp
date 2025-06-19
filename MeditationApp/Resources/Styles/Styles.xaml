@@ -551,25 +551,27 @@
         <Style TargetType="Shell"
                ApplyToDerivedTypes="True">
                 <Setter Property="Shell.BackgroundColor"
-                        Value="{StaticResource BackgroundColor}"/>
+                        Value="#EFEBD3"/>
                 <Setter Property="Shell.ForegroundColor"
-                        Value="#1A1A1A"/>
+                        Value="Black"/>
                 <Setter Property="Shell.TitleColor"
-                        Value="#1A1A1A"/>
+                        Value="Black"/>
                 <Setter Property="Shell.DisabledColor"
-                        Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray950}}"/>
+                        Value="#999999"/>
                 <Setter Property="Shell.UnselectedColor"
-                        Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray200}}"/>
+                        Value="#666666"/>
                 <Setter Property="Shell.NavBarHasShadow"
                         Value="False"/>
                 <Setter Property="Shell.TabBarBackgroundColor"
-                        Value="{StaticResource BackgroundColor}"/>
+                        Value="#EFEBD3"/>
                 <Setter Property="Shell.TabBarForegroundColor"
-                        Value="#1A1A1A"/>
+                        Value="Black"/>
                 <Setter Property="Shell.TabBarTitleColor"
-                        Value="#1A1A1A"/>
+                        Value="Black"/>
                 <Setter Property="Shell.TabBarUnselectedColor"
                         Value="#666666"/>
+                <Setter Property="Shell.FlyoutBackgroundColor"
+                        Value="#EFEBD3"/>
         </Style>
 
         <Style TargetType="NavigationPage">

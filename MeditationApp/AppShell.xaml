@@ -6,31 +6,92 @@
     xmlns:local="clr-namespace:MeditationApp"
     xmlns:views="clr-namespace:MeditationApp.Views"
     Shell.FlyoutBehavior="Flyout"
+    Shell.FlyoutBackgroundColor="#EFEBD3"
     Title="MeditationApp">
+
+    <Shell.Resources>
+        <!-- Custom flyout item style to match today view -->
+        <Style TargetType="Grid" x:Key="FlyoutItemStyle">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="Transparent"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor" Value="{StaticResource GlassyWhite}"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+    </Shell.Resources>
+
+    <!-- Custom flyout item data template -->
+    <Shell.ItemTemplate>
+        <DataTemplate>
+            <Grid HeightRequest="50" 
+                  Padding="15,5"
+                  BackgroundColor="Transparent">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <Frame Grid.Column="0"
+                       BackgroundColor="{StaticResource GlassyWhite}"
+                       BorderColor="{StaticResource GlassyBorder}"
+                       CornerRadius="15"
+                       Padding="0"
+                       WidthRequest="30"
+                       HeightRequest="30"
+                       HasShadow="False"
+                       VerticalOptions="Center">
+                    <Image Source="{Binding FlyoutIcon}"
+                           WidthRequest="18"
+                           HeightRequest="18"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"/>
+                </Frame>
+                
+                <Label Grid.Column="1"
+                       Text="{Binding Title}"
+                       FontSize="16"
+                       TextColor="Black"
+                       VerticalOptions="Center"
+                       Margin="15,0,0,0"/>
+            </Grid>
+        </DataTemplate>
+    </Shell.ItemTemplate>
 
     <!-- Flyout Header -->
     <Shell.FlyoutHeader>
-        <Grid BackgroundColor="{StaticResource Primary}"
+        <Grid BackgroundColor="#EFEBD3"
               HeightRequest="200">
             <StackLayout VerticalOptions="Center"
                          HorizontalOptions="Center">
                 <Image Source="logo.png"
                        HeightRequest="80"
                        WidthRequest="80"
-                       HorizontalOptions="Center"/>
-                <Label Text="Lucen"
-                       FontSize="20"
-                       FontAttributes="Bold"
-                       TextColor="White"
                        HorizontalOptions="Center"
-                       Margin="0,10,0,0"/>
+                       VerticalOptions="Center"/>
+                <Label Text="Lucen"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       TextColor="Black"
+                       HorizontalOptions="Center"
+                       Margin="0,15,0,0"/>
             </StackLayout>
         </Grid>
     </Shell.FlyoutHeader>
 
     <!-- Main app with flyout menu - Only Today and Calendar -->
     <FlyoutItem Title="Today"
-                Icon="home.svg"
+                Icon="home"
                 Shell.FlyoutBehavior="Flyout">
         <ShellContent
             Title="Today"
@@ -38,22 +99,26 @@
             Route="TodayPage"/>
     </FlyoutItem>
 
-    <FlyoutItem Title="Calendar"
-                Icon="calendar.svg"
+    <FlyoutItem Title="Past Meditations"
+                Icon="archive"
                 Shell.FlyoutBehavior="Flyout">
         <ShellContent
-            Title="Calendar"
+            Title="Your Sessions"
             ContentTemplate="{DataTemplate views:CalendarPage}"
             Route="CalendarPage"/>
     </FlyoutItem>
+    
 
     <FlyoutItem Title="Settings"
-                Icon="settings.svg"
+                Icon="settings"
                 Shell.FlyoutBehavior="Flyout">
         <ShellContent
             Title="Settings"
             ContentTemplate="{DataTemplate views:SettingsPage}"
             Route="SettingsPage"/>
     </FlyoutItem>
+    
+
+    
 
 </Shell>

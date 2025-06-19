@@ -63,14 +63,12 @@
                             Radius="8"
                             Opacity="0.15"/>
                 </Frame.Shadow>
-                <Button Text="⏪"
-                        FontSize="24"
-                        BackgroundColor="Transparent"
-                        TextColor="{StaticResource Primary}"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        BorderColor="Transparent"
-                        Command="{Binding SeekBackwardCommand}"/>
+                <ImageButton
+                    Source="backward"
+                    Command="{Binding SeekBackwardCommand}"
+                    Scale="0.5"
+                    >
+                </ImageButton>
             </Frame>
             <!-- Main Play/Pause Button -->
             <Frame Padding="0"
@@ -107,14 +105,11 @@
                             Radius="8"
                             Opacity="0.15"/>
                 </Frame.Shadow>
-                <Button Text="⏩"
-                        FontSize="24"
-                        BackgroundColor="Transparent"
-                        TextColor="{StaticResource Primary}"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        BorderColor="Transparent"
-                        Command="{Binding SeekForwardCommand}"/>
+                <ImageButton
+                    Source="forward"
+                    Command="{Binding SeekForwardCommand}"
+                    Scale="0.5">
+                </ImageButton>
             </Frame>
         </HorizontalStackLayout>
     </VerticalStackLayout>
