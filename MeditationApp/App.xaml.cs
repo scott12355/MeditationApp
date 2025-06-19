@@ -22,12 +22,12 @@ public partial class App : Application
         // Check if first launch
         if (!Preferences.Get("HasLaunchedBefore", false))
         {
-            // Set SplashPage as MainPage for first launch
-            MainPage = serviceProvider.GetRequiredService<Views.SplashPage>();
+            // Set OnboardingPage for first launch
+            MainPage = serviceProvider.GetRequiredService<Views.OnboardingPage1>();
         }
         else
         {
-            // Always show SplashPage on app start
+            // Always show SplashPage on subsequent app starts
             MainPage = serviceProvider.GetRequiredService<Views.SplashPage>();
         }
         RequestNotificationPermission();

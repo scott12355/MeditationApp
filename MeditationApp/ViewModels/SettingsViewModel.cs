@@ -240,7 +240,12 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
                 // Properly clear all user session data using HybridAuthService
                 await _hybridAuthService.SignOutAsync();
                 
-                await Shell.Current.GoToAsync("///LoginPage");
+                if (Application.Current != null)
+                {
+                    var appShell = new AppShell();
+                    Application.Current.MainPage = appShell;
+                    await appShell.GoToAsync("LoginPage");
+                }
             }
         }
     }

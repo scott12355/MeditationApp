@@ -122,7 +122,12 @@ public class SignUpViewModel : BindableObject
 
     private async Task OnBackToLogin()
     {
-        await Shell.Current.GoToAsync("///LoginPage");
+        if (Application.Current != null)
+        {
+            var appShell = new AppShell();
+            Application.Current.MainPage = appShell;
+            await appShell.GoToAsync("LoginPage");
+        }
     }
 
     private void ValidateEmail()

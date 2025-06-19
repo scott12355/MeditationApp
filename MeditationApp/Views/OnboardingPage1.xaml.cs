@@ -1,4 +1,5 @@
 using Microsoft.Maui.Controls;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MeditationApp.Views
 {
@@ -9,12 +10,14 @@ namespace MeditationApp.Views
             InitializeComponent();
         }
 
-        private async void OnNextClicked(object sender, EventArgs e)
+        private void OnNextClicked(object sender, EventArgs e)
         {
-            // Mark onboarding as complete
-            Microsoft.Maui.Storage.Preferences.Set("HasLaunchedBefore", true);
-            // Navigate to the splash or main page
-            await Shell.Current.GoToAsync("//SplashPage");
+            // Navigate to second onboarding page
+            if (Application.Current != null)
+            {
+                var onboardingPage2 = new OnboardingPage2();
+                Application.Current.MainPage = onboardingPage2;
+            }
         }
     }
 }

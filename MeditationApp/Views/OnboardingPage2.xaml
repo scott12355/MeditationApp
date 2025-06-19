@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage x:Class="MeditationApp.Views.OnboardingPage2"
+             xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             Title="Use Like a Diary"
+             NavigationPage.HasNavigationBar="False"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             BackgroundColor="#EFEBD3">
+    <Grid>
+        <!-- Decorative abstract shapes for modern look -->
+        <Ellipse WidthRequest="220"
+                 HeightRequest="220"
+                 Fill="#15BBDEFB"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"
+                 Margin="-80,-80,0,0"
+                 InputTransparent="True"/>
+        <Ellipse WidthRequest="120"
+                 HeightRequest="120"
+                 Fill="#10E1BEE7"
+                 HorizontalOptions="End"
+                 VerticalOptions="Start"
+                 Margin="0,-40,-40,0"
+                 InputTransparent="True"/>
+        <Ellipse WidthRequest="180"
+                 HeightRequest="180"
+                 Fill="#15FFCCBC"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"
+                 Margin="0,0,-60,-60"
+                 InputTransparent="True"/>
+        <Ellipse WidthRequest="90"
+                 HeightRequest="90"
+                 Fill="#10B3E5FC"
+                 HorizontalOptions="Center"
+                 VerticalOptions="Center"
+                 Margin="-100,100,0,0"
+                 InputTransparent="True"/>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Centered content -->
+        <StackLayout Grid.Row="0"
+                     Spacing="20"
+                     VerticalOptions="Center"
+                     HorizontalOptions="Center"
+                     Padding="30">
+
+            <!-- Progress indicator -->
+            <StackLayout Orientation="Horizontal"
+                    HorizontalOptions="Center"
+                    Spacing="8"
+                    Margin="0,0,0,20">
+                <Ellipse Fill="#BBBBBB"
+                        WidthRequest="10"
+                        HeightRequest="10"/>
+                <Ellipse Fill="#2B2B2B"
+                        WidthRequest="10"
+                        HeightRequest="10"/>
+            </StackLayout>
+
+            <!-- Icon with same styling as logo -->
+            <Label Text="📖"
+                   FontSize="120"
+                   HorizontalOptions="Center"
+                   Opacity="0.97"/>
+
+            <Label Text="Use Lucen Like a Diary"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   TextColor="#2B2B2B"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"/>
+
+            <Label Text="Reflect on your thoughts and feelings before each session. The more you share about your current state of mind, the better Lucen can personalize your meditation experience to help you find peace and clarity."
+                   FontSize="18"
+                   TextColor="#2B2B2B"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"/>
+        </StackLayout>
+
+        <!-- Button anchored to bottom -->
+        <Button Grid.Row="1"
+                Text="Get Started"
+                Clicked="OnGetStartedClicked"
+                HorizontalOptions="Center"
+                Margin="0,24,0,36"
+                FontSize="22"
+                HeightRequest="60"
+                WidthRequest="200"
+                CornerRadius="30"/>
+    </Grid>
+</ContentPage>

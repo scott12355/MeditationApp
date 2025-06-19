@@ -67,12 +67,16 @@ public class LoginViewModel : BindableObject
                 }
 
                 // Ensure navigation happens on main thread
-                await MainThread.InvokeOnMainThreadAsync(async () =>
+                await MainThread.InvokeOnMainThreadAsync(() =>
                 {
                     try
                     {
-                        await Shell.Current.GoToAsync("//SplashPage");
-                        System.Diagnostics.Debug.WriteLine("Navigation to MainTabs completed successfully");
+                        // After successful login, navigate to main app
+                        if (Application.Current != null)
+                        {
+                            Application.Current.MainPage = new AppShell();
+                        }
+                        System.Diagnostics.Debug.WriteLine("Navigation to main app completed successfully");
                     }
                     catch (Exception navEx)
                     {

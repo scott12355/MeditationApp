@@ -83,7 +83,10 @@ public partial class SplashPage : ContentPage
             LoadingLabel.Text = "Welcome back!";
             await Task.Delay(600);
             _hasNavigated = true;
-            Application.Current.MainPage = new AppShell();
+            if (Application.Current != null)
+            {
+                Application.Current.MainPage = new AppShell();
+            }
         }
         catch (Exception ex)
         {
@@ -106,6 +109,13 @@ public partial class SplashPage : ContentPage
         }
         
         _hasNavigated = true;
-        await Shell.Current.GoToAsync("//LoginPage");
+        
+        // Create a new AppShell and navigate to LoginPage
+        var appShell = new AppShell();
+        if (Application.Current != null)
+        {
+            Application.Current.MainPage = appShell;
+            await appShell.GoToAsync("LoginPage");
+        }
     }
 }

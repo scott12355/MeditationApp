@@ -131,6 +131,8 @@ public static class MauiProgram
         builder.Services.AddTransient<Views.CalendarPage>();
         builder.Services.AddTransient<Views.SettingsPage>();
         builder.Services.AddTransient<Views.DayDetailPage>();
+        builder.Services.AddTransient<Views.OnboardingPage1>();
+        builder.Services.AddTransient<Views.OnboardingPage2>();
 
         // Register view models
         builder.Services.AddTransient<ViewModels.LoginViewModel>();

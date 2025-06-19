@@ -37,7 +37,14 @@ public class VerificationViewModel : BindableObject
         _cognitoAuthService = cognitoAuthService;
         VerifyCommand = new Command(async () => await OnVerify());
         ResendCodeCommand = new Command(async () => await OnResendCode());
-        BackToLoginCommand = new Command(async () => await Shell.Current.GoToAsync("///LoginPage", animate: true));
+        BackToLoginCommand = new Command(async () => {
+            if (Application.Current != null)
+            {
+                var appShell = new AppShell();
+                Application.Current.MainPage = appShell;
+                await appShell.GoToAsync("LoginPage", animate: true);
+            }
+        });
     }
 
     private async Task OnVerify()
@@ -73,12 +80,15 @@ public class VerificationViewModel : BindableObject
                         await Task.Delay(500); // Brief delay to show success state
 
                         // Ensure navigation happens on main thread
-                        await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await MainThread.InvokeOnMainThreadAsync(() =>
                         {
                             try
                             {
-                                await Shell.Current.GoToAsync("//SplashPage", animate: true);
-                                System.Diagnostics.Debug.WriteLine("Navigation to Splash completed successfully");
+                                if (Application.Current != null)
+                                {
+                                    Application.Current.MainPage = new AppShell();
+                                }
+                                System.Diagnostics.Debug.WriteLine("Navigation to main app completed successfully");
                             }
                             catch (Exception navEx)
                             {
@@ -93,7 +103,10 @@ public class VerificationViewModel : BindableObject
                     }
                 }
                 // Fallback: show alert and go to login
-                await Application.Current?.MainPage?.DisplayAlert("Success", "Your account has been verified. You can now login.", "OK");
+                if (Application.Current?.MainPage != null)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Success", "Your account has been verified. You can now login.", "OK");
+                }
                 await Shell.Current.GoToAsync("..", animate: true);
             }
             else
