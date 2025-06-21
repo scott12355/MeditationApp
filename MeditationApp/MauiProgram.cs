@@ -10,8 +10,12 @@ using CommunityToolkit.Maui;
 using Plugin.Maui.Audio;
 using MediaManager;
 using UraniumUI;
+using Microsoft.Maui.Handlers;
+
 #if IOS
 using Microsoft.Maui.Handlers;
+using MeditationApp.Controls;
+using MeditationApp.Platforms.iOS.Handlers;
 #endif
 #if ANDROID
 using Microsoft.Maui.Handlers;
@@ -49,14 +53,21 @@ public static class MauiProgram
                 textField.BackgroundColor = UIKit.UIColor.Clear;
             }
         });
+        // Use ConfigureMauiHandlers API instead - works across .NET MAUI versions
+        builder.ConfigureMauiHandlers(handlers => 
+        {
+            handlers.AddHandler(typeof(AppleSignInButton), typeof(AppleSignInButtonHandler));
+        });
 #endif
 
 
         // Register Cognito authentication service
         var cognitoSettings = new CognitoSettings(
-            userPoolId: "eu-west-1_FDo9Q79jx", // Replace with your actual User Pool ID
-            appClientId: "5t3s0fctvuk3di5b022741sbrg", // Replace with your actual App Client ID
-            region: "eu-west-1" // e.g., "us-east-1"
+            userPoolId: "eu-west-1_FDo9Q79jx",
+            appClientId: "1s3rs9l9ajae05vtkt656m2eog", // Normal sign-in App Client ID
+            region: "eu-west-1",
+            appleClientId: "com.lucen.auth", // Apple Service ID
+            appleAppClientId: "7c63uhdpr22890l1g7ehgv5p1a" // <-- Cognito App Client ID with Apple IdP enabled
         );
 
         builder.Services.AddSingleton(cognitoSettings);

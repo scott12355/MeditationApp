@@ -367,6 +367,72 @@ public class HybridAuthService
             return false;
         }
     }
+
+    public async Task<AuthenticationResult> SignInWithAppleAsync(string idToken)
+    {
+        if (string.IsNullOrEmpty(idToken))
+        {
+            return new AuthenticationResult
+            {
+                IsSuccess = false,
+                IsOfflineMode = false,
+                Message = "Apple ID token is missing."
+            };
+        }
+
+        try
+        {
+            // Get Cognito settings (with AppleClientId and AppleAppClientId)
+            var settings = _serviceProvider.GetRequiredService<CognitoSettings>();
+
+            // Use Cognito's InitiateAuth with the 'USER_SRP_AUTH' or 'CUSTOM_AUTH' flow for federated sign-in
+            var request = new Amazon.CognitoIdentityProvider.Model.InitiateAuthRequest
+            {
+                AuthFlow = Amazon.CognitoIdentityProvider.AuthFlowType.USER_SRP_AUTH, // or CUSTOM_AUTH if configured
+                ClientId = settings.AppleAppClientId ?? settings.AppleClientId ?? settings.AppClientId, // Use the Apple-specific Cognito App Client ID if present
+                AuthParameters = new Dictionary<string, string>
+                {
+                    { "IDENTITY_PROVIDER", "Apple" }, // Cognito IdP name is 'Apple'
+                    { "TOKEN", idToken }
+                }
+            };
+
+            var response = await _cognitoService.Provider.InitiateAuthAsync(request);
+
+            if (response.AuthenticationResult != null)
+            {
+                // Store tokens as needed
+                await SecureStorage.Default.SetAsync("access_token", response.AuthenticationResult.AccessToken ?? string.Empty);
+                await SecureStorage.Default.SetAsync("id_token", response.AuthenticationResult.IdToken ?? string.Empty);
+                await SecureStorage.Default.SetAsync("refresh_token", response.AuthenticationResult.RefreshToken ?? string.Empty);
+
+                return new AuthenticationResult
+                {
+                    IsSuccess = true,
+                    IsOfflineMode = false,
+                    Message = "Signed in with Apple successfully."
+                };
+            }
+            else
+            {
+                return new AuthenticationResult
+                {
+                    IsSuccess = false,
+                    IsOfflineMode = false,
+                    Message = "Apple sign-in failed: No authentication result."
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            return new AuthenticationResult
+            {
+                IsSuccess = false,
+                IsOfflineMode = false,
+                Message = $"Apple sign-in error: {ex.Message}"
+            };
+        }
+    }
 }
 
 public class AuthenticationResult

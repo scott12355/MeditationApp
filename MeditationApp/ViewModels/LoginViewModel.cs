@@ -118,4 +118,41 @@ public class LoginViewModel : BindableObject
         Password = string.Empty;
         Status = string.Empty;
     }
+
+    public async Task SignInWithAppleAsync(string idToken)
+    {
+        System.Diagnostics.Debug.WriteLine($"SignInWithAppleAsync called. idToken: {idToken}");
+        if (IsBusy) return;
+        IsBusy = true;
+        try
+        {
+            LoadingText = "Signing in with Apple...";
+            Status = string.Empty;
+            var result = await _hybridAuthService.SignInWithAppleAsync(idToken);
+            System.Diagnostics.Debug.WriteLine($"SignInWithAppleAsync result: {result?.IsSuccess}, message: {result?.Message}");
+            if (result.IsSuccess)
+            {
+                LoadingText = "Redirecting...";
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    if (Application.Current != null)
+                        Application.Current.MainPage = new AppShell();
+                });
+            }
+            else
+            {
+                Status = result.Message;
+            }
+        }
+        catch (Exception ex)
+        {
+            Status = $"Apple Sign In error: {ex.Message}";
+            System.Diagnostics.Debug.WriteLine($"SignInWithAppleAsync exception: {ex}");
+        }
+        finally
+        {
+            IsBusy = false;
+            LoadingText = string.Empty;
+        }
+    }
 }

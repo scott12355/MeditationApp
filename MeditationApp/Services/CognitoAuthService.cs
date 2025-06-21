@@ -25,6 +25,8 @@ public class CognitoAuthService
         _userPool = new CognitoUserPool(_userPoolId, _clientId, _provider);
     }
 
+    public AmazonCognitoIdentityProviderClient Provider => _provider;
+
     public async Task<SignUpResult> SignUpAsync(string username, string email, string password, string firstName, string secondName)
     {
         try

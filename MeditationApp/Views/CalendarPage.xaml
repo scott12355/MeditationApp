@@ -5,15 +5,8 @@
              xmlns:models="clr-namespace:MeditationApp.Models"
              xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
              x:Class="MeditationApp.Views.CalendarPage"
-             Title="Past Sessions">
-
-    <ContentPage.Padding>
-        <OnPlatform x:TypeArguments="Thickness">
-            <On Platform="iOS" Value="0,0,0,-30" />
-            <On Platform="Android" Value="0,0,0,20" />
-            <On Platform="WinUI" Value="0" />
-        </OnPlatform>
-    </ContentPage.Padding>
+             Title="Past Sessions"
+             Padding="{OnPlatform iOS='0,0,0,24', Android='0,0,0,0', WinUI='0'}">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem Text="Settings"
@@ -35,7 +28,7 @@
                      RefreshColor="{StaticResource Primary}"
                      IsRefreshing="{Binding IsLoading}">
             <ScrollView Padding="0">
-                <VerticalStackLayout Padding="20,0,20,30"
+                <VerticalStackLayout Padding="20,0,20,0"
                                      Spacing="20">
 
                     <!-- Header Section -->
@@ -83,7 +76,8 @@
                     <!-- Sessions List with enhanced styling -->
                     <CollectionView ItemsSource="{Binding DaysWithSessions}"
                                     IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
-                                    BackgroundColor="Transparent">
+                                    BackgroundColor="Transparent"
+                                    Margin="0,0,0,20">
 
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="viewmodels:DaySessionData">
