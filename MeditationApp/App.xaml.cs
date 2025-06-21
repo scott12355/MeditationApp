@@ -116,4 +116,6 @@ public partial class App : Application
         base.OnSleep();
         System.Diagnostics.Debug.WriteLine("App entering sleep state");
     }
+
+    public IServiceProvider Services => _serviceProvider;
 }

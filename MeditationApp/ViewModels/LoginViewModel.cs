@@ -71,12 +71,12 @@ public class LoginViewModel : BindableObject
                 {
                     try
                     {
-                        // After successful login, navigate to main app
-                        if (Application.Current != null)
-                        {
-                            Application.Current.MainPage = new AppShell();
-                        }
-                        System.Diagnostics.Debug.WriteLine("Navigation to main app completed successfully");
+                        // After successful login, reset TodayViewModel so splash screen reloads data
+                        var todayViewModel = ((App)Application.Current).Services.GetRequiredService<ViewModels.TodayViewModel>();
+                        todayViewModel.Reset();
+                        var splashPage = ((App)Application.Current).Services.GetRequiredService<Views.SplashPage>();
+                        Application.Current.MainPage = splashPage;
+                        System.Diagnostics.Debug.WriteLine("Navigation to splash screen completed successfully");
                     }
                     catch (Exception navEx)
                     {
@@ -103,7 +103,15 @@ public class LoginViewModel : BindableObject
 
     private async Task OnSignUp()
     {
-        await Shell.Current.GoToAsync("SignUpPage", animate: true);
+        // Set SignUpPage as the root to prevent swipe-back
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            if (Application.Current != null)
+            {
+                var signUpPage = ((App)Application.Current).Services.GetRequiredService<Views.SignUpPage>();
+                Application.Current.MainPage = signUpPage;
+            }
+        });
     }
 
     private async Task OnForgotPassword()

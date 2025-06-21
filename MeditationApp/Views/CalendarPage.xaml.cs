@@ -96,4 +96,9 @@ public partial class CalendarPage : ContentPage
     {
         await Shell.Current.GoToAsync("..");
     }
+
+    private void OnHamburgerClicked(object sender, EventArgs e)
+    {
+        Shell.Current.FlyoutIsPresented = true;
+    }
 }

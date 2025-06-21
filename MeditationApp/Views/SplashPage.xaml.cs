@@ -110,12 +110,11 @@ public partial class SplashPage : ContentPage
         
         _hasNavigated = true;
         
-        // Create a new AppShell and navigate to LoginPage
-        var appShell = new AppShell();
+        // Set LoginPage as the root MainPage to prevent swipe-back
         if (Application.Current != null)
         {
-            Application.Current.MainPage = appShell;
-            await appShell.GoToAsync("LoginPage");
+            var loginPage = ((App)Application.Current).Services.GetRequiredService<Views.LoginPage>();
+            Application.Current.MainPage = loginPage;
         }
     }
 }

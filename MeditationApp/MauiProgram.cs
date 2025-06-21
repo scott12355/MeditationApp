@@ -55,7 +55,7 @@ public static class MauiProgram
         // Register Cognito authentication service
         var cognitoSettings = new CognitoSettings(
             userPoolId: "eu-west-1_FDo9Q79jx", // Replace with your actual User Pool ID
-            appClientId: "5t3s0fctvuk3di5b022741sbrg", // Replace with your actual App Client ID
+            appClientId: "1s3rs9l9ajae05vtkt656m2eog", // Replace with your actual App Client ID
             region: "eu-west-1" // e.g., "us-east-1"
         );
 

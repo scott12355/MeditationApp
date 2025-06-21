@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
              x:Class="MeditationApp.Views.SettingsPage"
-             Title="Settings">
+             Title="Settings"
+             Shell.NavBarIsVisible="False">
 
        <ContentPage.Background>
               <SolidColorBrush Color="#EFEBD3"/>
@@ -108,23 +109,29 @@
               </Ellipse>
 
               <ScrollView>
-                     <VerticalStackLayout Padding="20"
+                     <VerticalStackLayout Padding="20,0,20,90"
                                           Spacing="20">
 
-                            <!-- Header -->
-                            <VerticalStackLayout Spacing="10"
-                                                 Margin="0,20,0,0">
+                            <!-- Header with Hamburger Menu -->
+                            <Grid Padding="0,20,0,0">
+                                   <Button x:Name="HamburgerButton"
+                                           Text="☰"
+                                           FontSize="24"
+                                           BackgroundColor="Transparent"
+                                           TextColor="Black"
+                                           WidthRequest="44"
+                                           HeightRequest="44"
+                                           HorizontalOptions="Start"
+                                           VerticalOptions="Start"
+                                           Clicked="OnHamburgerClicked"/>
+
                                    <Label Text="Settings"
                                           FontSize="28"
                                           FontAttributes="Bold"
+                                          TextColor="Black"
                                           HorizontalOptions="Center"
-                                          TextColor="Black"/>
-                                   <Label Text="Customize your meditation experience"
-                                          FontSize="16"
-                                          HorizontalOptions="Center"
-                                          TextColor="#666666"
-                                          Margin="0,0,0,10"/>
-                            </VerticalStackLayout>
+                                          VerticalOptions="Center"/>
+                            </Grid>
 
                             <!-- Notification Settings with glassmorphism -->
                             <Frame BackgroundColor="{StaticResource GlassyWhite}"
@@ -281,6 +288,28 @@
                                                  </VisualStateManager.VisualStateGroups>
                                           </Button>
                                    </Frame>
+                            </VerticalStackLayout>
+
+                            <!-- Privacy Policy and Terms Links -->
+                            <VerticalStackLayout Spacing="8"
+                                                 Margin="0,30,0,20"
+                                                 HorizontalOptions="Center">
+                                   <Button Text="Privacy Policy"
+                                           Clicked="OnPrivacyPolicyClicked"
+                                           BackgroundColor="Transparent"
+                                           TextColor="#007AFF"
+                                           FontSize="14"
+                                           FontAttributes="None"
+                                           Padding="0"
+                                           BorderColor="Transparent"/>
+                                   <Button Text="Terms &amp; Conditions"
+                                           Clicked="OnTermsClicked"
+                                           BackgroundColor="Transparent"
+                                           TextColor="#007AFF"
+                                           FontSize="14"
+                                           FontAttributes="None"
+                                           Padding="0"
+                                           BorderColor="Transparent"/>
                             </VerticalStackLayout>
 
                      </VerticalStackLayout>

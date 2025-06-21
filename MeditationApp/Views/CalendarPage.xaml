@@ -5,13 +5,17 @@
              xmlns:models="clr-namespace:MeditationApp.Models"
              xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
              x:Class="MeditationApp.Views.CalendarPage"
-             Title="Past Sessions">
+             Title="Past Sessions"
+             Shell.NavBarIsVisible="False">
 
     <ContentPage.Padding>
         <OnPlatform x:TypeArguments="Thickness">
-            <On Platform="iOS" Value="0,0,0,-30" />
-            <On Platform="Android" Value="0,0,0,20" />
-            <On Platform="WinUI" Value="0" />
+            <On Platform="iOS"
+                Value="0,0,0,-30"/>
+            <On Platform="Android"
+                Value="0,0,0,20"/>
+            <On Platform="WinUI"
+                Value="0"/>
         </OnPlatform>
     </ContentPage.Padding>
 
@@ -25,33 +29,34 @@
     </ContentPage.Background>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
         <!-- Main content with ScrollView -->
-        <RefreshView Grid.Row="0"
-                     x:Name="CalendarRefreshView"
+        <RefreshView x:Name="CalendarRefreshView"
                      RefreshColor="{StaticResource Primary}"
                      IsRefreshing="{Binding IsLoading}">
             <ScrollView Padding="0">
-                <VerticalStackLayout Padding="20,0,20,30"
+                <VerticalStackLayout Padding="20,0,20,90"
                                      Spacing="20">
 
-                    <!-- Header Section -->
-                    <VerticalStackLayout Spacing="10"
-                                         Margin="0,20,0,0">
-                        <Label Text="Your Meditation Journey"
+                    <!-- Header with Hamburger Menu -->
+                    <Grid Padding="0,20,0,0">
+                        <Button x:Name="HamburgerButton"
+                                Text="☰"
+                                FontSize="24"
+                                BackgroundColor="Transparent"
+                                TextColor="Black"
+                                WidthRequest="44"
+                                HeightRequest="44"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Start"
+                                Clicked="OnHamburgerClicked"/>
+
+                        <Label Text="Past Sessions"
                                FontSize="28"
                                FontAttributes="Bold"
+                               TextColor="Black"
                                HorizontalOptions="Center"
-                               TextColor="Black"/>
-                        <Label Text="Explore your past meditation sessions"
-                               FontSize="16"
-                               HorizontalOptions="Center"
-                               TextColor="#666666"
-                               Margin="0,0,0,10"/>
-                    </VerticalStackLayout>
+                               VerticalOptions="Center"/>
+                    </Grid>
 
                     <!-- Loading Indicator with glassmorphism styling -->
                     <Frame IsVisible="{Binding IsLoading}"
