@@ -15,6 +15,12 @@ public partial class VerificationPage : UraniumContentPage, IQueryAttributable
         BindingContext = _viewModel;
     }
 
+    public VerificationPage() : this(
+        Microsoft.Maui.Controls.Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(CognitoAuthService)) as CognitoAuthService
+    )
+    {
+    }
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.ContainsKey("Username") && query["Username"] != null)

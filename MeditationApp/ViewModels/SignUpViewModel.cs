@@ -37,7 +37,7 @@ public class SignUpViewModel : BindableObject
     public ICommand SignUpCommand { get; }
     public ICommand BackToLoginCommand { get; }
 
-    public INavigation? Navigation { get; set; }
+    public event EventHandler? SignUpSucceeded;
 
     public SignUpViewModel(CognitoAuthService cognitoAuthService)
     {
@@ -66,34 +66,19 @@ public class SignUpViewModel : BindableObject
                 Status = "Passwords do not match";
                 return;
             }
-            
             LoadingText = "Creating your account...";
             Status = string.Empty;
-            
             var result = await _cognitoAuthService.SignUpAsync(
                 Email, Email, Password, FirstName, SecondName);
             if (result.IsSuccess)
             {
                 LoadingText = "Redirecting to verification...";
                 await Task.Delay(500); // Brief delay to show success state
-                
-                if (Navigation != null)
-                {
-                    var navigationParameter = new Dictionary<string, object> 
-                    { 
-                        { "Username", Email }, 
-                        { "Password", Password },
-                        { "Email", Email },
-                        { "FirstName", FirstName }
-                    };
-                    await Shell.Current.GoToAsync("VerificationPage", navigationParameter);
-                }
+                SignUpSucceeded?.Invoke(this, EventArgs.Empty);
             }
             else
             {
                 Status = result.ErrorMessage;
-                
-                // Set field-specific error states based on error type
                 if (result.ErrorCode == "InvalidPasswordException")
                 {
                     HasPasswordError = true;

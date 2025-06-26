@@ -13,6 +13,7 @@ using Microsoft.Maui.Storage;
 using System;
 using System.Windows.Input;
 using System.Collections.ObjectModel;
+using System.Threading; // Add this at the top if not present
 
 namespace MeditationApp.ViewModels;
 
@@ -124,6 +125,9 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
     private static int _refreshAttemptCount = 0;
     private const int MAX_REFRESH_ATTEMPTS = 3;
     private static readonly TimeSpan REFRESH_COOLDOWN = TimeSpan.FromMinutes(1);
+
+    // Add a semaphore to serialize mood chart updates
+    private readonly SemaphoreSlim _moodChartSemaphore = new(1, 1);
 
     public TodayViewModel(GraphQLService graphQLService, CognitoAuthService cognitoAuthService, MeditationSessionDatabase sessionDatabase, IAudioDownloadService audioDownloadService, SessionStatusPoller sessionStatusPoller, AudioPlayerService audioPlayerService, DatabaseSyncService databaseSyncService, MoodChartService moodChartService)
     {
@@ -737,7 +741,7 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
     }
 
     [RelayCommand]
-    private async Task SelectMood(string mood)
+    private void SelectMood(string mood)
     {
         // Skip saving if we're currently loading data to prevent recursion
         if (_isLoadingData)
@@ -751,12 +755,44 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
             Debug.WriteLine($"[SelectMood] Selected mood: {moodValue}");
             SelectedMood = moodValue;
             IsMoodSelectorExpanded = false; // Collapse the selector after selection
-            await SaveUserDailyInsights();
-            
-            Debug.WriteLine("[SelectMood] Refreshing mood chart data...");
-            // Refresh mood chart data immediately after saving the mood
-            await LoadMoodChartDataAsync();
-            Debug.WriteLine("[SelectMood] Mood chart data refreshed");
+
+            // Immediately update mood chart data for fast UI feedback
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await _moodChartSemaphore.WaitAsync();
+                    try
+                    {
+                        await MainThread.InvokeOnMainThreadAsync(async () =>
+                        {
+                            await LoadMoodChartDataAsync();
+                            Debug.WriteLine("[SelectMood] Mood chart data refreshed (immediate)");
+                        });
+                    }
+                    finally
+                    {
+                        _moodChartSemaphore.Release();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[SelectMood] Error refreshing mood chart data: {ex.Message}");
+                }
+            });
+
+            // Fire-and-forget background save (does not block chart update)
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await SaveUserDailyInsights();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[SelectMood] Error in background mood save: {ex.Message}");
+                }
+            });
         }
     }
 
@@ -1922,11 +1958,12 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
 
             Debug.WriteLine($"[LoadMoodChartDataAsync] Loaded {moodData.Count} mood data points.");
 
-            // Create a new ObservableCollection to ensure the binding updates
-            var newMoodData = new ObservableCollection<MoodDataPoint>(moodData);
-            MoodData = newMoodData;
-            
-            Debug.WriteLine($"[LoadMoodChartDataAsync] Updated MoodData property with {MoodData.Count} items");
+            // Always update MoodData on the main thread
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                MoodData = new ObservableCollection<MoodDataPoint>(moodData);
+                Debug.WriteLine($"[LoadMoodChartDataAsync] Updated MoodData property with {MoodData.Count} items");
+            });
         }
         catch (Exception ex)
         {

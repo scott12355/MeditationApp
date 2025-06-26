@@ -1,0 +1,7 @@
+mutation DeleteAccount($userID: ID!) {
+  deleteUserAccount(userID: $userID) {
+    userID
+    status
+    requestedAt
+  }
+}

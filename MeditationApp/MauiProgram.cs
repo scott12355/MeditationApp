@@ -139,6 +139,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewModels.SignUpViewModel>();
         builder.Services.AddTransient<ViewModels.VerificationViewModel>();
         builder.Services.AddTransient<ViewModels.SettingsViewModel>();
+        builder.Services.AddTransient<ViewModels.ProfileViewModel>();
         builder.Services.AddTransient<ViewModels.SimpleCalendarViewModel>(provider =>
             new ViewModels.SimpleCalendarViewModel(
                 provider.GetRequiredService<MeditationSessionDatabase>(),

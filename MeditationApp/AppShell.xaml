@@ -11,18 +11,21 @@
 
     <Shell.Resources>
         <!-- Custom flyout item style to match today view -->
-        <Style TargetType="Grid" x:Key="FlyoutItemStyle">
+        <Style TargetType="Grid"
+               x:Key="FlyoutItemStyle">
             <Setter Property="VisualStateManager.VisualStateGroups">
                 <VisualStateGroupList>
                     <VisualStateGroup x:Name="CommonStates">
                         <VisualState x:Name="Normal">
                             <VisualState.Setters>
-                                <Setter Property="BackgroundColor" Value="Transparent"/>
+                                <Setter Property="BackgroundColor"
+                                        Value="Transparent"/>
                             </VisualState.Setters>
                         </VisualState>
                         <VisualState x:Name="Selected">
                             <VisualState.Setters>
-                                <Setter Property="BackgroundColor" Value="{StaticResource GlassyWhite}"/>
+                                <Setter Property="BackgroundColor"
+                                        Value="{StaticResource GlassyWhite}"/>
                             </VisualState.Setters>
                         </VisualState>
                     </VisualStateGroup>
@@ -34,14 +37,14 @@
     <!-- Custom flyout item data template -->
     <Shell.ItemTemplate>
         <DataTemplate>
-            <Grid HeightRequest="50" 
+            <Grid HeightRequest="50"
                   Padding="15,5"
                   BackgroundColor="Transparent">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="40"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                
+
                 <Frame Grid.Column="0"
                        BackgroundColor="{StaticResource GlassyWhite}"
                        BorderColor="{StaticResource GlassyBorder}"
@@ -57,7 +60,7 @@
                            VerticalOptions="Center"
                            HorizontalOptions="Center"/>
                 </Frame>
-                
+
                 <Label Grid.Column="1"
                        Text="{Binding Title}"
                        FontSize="16"
@@ -107,7 +110,7 @@
             ContentTemplate="{DataTemplate views:CalendarPage}"
             Route="CalendarPage"/>
     </FlyoutItem>
-    
+
 
     <FlyoutItem Title="Settings"
                 Icon="settings"
@@ -117,8 +120,5 @@
             ContentTemplate="{DataTemplate views:SettingsPage}"
             Route="SettingsPage"/>
     </FlyoutItem>
-    
-
-    
 
 </Shell>

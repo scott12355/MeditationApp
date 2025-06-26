@@ -60,7 +60,7 @@
                        CornerRadius="15"
                        Padding="15,10"
                        HorizontalOptions="Center"
-                       IsVisible="False"
+                       IsVisible="{Binding IsOfflineMode}"
                        HasShadow="True">
                     <Label Text="Offline Mode - Limited functionality"
                            TextColor="#1A1A1A"
@@ -82,7 +82,7 @@
                                    WidthRequest="100"
                                    TextColor="#1A1A1A"/>
                             <Label x:Name="UsernameLabel"
-                                   Text="Loading..."
+                                   Text="{Binding Username}"
                                    TextColor="#2C2C2C"/>
                         </HorizontalStackLayout>
 
@@ -92,7 +92,7 @@
                                    WidthRequest="100"
                                    TextColor="#1A1A1A"/>
                             <Label x:Name="EmailLabel"
-                                   Text="Loading..."
+                                   Text="{Binding Email}"
                                    TextColor="#2C2C2C"/>
                         </HorizontalStackLayout>
 
@@ -102,7 +102,7 @@
                                    WidthRequest="100"
                                    TextColor="#1A1A1A"/>
                             <Label x:Name="FirstNameLabel"
-                                   Text="Loading..."
+                                   Text="{Binding FirstName}"
                                    TextColor="#2C2C2C"/>
                         </HorizontalStackLayout>
 
@@ -112,7 +112,7 @@
                                    WidthRequest="100"
                                    TextColor="#1A1A1A"/>
                             <Label x:Name="LastNameLabel"
-                                   Text="Loading..."
+                                   Text="{Binding LastName}"
                                    TextColor="#2C2C2C"/>
                         </HorizontalStackLayout>
                     </VerticalStackLayout>
@@ -120,11 +120,34 @@
 
                 <Label
                     x:Name="StatusLabel"
-                    Text=""
+                    Text="{Binding StatusMessage}"
                     HorizontalOptions="Center"
                     TextColor="#1A1A1A"/>
 
             </VerticalStackLayout>
         </ScrollView>
+
+        <!-- Smaller, red Delete Account section at the bottom with improved contrast -->
+        <Grid VerticalOptions="End" Padding="0,0,0,20">
+            <StackLayout HorizontalOptions="Center" VerticalOptions="End">
+                <Button x:Name="DeleteAccountButton"
+                        Text="{Binding DeleteButtonText}"
+                        BackgroundColor="Transparent"
+                        TextColor="#F44336"
+                        BorderColor="#F44336"
+                        BorderWidth="1"
+                        CornerRadius="6"
+                        FontSize="12"
+                        Padding="8,2"
+                        WidthRequest="130"
+                        IsEnabled="{Binding IsDeleteButtonEnabled}"
+                        Command="{Binding DeleteAccountCommand}"/>
+                <Label Text="This action cannot be undone."
+                       FontSize="10"
+                       TextColor="{StaticResource PrimaryDarkText}"
+                       HorizontalOptions="Center"
+                       Margin="0,2,0,0"/>
+            </StackLayout>
+        </Grid>
     </Grid>
 </ContentPage>
