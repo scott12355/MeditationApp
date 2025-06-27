@@ -235,7 +235,7 @@ public class HybridAuthService
         // Clear database data
         await _sessionDatabase.ClearAllSessionsAsync();
         _sessionDatabase.ClearCache();
-        
+
         // Reset TodayViewModel state to prevent hanging tasks on re-login
         try
         {
@@ -254,7 +254,7 @@ public class HybridAuthService
         {
             Console.WriteLine($"HybridAuthService: Error resetting TodayViewModel: {ex.Message}");
         }
-        
+
         // Clear calendar cache to prevent cross-user data contamination
         try
         {
@@ -273,14 +273,14 @@ public class HybridAuthService
         {
             Console.WriteLine($"HybridAuthService: Error clearing CalendarDataService cache: {ex.Message}");
         }
-        
+
         // Reset SimpleCalendarViewModel to clear user-specific calendar data
         try
         {
             // Clear static data directly (most important for cross-user contamination)
             SimpleCalendarViewModel.SelectedDayData = null;
             Console.WriteLine("HybridAuthService: Static SelectedDayData cleared");
-            
+
             var simpleCalendarViewModel = _serviceProvider.GetService<SimpleCalendarViewModel>();
             if (simpleCalendarViewModel != null)
             {
@@ -296,7 +296,7 @@ public class HybridAuthService
         {
             Console.WriteLine($"HybridAuthService: Error resetting SimpleCalendarViewModel: {ex.Message}");
         }
-        
+
         // Reset DayDetailViewModel to clear user-specific day data
         try
         {
@@ -315,7 +315,7 @@ public class HybridAuthService
         {
             Console.WriteLine($"HybridAuthService: Error resetting DayDetailViewModel: {ex.Message}");
         }
-        
+
         // Reset CalendarPage loaded flag to ensure fresh data on next login
         try
         {
@@ -326,7 +326,7 @@ public class HybridAuthService
         {
             Console.WriteLine($"HybridAuthService: Error resetting CalendarPage loaded flag: {ex.Message}");
         }
-        
+
         Console.WriteLine("HybridAuthService: SignOut completed, all data cleared");
     }
 
@@ -366,6 +366,16 @@ public class HybridAuthService
         {
             return false;
         }
+    }
+
+    public async Task<bool> ForgotPasswordAsync(string email)
+    {
+        return await _cognitoService.ForgotPasswordAsync(email);
+    }
+
+    public async Task<bool> ConfirmForgotPasswordAsync(string email, string code, string newPassword)
+    {
+        return await _cognitoService.ConfirmForgotPasswordAsync(email, code, newPassword);
     }
 }
 

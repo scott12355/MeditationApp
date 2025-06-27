@@ -116,8 +116,15 @@ public class LoginViewModel : BindableObject
 
     private async Task OnForgotPassword()
     {
-        // TODO: Implement forgot password functionality
-        await Shell.Current.DisplayAlert("Forgot Password", "Password reset functionality will be implemented soon.", "OK");
+        // Navigate to ForgotPasswordPage
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            if (Application.Current != null)
+            {
+                var forgotPasswordPage = ((App)Application.Current).Services.GetRequiredService<Views.ForgotPasswordPage>();
+                Application.Current.MainPage = forgotPasswordPage;
+            }
+        });
     }
 
     public void ClearFields()

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                            xmlns:controls="clr-namespace:MeditationApp.Controls"
+                            xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
+                            xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+                            x:Class="MeditationApp.Views.BreathingExercisePage"
+                            Title="Breathing Exercises"
+                            Shell.NavBarIsVisible="False">
+    <uranium:UraniumContentPage.Background>
+        <SolidColorBrush Color="#EFEBD3"/>
+    </uranium:UraniumContentPage.Background>
+
+<Grid RowDefinitions="Auto,*" BackgroundColor="#EFEBD3">        <!-- Header with Hamburger Menu -->
+        <!-- Header with Hamburger Menu -->
+                <Grid Padding="20,20,20,0">
+                    <Button x:Name="HamburgerButton"
+                            Text="☰"
+                            FontSize="24"
+                            BackgroundColor="Transparent"
+                            TextColor="Black"
+                            WidthRequest="44"
+                            HeightRequest="44"
+                            HorizontalOptions="Start"
+                            VerticalOptions="Start"
+                            Clicked="OnHamburgerClicked"/>
+
+                    <Label Text="Breath"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="Black"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+                </Grid>
+        <VerticalStackLayout Grid.Row="1" Padding="20,40,20,40" Spacing="30" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
+            <Label x:Name="BreathingPhaseLabel"
+                   Text="Ready to begin?"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   TextColor="#2E7D32"
+                   HorizontalOptions="Center"/>
+            <Grid HeightRequest="240" WidthRequest="240" HorizontalOptions="Center" VerticalOptions="Center">
+                <Ellipse x:Name="BreathingCircle"
+                         WidthRequest="200"
+                         HeightRequest="200"
+                         Fill="#A7D7C5"
+                         Stroke="#4CAF50"
+                         StrokeThickness="6"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Center"/>
+            </Grid>
+            <Frame Padding="0"
+                   CornerRadius="25"
+                   HasShadow="True"
+                   HorizontalOptions="Center"
+                   HeightRequest="56"
+                   WidthRequest="200"
+                   BackgroundColor="#4CAF50"
+                   BorderColor="Transparent">
+                <Frame.Shadow>
+                    <Shadow Brush="#4CAF50"
+                            Offset="0,6"
+                            Radius="15"
+                            Opacity="0.25"/>
+                </Frame.Shadow>
+                <Button Text="Start"
+                        x:Name="StartButton"
+                        BackgroundColor="Transparent"
+                        TextColor="White"
+                        FontSize="18"
+                        FontAttributes="Bold"
+                        Clicked="OnStartButtonClicked"
+                        HorizontalOptions="Fill"
+                        VerticalOptions="Fill"
+                        BorderColor="Transparent">
+                    <VisualStateManager.VisualStateGroups>
+                        <VisualStateGroupList>
+                            <VisualStateGroup x:Name="CommonStates">
+                                <VisualState x:Name="Normal">
+                                    <VisualState.Setters>
+                                        <Setter Property="Scale" Value="1.0"/>
+                                        <Setter Property="Opacity" Value="1.0"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                                <VisualState x:Name="Pressed">
+                                    <VisualState.Setters>
+                                        <Setter Property="Scale" Value="0.95"/>
+                                        <Setter Property="Opacity" Value="0.8"/>
+                                    </VisualState.Setters>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateGroupList>
+                    </VisualStateManager.VisualStateGroups>
+                </Button>
+            </Frame>
+        </VerticalStackLayout>
+    </Grid>
+</uranium:UraniumContentPage> 

@@ -14,7 +14,7 @@
         <ActivityIndicator
             IsRunning="{Binding Source={x:Reference LoadingIndicatorView}, Path=IsLoading}"
             IsVisible="{Binding Source={x:Reference LoadingIndicatorView}, Path=IsLoading}"
-            Color="#FF71BEF1"
+            Color="{StaticResource Primary}"
             WidthRequest="24"
             HeightRequest="24"/>
 

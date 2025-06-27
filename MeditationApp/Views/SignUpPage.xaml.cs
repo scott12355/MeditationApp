@@ -2,13 +2,24 @@ using MeditationApp.Services;
 using MeditationApp.ViewModels;
 using Microsoft.Maui.Controls.PlatformConfiguration.iOSSpecific;
 using UraniumUI.Pages;
+using Microsoft.Maui.Platform;
+#if ANDROID
+using Android.Views;
+#endif
+#if IOS
+using UIKit;
+using Foundation;
+#endif
 
 namespace MeditationApp.Views;
 
 public partial class SignUpPage : UraniumContentPage
 {
     private readonly SignUpViewModel _viewModel;
-
+#if IOS
+    NSObject? _keyboardShowObserver;
+    NSObject? _keyboardHideObserver;
+#endif
     public SignUpPage(CognitoAuthService cognitoAuthService)
     {
         InitializeComponent();
@@ -41,6 +52,27 @@ public partial class SignUpPage : UraniumContentPage
     {
         base.OnAppearing();
         _viewModel.ClearFields();
+
+#if IOS
+        _keyboardShowObserver = UIKeyboard.Notifications.ObserveWillShow((sender, args) =>
+        {
+            var keyboardHeight = args.FrameEnd.Height;
+            this.Padding = new Thickness(0, 0, 0, keyboardHeight);
+        });
+        _keyboardHideObserver = UIKeyboard.Notifications.ObserveWillHide((sender, args) =>
+        {
+            this.Padding = new Thickness(0);
+        });
+#endif
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+#if IOS
+        _keyboardShowObserver?.Dispose();
+        _keyboardHideObserver?.Dispose();
+#endif
     }
 
     private async void OnBackButtonClicked(object sender, EventArgs e)

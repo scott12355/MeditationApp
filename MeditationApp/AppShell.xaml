@@ -111,6 +111,14 @@
             Route="CalendarPage"/>
     </FlyoutItem>
 
+    <FlyoutItem Title="Breathing Exercise"
+                Icon="book"
+                Shell.FlyoutBehavior="Flyout">
+        <ShellContent
+            Title="Breathing"
+            ContentTemplate="{DataTemplate views:BreathingExercisePage}"
+            Route="BreathingExercisePage"/>
+    </FlyoutItem>
 
     <FlyoutItem Title="Settings"
                 Icon="settings"

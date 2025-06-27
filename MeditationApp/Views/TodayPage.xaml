@@ -749,7 +749,7 @@
                                            HasShadow="False">
                                         <Editor x:Name="SessionNotesEditor"
                                                 Text="{Binding SessionNotes}"
-                                                Placeholder="Share your thoughts and feelings as if writing in a diary. How are you today, and what’s been happening in your life?"                                                PlaceholderColor="#A0A0A0"
+                                                Placeholder="Share your thoughts and feelings as if writing in a diary. How are you today, and what's been happening in your life?"                                                PlaceholderColor="#A0A0A0"
                                                 HeightRequest="100"
                                                 BackgroundColor="Transparent"
                                                 FontSize="16"
@@ -771,46 +771,33 @@
                                                 Radius="15"
                                                 Opacity="0.25"/>
                                     </Frame.Shadow>
-                                    <Button Text="✨ Create My Meditation"
-                                            Command="{Binding RequestNewSessionCommand}"
-                                            BackgroundColor="Transparent"
-                                            TextColor="White"
-                                            FontSize="18"
-                                            FontAttributes="Bold"
-                                            HorizontalOptions="Fill"
-                                            VerticalOptions="Fill"
-                                            BorderColor="Transparent">
-                                        <VisualStateManager.VisualStateGroups>
-                                            <VisualStateGroupList>
-                                                <VisualStateGroup x:Name="CommonStates">
-                                                    <VisualState x:Name="Normal">
-                                                        <VisualState.Setters>
-                                                            <Setter Property="Scale"
-                                                                    Value="1.0"/>
-                                                            <Setter Property="Opacity"
-                                                                    Value="1.0"/>
-                                                        </VisualState.Setters>
-                                                    </VisualState>
-                                                    <VisualState x:Name="Pressed">
-                                                        <VisualState.Setters>
-                                                            <Setter Property="Scale"
-                                                                    Value="0.96"/>
-                                                            <Setter Property="Opacity"
-                                                                    Value="0.85"/>
-                                                        </VisualState.Setters>
-                                                    </VisualState>
-                                                </VisualStateGroup>
-                                            </VisualStateGroupList>
-                                        </VisualStateManager.VisualStateGroups>
-                                        <Button.Behaviors>
-                                            <toolkit:AnimationBehavior>
-                                                <toolkit:AnimationBehavior.AnimationType>
-                                                    <toolkit:FadeAnimation Length="200"/>
-                                                </toolkit:AnimationBehavior.AnimationType>
-                                            </toolkit:AnimationBehavior>
-                                        </Button.Behaviors>
+                                    <Button
+                                        x:Name="CreateMeditationButton"
+                                        Text="✨ Create My Meditation"
+                                        Command="{Binding RequestNewSessionCommand}"
+                                        BackgroundColor="Transparent"
+                                        TextColor="White"
+                                        FontSize="18"
+                                        FontAttributes="Bold"
+                                        HorizontalOptions="Fill"
+                                        VerticalOptions="Fill"
+                                        BorderColor="Transparent"
+                                        IsEnabled="{Binding IsRequestingSession, Converter={StaticResource InverseBoolConverter}}">
+                                        <Button.Triggers>
+                                            <DataTrigger TargetType="Button" Binding="{Binding IsRequestingSession}" Value="True">
+                                                <Setter Property="Text" Value="Creating…"/>
+                                            </DataTrigger>
+                                        </Button.Triggers>
                                     </Button>
                                 </Frame>
+                                <ActivityIndicator
+                                    IsRunning="{Binding IsRequestingSession}"
+                                    IsVisible="{Binding IsRequestingSession}"
+                                    Color="White"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center"
+                                    WidthRequest="24"
+                                    HeightRequest="24"/>
                             </VerticalStackLayout>
                         </Frame>
                     </VerticalStackLayout>

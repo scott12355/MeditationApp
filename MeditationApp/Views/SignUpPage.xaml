@@ -56,208 +56,210 @@
                  InputTransparent="True"/>
 
         <!-- Main content -->
-        <VerticalStackLayout Padding="30,20,30,30"
-                             Spacing="0"
-                             VerticalOptions="Start"
-                             MinimumHeightRequest="600">
+        <ScrollView VerticalOptions="FillAndExpand">
+            <VerticalStackLayout Padding="30,20,30,30"
+                                 Spacing="0"
+                                 VerticalOptions="StartAndExpand"
+                                 MinimumHeightRequest="600">
 
-            <!-- Logo and Welcome Section -->
-            <VerticalStackLayout Spacing="15"
-                                 HorizontalOptions="Center"
-                                 Margin="0,20,0,20">
-                
-                <!-- Logo Image -->
-                <Image Source="logo.png"
-                       HeightRequest="80"
-                       WidthRequest="80"
-                       HorizontalOptions="Center"
-                       Opacity="0.9"/>
-
-                <!-- Welcome Text -->
-                <VerticalStackLayout Spacing="5"
-                                     HorizontalOptions="Center">
-                    <Label Text="Create Account"
-                           TextColor="{StaticResource PrimaryDarkText}"
-                           FontSize="32"
-                           FontAttributes="Bold"
-                           HorizontalOptions="Center"/>
-                    <Label Text="Please fill in your details"
-                           FontSize="14"
-                           TextColor="{StaticResource SecondaryDarkText}"
+                <!-- Logo and Welcome Section -->
+                <VerticalStackLayout Spacing="15"
+                                     HorizontalOptions="Center"
+                                     Margin="0,20,0,20">
+                    
+                    <!-- Logo Image -->
+                    <Image Source="logo.png"
+                           HeightRequest="80"
+                           WidthRequest="80"
                            HorizontalOptions="Center"
-                           HorizontalTextAlignment="Center"/>
-                </VerticalStackLayout>
-            </VerticalStackLayout>
+                           Opacity="0.9"/>
 
-            <!-- Sign Up Form Card -->
-            <Frame BackgroundColor="{StaticResource GlassyWhite}"
-                   BorderColor="{StaticResource GlassyBorder}"
-                   CornerRadius="24"
-                   Padding="25,20"
-                   HasShadow="True"
-                   Margin="0,0,0,15">
-                <Frame.Shadow>
-                    <Shadow Brush="Black"
-                            Offset="0,8"
-                            Radius="20"
-                            Opacity="0.12"/>
-                </Frame.Shadow>
-                <Frame.Effects>
-                    <uranium:BlurEffect Mode="Light"
-                                        AccentOpacity="0.1"/>
-                </Frame.Effects>
-
-                <VerticalStackLayout Spacing="20">
-
-                    <!-- Name fields in a horizontal layout -->
-                    <Grid ColumnDefinitions="*,10,*"
-                          RowDefinitions="Auto"
-                          HorizontalOptions="Fill">
-                        <material:TextField
-                            Grid.Column="0"
-                            Title="First Name"
-                            Text="{Binding FirstName}"
-                            AccentColor="{StaticResource Primary}"/>
-
-                        <material:TextField
-                            Grid.Column="2"
-                            Title="Last Name"
-                            Text="{Binding SecondName}"
-                            AccentColor="{StaticResource Primary}"/>
-                    </Grid>
-
-                    <!-- Email -->
-                    <material:TextField Title="Email"
-                                       Text="{Binding Email}"
-                                       Keyboard="Email"
-                                       AccentColor="{StaticResource Primary}"
-                                       AllowClear="True"/>
-
-                    <!-- Password -->
-                    <material:TextField Title="Password"
-                                       Text="{Binding Password}"
-                                       IsPassword="True"
-                                       AccentColor="{StaticResource Primary}">
-                        <material:TextField.Attachments>
-                            <material:TextFieldPasswordShowHideAttachment />
-                        </material:TextField.Attachments>
-                    </material:TextField>
-
-                    <!-- Confirm Password -->
-                    <material:TextField Title="Confirm Password"
-                                       Text="{Binding ConfirmPassword}"
-                                       IsPassword="True"
-                                       AccentColor="{StaticResource Primary}">
-                        <material:TextField.Attachments>
-                            <material:TextFieldPasswordShowHideAttachment />
-                        </material:TextField.Attachments>
-                    </material:TextField>
-
-                    <!-- Status and Loading Indicator -->
-                    <Grid HorizontalOptions="Center"
-                          Margin="0,5,0,0">
-                        <Label Text="{Binding Status}"
-                               TextColor="Red"
+                    <!-- Welcome Text -->
+                    <VerticalStackLayout Spacing="5"
+                                         HorizontalOptions="Center">
+                        <Label Text="Create Account"
+                               TextColor="{StaticResource PrimaryDarkText}"
+                               FontSize="32"
+                               FontAttributes="Bold"
+                               HorizontalOptions="Center"/>
+                        <Label Text="Please fill in your details"
                                FontSize="14"
+                               TextColor="{StaticResource SecondaryDarkText}"
                                HorizontalOptions="Center"
-                               HorizontalTextAlignment="Center"
-                               IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"/>
-                        <controls:LoadingIndicator
-                            IsLoading="{Binding IsBusy}"
-                            LoadingText="{Binding LoadingText}"
-                            IsVisible="{Binding IsBusy}"/>
-                    </Grid>
-
-                    <!-- Sign Up Button -->
-                    <Frame Padding="0"
-                           CornerRadius="25"
-                           HasShadow="True"
-                           HorizontalOptions="Fill"
-                           HeightRequest="56"
-                           BackgroundColor="{StaticResource Primary}"
-                           BorderColor="Transparent">
-                        <Frame.Shadow>
-                            <Shadow Brush="{StaticResource Primary}"
-                                    Offset="0,6"
-                                    Radius="15"
-                                    Opacity="0.25"/>
-                        </Frame.Shadow>
-                        <Button Text="Create Account"
-                                Command="{Binding SignUpCommand}"
-                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
-                                BackgroundColor="Transparent"
-                                TextColor="White"
-                                FontSize="18"
-                                FontAttributes="Bold"
-                                HorizontalOptions="Fill"
-                                VerticalOptions="Fill"
-                                BorderColor="Transparent">
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroupList>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal">
-                                            <VisualState.Setters>
-                                                <Setter Property="Scale"
-                                                        Value="1.0"/>
-                                                <Setter Property="Opacity"
-                                                        Value="1.0"/>
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                        <VisualState x:Name="Pressed">
-                                            <VisualState.Setters>
-                                                <Setter Property="Scale"
-                                                        Value="0.96"/>
-                                                <Setter Property="Opacity"
-                                                        Value="0.85"/>
-                                            </VisualState.Setters>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                </VisualStateGroupList>
-                            </VisualStateManager.VisualStateGroups>
-                            <Button.Behaviors>
-                                <toolkit:AnimationBehavior>
-                                    <toolkit:AnimationBehavior.AnimationType>
-                                        <toolkit:FadeAnimation Length="200"/>
-                                    </toolkit:AnimationBehavior.AnimationType>
-                                </toolkit:AnimationBehavior>
-                            </Button.Behaviors>
-                        </Button>
-                    </Frame>
-
+                               HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
                 </VerticalStackLayout>
-            </Frame>
 
-            <!-- Sign In Section -->
-            <Frame BackgroundColor="#60E3F0FF"
-                   BorderColor="#40FFFFFF"
-                   CornerRadius="16"
-                   Padding="15,10"
-                   HasShadow="True"
-                   HorizontalOptions="Center">
-                <Frame.Shadow>
-                    <Shadow Brush="Black"
-                            Offset="0,4"
-                            Radius="12"
-                            Opacity="0.06"/>
-                </Frame.Shadow>
-                <StackLayout Orientation="Horizontal"
-                             HorizontalOptions="Center">
-                    <Label Text="Already have an account? "
-                           TextColor="{StaticResource SecondaryDarkText}"
-                           FontSize="14"
-                           VerticalOptions="Center"/>
-                    <Label Text="Sign in"
-                           TextColor="{StaticResource Primary}"
-                           FontSize="14"
-                           FontAttributes="Bold"
-                           VerticalOptions="Center">
-                        <Label.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding BackToLoginCommand}"/>
-                        </Label.GestureRecognizers>
-                    </Label>
-                </StackLayout>
-            </Frame>
+                <!-- Sign Up Form Card -->
+                <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                       BorderColor="{StaticResource GlassyBorder}"
+                       CornerRadius="24"
+                       Padding="25,20"
+                       HasShadow="True"
+                       Margin="0,0,0,15">
+                    <Frame.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="0,8"
+                                Radius="20"
+                                Opacity="0.12"/>
+                    </Frame.Shadow>
+                    <Frame.Effects>
+                        <uranium:BlurEffect Mode="Light"
+                                            AccentOpacity="0.1"/>
+                    </Frame.Effects>
 
-        </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="20">
+
+                        <!-- Name fields in a horizontal layout -->
+                        <Grid ColumnDefinitions="*,10,*"
+                              RowDefinitions="Auto"
+                              HorizontalOptions="Fill">
+                            <material:TextField
+                                Grid.Column="0"
+                                Title="First Name"
+                                Text="{Binding FirstName}"
+                                AccentColor="{StaticResource Primary}"/>
+
+                            <material:TextField
+                                Grid.Column="2"
+                                Title="Last Name"
+                                Text="{Binding SecondName}"
+                                AccentColor="{StaticResource Primary}"/>
+                        </Grid>
+
+                        <!-- Email -->
+                        <material:TextField Title="Email"
+                                           Text="{Binding Email}"
+                                           Keyboard="Email"
+                                           AccentColor="{StaticResource Primary}"
+                                           AllowClear="True"/>
+
+                        <!-- Password -->
+                        <material:TextField Title="Password"
+                                           Text="{Binding Password}"
+                                           IsPassword="True"
+                                           AccentColor="{StaticResource Primary}">
+                            <material:TextField.Attachments>
+                                <material:TextFieldPasswordShowHideAttachment />
+                            </material:TextField.Attachments>
+                        </material:TextField>
+
+                        <!-- Confirm Password -->
+                        <material:TextField Title="Confirm Password"
+                                           Text="{Binding ConfirmPassword}"
+                                           IsPassword="True"
+                                           AccentColor="{StaticResource Primary}">
+                            <material:TextField.Attachments>
+                                <material:TextFieldPasswordShowHideAttachment />
+                            </material:TextField.Attachments>
+                        </material:TextField>
+
+                        <!-- Status and Loading Indicator -->
+                        <Grid HorizontalOptions="Center"
+                              Margin="0,5,0,0">
+                            <Label Text="{Binding Status}"
+                                   TextColor="Red"
+                                   FontSize="14"
+                                   HorizontalOptions="Center"
+                                   HorizontalTextAlignment="Center"
+                                   IsVisible="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"/>
+                            <controls:LoadingIndicator
+                                IsLoading="{Binding IsBusy}"
+                                LoadingText="{Binding LoadingText}"
+                                IsVisible="{Binding IsBusy}"/>
+                        </Grid>
+
+                        <!-- Sign Up Button -->
+                        <Frame Padding="0"
+                               CornerRadius="25"
+                               HasShadow="True"
+                               HorizontalOptions="Fill"
+                               HeightRequest="56"
+                               BackgroundColor="{StaticResource Primary}"
+                               BorderColor="Transparent">
+                            <Frame.Shadow>
+                                <Shadow Brush="{StaticResource Primary}"
+                                        Offset="0,6"
+                                        Radius="15"
+                                        Opacity="0.25"/>
+                            </Frame.Shadow>
+                            <Button Text="Create Account"
+                                    Command="{Binding SignUpCommand}"
+                                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                                    BackgroundColor="Transparent"
+                                    TextColor="White"
+                                    FontSize="18"
+                                    FontAttributes="Bold"
+                                    HorizontalOptions="Fill"
+                                    VerticalOptions="Fill"
+                                    BorderColor="Transparent">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroupList>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal">
+                                                <VisualState.Setters>
+                                                    <Setter Property="Scale"
+                                                            Value="1.0"/>
+                                                    <Setter Property="Opacity"
+                                                            Value="1.0"/>
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                            <VisualState x:Name="Pressed">
+                                                <VisualState.Setters>
+                                                    <Setter Property="Scale"
+                                                            Value="0.96"/>
+                                                    <Setter Property="Opacity"
+                                                            Value="0.85"/>
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateGroupList>
+                                </VisualStateManager.VisualStateGroups>
+                                <Button.Behaviors>
+                                    <toolkit:AnimationBehavior>
+                                        <toolkit:AnimationBehavior.AnimationType>
+                                            <toolkit:FadeAnimation Length="200"/>
+                                        </toolkit:AnimationBehavior.AnimationType>
+                                    </toolkit:AnimationBehavior>
+                                </Button.Behaviors>
+                            </Button>
+                        </Frame>
+
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Sign In Section -->
+                <Frame BackgroundColor="#60E3F0FF"
+                       BorderColor="#40FFFFFF"
+                       CornerRadius="16"
+                       Padding="15,10"
+                       HasShadow="True"
+                       HorizontalOptions="Center">
+                    <Frame.Shadow>
+                        <Shadow Brush="Black"
+                                Offset="0,4"
+                                Radius="12"
+                                Opacity="0.06"/>
+                    </Frame.Shadow>
+                    <StackLayout Orientation="Horizontal"
+                                 HorizontalOptions="Center">
+                        <Label Text="Already have an account? "
+                               TextColor="{StaticResource SecondaryDarkText}"
+                               FontSize="14"
+                               VerticalOptions="Center"/>
+                        <Label Text="Sign in"
+                               TextColor="{StaticResource Primary}"
+                               FontSize="14"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding BackToLoginCommand}"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </StackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+        </ScrollView>
     </Grid>
 </uranium:UraniumContentPage>

@@ -122,7 +122,6 @@
                     <material:TextField Title="Password"
                                        Text="{Binding Password}"
                                        IsPassword="True"
-                                       
                                        AccentColor="{StaticResource Primary}">
                         <material:TextField.Attachments>
                             <material:TextFieldPasswordShowHideAttachment />

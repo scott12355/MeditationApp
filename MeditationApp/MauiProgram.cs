@@ -18,6 +18,7 @@ using Microsoft.Maui.Handlers;
 using MeditationApp.Controls;
 // using MeditationApp.Platforms.Android;
 #endif
+using MeditationApp.Views;
 
 namespace MeditationApp;
 
@@ -133,6 +134,8 @@ public static class MauiProgram
         builder.Services.AddTransient<Views.DayDetailPage>();
         builder.Services.AddTransient<Views.OnboardingPage1>();
         builder.Services.AddTransient<Views.OnboardingPage2>();
+        builder.Services.AddTransient<Views.ForgotPasswordPage>();
+        builder.Services.AddTransient<BreathingExercisePage>();
 
         // Register view models
         builder.Services.AddTransient<ViewModels.LoginViewModel>();
@@ -157,6 +160,7 @@ public static class MauiProgram
                 provider.GetRequiredService<AudioPlayerService>()
             )
         );
+        builder.Services.AddTransient<ViewModels.ForgotPasswordViewModel>();
 
         // Register MeditationSessionDatabase
         string dbPath = Path.Combine(FileSystem.AppDataDirectory, "meditation_sessions.db3");
