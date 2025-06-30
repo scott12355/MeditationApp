@@ -16,6 +16,7 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
 
     private readonly HybridAuthService _hybridAuthService;
     private readonly NotificationService _notificationService;
+    private readonly InAppPurchaseService _inAppPurchaseService;
     
     private string _userName = "John Doe";
     private string _email = "john.doe@example.com";
@@ -83,13 +84,16 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
 
     public ICommand SaveSettingsCommand { get; }
     public ICommand LogoutCommand { get; }
+    public ICommand SubscribeCommand { get; }
 
-    public SettingsViewModel(HybridAuthService hybridAuthService, NotificationService notificationService)
+    public SettingsViewModel(HybridAuthService hybridAuthService, NotificationService notificationService, InAppPurchaseService inAppPurchaseService)
     {
         _hybridAuthService = hybridAuthService;
         _notificationService = notificationService;
+        _inAppPurchaseService = inAppPurchaseService;
         SaveSettingsCommand = new Command(OnSaveSettings);
         LogoutCommand = new Command(async () => await OnLogout());
+        SubscribeCommand = new Command(async () => await OnSubscribe());
         LoadUserData();
         LoadSettings();
     }
@@ -254,6 +258,37 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
     {
         // TODO: Load actual user data from service
         // For now using sample data
+    }
+
+    private async Task OnSubscribe()
+    {
+        try
+        {
+            // Replace with your actual product ID from App Store Connect
+            const string productId = "com.lucen.subscription.month";
+            var result = await _inAppPurchaseService.PurchaseSubscriptionAsync(productId);
+            var mainPage = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (mainPage != null)
+            {
+                if (result)
+                {
+                    await mainPage.DisplayAlert("Success", "Subscription purchased!", "OK");
+                }
+                else
+                {
+                    await mainPage.DisplayAlert("Error", "Subscription failed or cancelled.", "OK");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            var mainPage = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (mainPage != null)
+            {
+                await mainPage.DisplayAlert("Error", $"An error occurred during purchase: {ex.Message}", "OK");
+            }
+            System.Diagnostics.Debug.WriteLine($"In-app purchase error: {ex}");
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

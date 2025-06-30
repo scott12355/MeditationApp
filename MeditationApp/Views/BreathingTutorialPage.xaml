@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                            xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+                            x:Class="MeditationApp.Views.BreathingTutorialPage"
+                            Title="Breathing Tutorial">
+
+    <uranium:UraniumContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#EFEBD3" Offset="0.0"/>
+            <GradientStop Color="#F5F1E8" Offset="1.0"/>
+        </LinearGradientBrush>
+    </uranium:UraniumContentPage.Background>
+
+    <ScrollView Padding="20">
+        <StackLayout Spacing="25">
+            
+            <!-- Welcome Section -->
+            <Frame BackgroundColor="White" CornerRadius="20" HasShadow="True" Padding="25">
+                <StackLayout Spacing="15" HorizontalOptions="Center">
+                    <Label Text="🫁" FontSize="60" HorizontalOptions="Center"/>
+                    <Label Text="Welcome to Breath" 
+                           FontSize="28" 
+                           FontAttributes="Bold" 
+                           TextColor="#2E7D32" 
+                           HorizontalOptions="Center"/>
+                    <Label Text="Discover the power of conscious breathing to reduce stress, improve focus, and enhance your well-being." 
+                           FontSize="16" 
+                           TextColor="#666" 
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
+                </StackLayout>
+            </Frame>
+
+            <!-- Benefits Section -->
+            <Frame BackgroundColor="White" CornerRadius="15" HasShadow="True" Padding="20">
+                <StackLayout Spacing="15">
+                    <Label Text="✨ Benefits of Breathing Exercises" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           TextColor="#2E7D32"/>
+                    
+                    <StackLayout Spacing="12">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                            <Label Grid.Column="0" Text="🧘‍♀️" FontSize="24" VerticalOptions="Center"/>
+                            <StackLayout Grid.Column="1">
+                                <Label Text="Stress Reduction" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="Activate your parasympathetic nervous system for instant calm" FontSize="14" TextColor="#666"/>
+                            </StackLayout>
+                        </Grid>
+                        
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                            <Label Grid.Column="0" Text="🎯" FontSize="24" VerticalOptions="Center"/>
+                            <StackLayout Grid.Column="1">
+                                <Label Text="Improved Focus" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="Enhance concentration and mental clarity" FontSize="14" TextColor="#666"/>
+                            </StackLayout>
+                        </Grid>
+                        
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                            <Label Grid.Column="0" Text="😴" FontSize="24" VerticalOptions="Center"/>
+                            <StackLayout Grid.Column="1">
+                                <Label Text="Better Sleep" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="Prepare your body and mind for restful sleep" FontSize="14" TextColor="#666"/>
+                            </StackLayout>
+                        </Grid>
+                        
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                            <Label Grid.Column="0" Text="⚡" FontSize="24" VerticalOptions="Center"/>
+                            <StackLayout Grid.Column="1">
+                                <Label Text="Energy Boost" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="Natural way to increase alertness and vitality" FontSize="14" TextColor="#666"/>
+                            </StackLayout>
+                        </Grid>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- How It Works Section -->
+            <Frame BackgroundColor="White" CornerRadius="15" HasShadow="True" Padding="20">
+                <StackLayout Spacing="15">
+                    <Label Text="🔄 How It Works" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           TextColor="#2E7D32"/>
+                    
+                    <StackLayout Spacing="15">
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                            <Frame Grid.Column="0" 
+                                   BackgroundColor="#E3F2FD" 
+                                   WidthRequest="40" 
+                                   HeightRequest="40" 
+                                   CornerRadius="20" 
+                                   HasShadow="False" 
+                                   Padding="0">
+                                <Label Text="1" 
+                                       FontSize="18" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#1976D2" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="Choose Your Technique" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="Select from various proven breathing patterns" FontSize="14" TextColor="#666"/>
+                            </StackLayout>
+                        </Grid>
+                        
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                            <Frame Grid.Column="0" 
+                                   BackgroundColor="#E8F5E8" 
+                                   WidthRequest="40" 
+                                   HeightRequest="40" 
+                                   CornerRadius="20" 
+                                   HasShadow="False" 
+                                   Padding="0">
+                                <Label Text="2" 
+                                       FontSize="18" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#4CAF50" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="Follow the Guide" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="Visual cues and timing help you breathe correctly" FontSize="14" TextColor="#666"/>
+                            </StackLayout>
+                        </Grid>
+                        
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="15">
+                            <Frame Grid.Column="0" 
+                                   BackgroundColor="#FFF3E0" 
+                                   WidthRequest="40" 
+                                   HeightRequest="40" 
+                                   CornerRadius="20" 
+                                   HasShadow="False" 
+                                   Padding="0">
+                                <Label Text="3" 
+                                       FontSize="18" 
+                                       FontAttributes="Bold" 
+                                       TextColor="#FF9800" 
+                                       HorizontalOptions="Center" 
+                                       VerticalOptions="Center"/>
+                            </Frame>
+                            <StackLayout Grid.Column="1" VerticalOptions="Center">
+                                <Label Text="Track Your Progress" FontSize="16" FontAttributes="Bold"/>
+                                <Label Text="Monitor your sessions and build healthy habits" FontSize="14" TextColor="#666"/>
+                            </StackLayout>
+                        </Grid>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Quick Start Guide -->
+            <Frame BackgroundColor="White" CornerRadius="15" HasShadow="True" Padding="20">
+                <StackLayout Spacing="15">
+                    <Label Text="🚀 Quick Start Guide" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           TextColor="#2E7D32"/>
+                    
+                    <StackLayout Spacing="10">
+                        <Label Text="• Find a quiet, comfortable space" FontSize="16" TextColor="#333"/>
+                        <Label Text="• Sit or lie down with your spine straight" FontSize="16" TextColor="#333"/>
+                        <Label Text="• Choose a breathing technique for beginners" FontSize="16" TextColor="#333"/>
+                        <Label Text="• Focus on the visual guide and timing" FontSize="16" TextColor="#333"/>
+                        <Label Text="• Start with just 5-10 cycles" FontSize="16" TextColor="#333"/>
+                        <Label Text="• Be patient and gentle with yourself" FontSize="16" TextColor="#333"/>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Recommended Techniques for Beginners -->
+            <Frame BackgroundColor="White" CornerRadius="15" HasShadow="True" Padding="20">
+                <StackLayout Spacing="15">
+                    <Label Text="👶 Beginner-Friendly Techniques" 
+                           FontSize="20" 
+                           FontAttributes="Bold" 
+                           TextColor="#2E7D32"/>
+                    
+                    <StackLayout Spacing="12">
+                        <Frame BackgroundColor="#4CAF50" CornerRadius="10" Padding="15">
+                            <StackLayout Spacing="5">
+                                <Label Text="Equal Breathing" FontSize="16" FontAttributes="Bold" TextColor="White"/>
+                                <Label Text="Perfect for beginners - simple and balanced" FontSize="14" TextColor="White" Opacity="0.9"/>
+                            </StackLayout>
+                        </Frame>
+                        
+                        <Frame BackgroundColor="#2196F3" CornerRadius="10" Padding="15">
+                            <StackLayout Spacing="5">
+                                <Label Text="4-7-8 Technique" FontSize="16" FontAttributes="Bold" TextColor="White"/>
+                                <Label Text="Great for relaxation and sleep preparation" FontSize="14" TextColor="White" Opacity="0.9"/>
+                            </StackLayout>
+                        </Frame>
+                        
+                        <Frame BackgroundColor="#9C27B0" CornerRadius="10" Padding="15">
+                            <StackLayout Spacing="5">
+                                <Label Text="Relaxing Breath" FontSize="16" FontAttributes="Bold" TextColor="White"/>
+                                <Label Text="Quick stress relief when you need it most" FontSize="14" TextColor="White" Opacity="0.9"/>
+                            </StackLayout>
+                        </Frame>
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Call to Action -->
+            <StackLayout Spacing="15">
+                <Button Text="Start Your First Session" 
+                        BackgroundColor="#4CAF50" 
+                        TextColor="White" 
+                        FontSize="18" 
+                        FontAttributes="Bold"
+                        CornerRadius="25" 
+                        HeightRequest="60"
+                        Clicked="OnStartFirstSessionClicked"/>
+                
+                <Label Text="Take your first step towards better breathing and wellness" 
+                       FontSize="14" 
+                       TextColor="#666" 
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"/>
+            </StackLayout>
+
+        </StackLayout>
+    </ScrollView>
+</uranium:UraniumContentPage>

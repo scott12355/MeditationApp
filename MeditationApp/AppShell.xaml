@@ -120,6 +120,24 @@
             Route="BreathingExercisePage"/>
     </FlyoutItem>
 
+    <FlyoutItem Title="Breathing Stats"
+                Icon="chart"
+                Shell.FlyoutBehavior="Flyout">
+        <ShellContent
+            Title="Breathing Stats"
+            ContentTemplate="{DataTemplate views:BreathingStatsPage}"
+            Route="BreathingStatsPage"/>
+    </FlyoutItem>
+
+    <FlyoutItem Title="Breathing Settings"
+                Icon="settings"
+                Shell.FlyoutBehavior="Flyout">
+        <ShellContent
+            Title="Breathing Settings"
+            ContentTemplate="{DataTemplate views:BreathingSettingsPage}"
+            Route="BreathingSettingsPage"/>
+    </FlyoutItem>
+
     <FlyoutItem Title="Settings"
                 Icon="settings"
                 Shell.FlyoutBehavior="Flyout">

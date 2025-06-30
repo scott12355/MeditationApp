@@ -32,6 +32,10 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 		</dict>
+
+		<!-- store kit -->
+		<key>SKAdNetworkItems</key>
+		<array/>
 	</dict>
 
 </plist>

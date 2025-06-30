@@ -135,13 +135,22 @@ public static class MauiProgram
         builder.Services.AddTransient<Views.OnboardingPage1>();
         builder.Services.AddTransient<Views.OnboardingPage2>();
         builder.Services.AddTransient<Views.ForgotPasswordPage>();
-        builder.Services.AddTransient<BreathingExercisePage>();
+        builder.Services.AddTransient<BreathingExercisePage>(provider =>
+            new BreathingExercisePage(provider.GetRequiredService<ViewModels.BreathingExerciseViewModel>()));
+        builder.Services.AddTransient<Views.BreathingStatsPage>(provider =>
+            new Views.BreathingStatsPage(provider.GetRequiredService<ViewModels.BreathingExerciseViewModel>()));
 
         // Register view models
         builder.Services.AddTransient<ViewModels.LoginViewModel>();
         builder.Services.AddTransient<ViewModels.SignUpViewModel>();
         builder.Services.AddTransient<ViewModels.VerificationViewModel>();
-        builder.Services.AddTransient<ViewModels.SettingsViewModel>();
+        builder.Services.AddTransient<ViewModels.SettingsViewModel>(provider =>
+            new ViewModels.SettingsViewModel(
+                provider.GetRequiredService<HybridAuthService>(),
+                provider.GetRequiredService<NotificationService>(),
+                provider.GetRequiredService<InAppPurchaseService>()
+            )
+        );
         builder.Services.AddTransient<ViewModels.ProfileViewModel>();
         builder.Services.AddTransient<ViewModels.SimpleCalendarViewModel>(provider =>
             new ViewModels.SimpleCalendarViewModel(
@@ -161,6 +170,11 @@ public static class MauiProgram
             )
         );
         builder.Services.AddTransient<ViewModels.ForgotPasswordViewModel>();
+        builder.Services.AddTransient<ViewModels.BreathingExerciseViewModel>(provider =>
+            new ViewModels.BreathingExerciseViewModel(
+                provider.GetService<NotificationService>(),
+                provider.GetRequiredService<BreathingDatabaseService>()
+            ));
 
         // Register MeditationSessionDatabase
         string dbPath = Path.Combine(FileSystem.AppDataDirectory, "meditation_sessions.db3");
@@ -190,6 +204,7 @@ public static class MauiProgram
 
         // Register NotificationService
         builder.Services.AddSingleton<MeditationApp.Services.NotificationService>();
+        builder.Services.AddSingleton<InAppPurchaseService>();
 
         // Register Plugin.Maui.Audio
         builder.Services.AddSingleton(AudioManager.Current);
@@ -210,6 +225,13 @@ public static class MauiProgram
         {
             var audioManager = provider.GetRequiredService<IAudioManager>();
             return new AudioPlayerService(audioManager);
+        });
+
+        // Register breathing database service
+        builder.Services.AddSingleton<BreathingDatabaseService>(provider =>
+        {
+            var dbPath = Path.Combine(FileSystem.AppDataDirectory, "BreathingDatabase.db3");
+            return new BreathingDatabaseService(dbPath);
         });
 
 #if DEBUG

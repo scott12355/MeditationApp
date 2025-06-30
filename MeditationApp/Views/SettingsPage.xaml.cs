@@ -32,4 +32,16 @@ public partial class SettingsPage : ContentPage
     {
         Shell.Current.FlyoutIsPresented = true;
     }
+
+    private async void OnSubscribeClicked(object sender, EventArgs e)
+    {
+        if (BindingContext is SettingsViewModel vm && vm.SubscribeCommand != null && vm.SubscribeCommand.CanExecute(null))
+        {
+            vm.SubscribeCommand.Execute(null);
+        }
+        else
+        {
+            await DisplayAlert("Error", "Subscription feature is not available.", "OK");
+        }
+    }
 }

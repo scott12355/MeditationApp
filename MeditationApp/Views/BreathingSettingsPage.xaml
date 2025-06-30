@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                            xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+                            xmlns:viewmodels="clr-namespace:MeditationApp.ViewModels"
+                            x:Class="MeditationApp.Views.BreathingSettingsPage"
+                            x:DataType="viewmodels:BreathingExerciseViewModel"
+                            Title="Breathing Settings">
+
+    <uranium:UraniumContentPage.Background>
+        <SolidColorBrush Color="{StaticResource BackgroundColor}"/>
+    </uranium:UraniumContentPage.Background>
+
+    <Grid BackgroundColor="{StaticResource BackgroundColor}">
+        <!-- Decorative abstract shapes -->
+        <Ellipse WidthRequest="150"
+                 HeightRequest="150"
+                 Fill="#15BBDEFB"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"
+                 Margin="-60,30,0,0"
+                 InputTransparent="True"/>
+
+        <Ellipse WidthRequest="120"
+                 HeightRequest="120"
+                 Fill="#10E1BEE7"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"
+                 Margin="0,0,-50,60"
+                 InputTransparent="True"/>
+    </Grid>
+
+    <ScrollView Padding="20">
+        <StackLayout Spacing="25">
+
+            <!-- Audio Settings -->
+            <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                   BorderColor="{StaticResource GlassyBorder}"
+                   CornerRadius="24"
+                   HasShadow="True"
+                   Padding="25,20">
+                <StackLayout Spacing="20">
+                    <Label Text="Audio Settings"
+                           FontSize="24"
+                           FontAttributes="Bold"
+                           FontFamily="OpenSansRegular"
+                           TextColor="{StaticResource Primary}"/>
+
+                    <Grid ColumnDefinitions="*,Auto"
+                            RowDefinitions="Auto,Auto,Auto"
+                            RowSpacing="15">
+                        <Label Grid.Row="0"
+                                Grid.Column="0"
+                               Text="Enable Sound Effects"
+                               FontFamily="OpenSansRegular"
+                               FontSize="16"
+                               TextColor="{StaticResource Gray700}"
+                               VerticalOptions="Center"/>
+                        <Switch Grid.Row="0"
+                                Grid.Column="1"
+                                IsToggled="{Binding Settings.EnableSoundEffects}"/>
+
+                        <Label Grid.Row="1"
+                                Grid.Column="0"
+                               Text="Enable Background Music"
+                               FontFamily="OpenSansRegular"
+                               FontSize="16"
+                               TextColor="{StaticResource Gray700}"
+                               VerticalOptions="Center"/>
+                        <Switch Grid.Row="1"
+                                Grid.Column="1"
+                                IsToggled="{Binding Settings.EnableBackgroundMusic}"/>
+
+                        <Label Grid.Row="2"
+                                Grid.Column="0"
+                               Text="Sound Volume"
+                               FontFamily="OpenSansRegular"
+                               FontSize="16"
+                               TextColor="{StaticResource Gray700}"
+                               VerticalOptions="Center"/>
+                        <Slider Grid.Row="2"
+                                Grid.Column="1"
+                                Value="{Binding Settings.SoundVolume}"
+                                Minimum="0"
+                                Maximum="1"
+                                WidthRequest="120"
+                                ThumbColor="{StaticResource Primary}"
+                                MinimumTrackColor="{StaticResource Primary}"
+                                MaximumTrackColor="{StaticResource Gray300}"/>
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <!-- Feedback Settings -->
+            <Frame BackgroundColor="White"
+                    CornerRadius="15"
+                    HasShadow="True"
+                    Padding="20">
+                <StackLayout Spacing="15">
+                    <Label Text="Feedback Settings"
+                            FontSize="20"
+                            FontAttributes="Bold"
+                            TextColor="#2E7D32"/>
+
+                    <Grid ColumnDefinitions="*,Auto"
+                            RowDefinitions="Auto,Auto,Auto,Auto">
+                        <Label Grid.Row="0"
+                                Grid.Column="0"
+                                Text="Enable Haptic Feedback"
+                                VerticalOptions="Center"/>
+                        <Switch Grid.Row="0"
+                                Grid.Column="1"
+                                IsToggled="{Binding Settings.EnableHapticFeedback}"/>
+
+                        <Label Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Enable Visual Cues"
+                                VerticalOptions="Center"/>
+                        <Switch Grid.Row="1"
+                                Grid.Column="1"
+                                IsToggled="{Binding Settings.EnableVisualCues}"/>
+
+                        <Label Grid.Row="2"
+                                Grid.Column="0"
+                                Text="Show Countdown Timer"
+                                VerticalOptions="Center"/>
+                        <Switch Grid.Row="2"
+                                Grid.Column="1"
+                                IsToggled="{Binding Settings.EnableCountdown}"/>
+
+                        <Label Grid.Row="3"
+                                Grid.Column="0"
+                                Text="Show Progress Indicator"
+                                VerticalOptions="Center"/>
+                        <Switch Grid.Row="3"
+                                Grid.Column="1"
+                                IsToggled="{Binding Settings.ShowProgress}"/>
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <!-- Session Settings -->
+            <Frame BackgroundColor="White"
+                    CornerRadius="15"
+                    HasShadow="True"
+                    Padding="20">
+                <StackLayout Spacing="15">
+                    <Label Text="Session Settings"
+                            FontSize="20"
+                            FontAttributes="Bold"
+                            TextColor="#2E7D32"/>
+
+                    <Grid ColumnDefinitions="*,Auto"
+                            RowDefinitions="Auto,Auto,Auto">
+                        <Label Grid.Row="0"
+                                Grid.Column="0"
+                                Text="Auto-start Next Cycle"
+                                VerticalOptions="Center"/>
+                        <Switch Grid.Row="0"
+                                Grid.Column="1"
+                                IsToggled="{Binding Settings.AutoStartNextCycle}"/>
+
+                        <Label Grid.Row="1"
+                                Grid.Column="0"
+                                Text="Enable Session Summary"
+                                VerticalOptions="Center"/>
+                        <Switch Grid.Row="1"
+                                Grid.Column="1"
+                                IsToggled="{Binding Settings.EnableSessionSummary}"/>
+
+                        <Label Grid.Row="2"
+                                Grid.Column="0"
+                                Text="Track Mood Changes"
+                                VerticalOptions="Center"/>
+                        <Switch Grid.Row="2"
+                                Grid.Column="1"
+                                IsToggled="{Binding Settings.TrackMoodChanges}"/>
+                    </Grid>
+                </StackLayout>
+            </Frame>
+
+            <!-- Theme Settings -->
+            <Frame BackgroundColor="White"
+                    CornerRadius="15"
+                    HasShadow="True"
+                    Padding="20">
+                <StackLayout Spacing="15">
+                    <Label Text="Theme Settings"
+                            FontSize="20"
+                            FontAttributes="Bold"
+                            TextColor="#2E7D32"/>
+
+                    <Label Text="Preferred Theme"
+                            FontSize="16"/>
+                    <Picker Title="Choose Theme"
+                            SelectedItem="{Binding Settings.PreferredTheme}">
+                        <Picker.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>nature</x:String>
+                                <x:String>minimal</x:String>
+                                <x:String>cosmic</x:String>
+                            </x:Array>
+                        </Picker.ItemsSource>
+                    </Picker>
+                </StackLayout>
+            </Frame>
+
+            <!-- Reminder Settings -->
+            <Frame BackgroundColor="White"
+                    CornerRadius="15"
+                    HasShadow="True"
+                    Padding="20">
+                <StackLayout Spacing="15">
+                    <Label Text="Reminder Settings"
+                            FontSize="20"
+                            FontAttributes="Bold"
+                            TextColor="#2E7D32"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0"
+                                Text="Enable Daily Reminders"
+                                VerticalOptions="Center"/>
+                        <Switch Grid.Column="1"
+                                IsToggled="{Binding Settings.EnableReminders}"/>
+                    </Grid>
+
+                    <StackLayout IsVisible="{Binding Settings.EnableReminders}"
+                            Spacing="10">
+                        <Label Text="Reminder Time"/>
+                        <TimePicker Time="{Binding Settings.ReminderTime}"/>
+
+                        <Label Text="Reminder Days"/>
+                        <!-- Day selection would need custom implementation -->
+                    </StackLayout>
+                </StackLayout>
+            </Frame>
+
+            <!-- Save Button -->
+            <Button Text="Save Settings"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"
+                    CornerRadius="25"
+                    HeightRequest="50"
+                    Command="{Binding SaveSettingsCommand}"/>
+        </StackLayout>
+
+    </ScrollView>
+</uranium:UraniumContentPage>
