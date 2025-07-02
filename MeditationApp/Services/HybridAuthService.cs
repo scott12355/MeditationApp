@@ -51,16 +51,18 @@ public class HybridAuthService
                     // Get and store user profile
                     try
                     {
-                        var userAttributes = await _cognitoService.GetUserAttributesAsync(onlineResult.AccessToken!);
+                        var (userId, userAttributes) = await _cognitoService.GetUserInfoAsync(onlineResult.AccessToken!);
                         var profile = new LocalUserProfile
                         {
-                            Username = username,
+                            Username = userId, // This is the actual UUID from Cognito
                             Email = userAttributes.FirstOrDefault(a => a.Name == "email")?.Value ?? username,
                             FirstName = userAttributes.FirstOrDefault(a => a.Name == "given_name")?.Value ?? "",
                             LastName = userAttributes.FirstOrDefault(a => a.Name == "family_name")?.Value ?? "",
                             LastUpdated = DateTime.UtcNow
                         };
                         await _localService.StoreUserProfileAsync(profile);
+                        
+                        Console.WriteLine($"[HybridAuthService] Stored profile with UUID: {userId}");
                     }
                     catch (Exception ex)
                     {

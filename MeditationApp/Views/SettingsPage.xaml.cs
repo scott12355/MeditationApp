@@ -1,5 +1,9 @@
 using MeditationApp.ViewModels;
 using MeditationApp.Services;
+#if IOS
+using RevenueCat;
+using Tonestro.Maui.RevenueCat.iOS.Extensions;
+#endif
 
 namespace MeditationApp.Views;
 

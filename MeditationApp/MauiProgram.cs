@@ -10,8 +10,10 @@ using CommunityToolkit.Maui;
 using Plugin.Maui.Audio;
 using MediaManager;
 using UraniumUI;
+// using Tonestro.Maui.RevenueCat;
 #if IOS
 using Microsoft.Maui.Handlers;
+using RevenueCat;
 #endif
 #if ANDROID
 using Microsoft.Maui.Handlers;
@@ -50,6 +52,12 @@ public static class MauiProgram
                 textField.BackgroundColor = UIKit.UIColor.Clear;
             }
         });
+
+        // Enable RevenueCat debug logs
+        RCPurchases.DebugLogsEnabled = true;
+        // Initialize RevenueCat SDK for iOS
+        RCPurchases.ConfigureWithAPIKey("appl_jOuHsNSjVHqUMcFuDJjBIqrePRv");
+        Console.WriteLine("RevenueCat SDK initialized with API key.");
 #endif
 
 
@@ -146,7 +154,8 @@ public static class MauiProgram
             new ViewModels.SettingsViewModel(
                 provider.GetRequiredService<HybridAuthService>(),
                 provider.GetRequiredService<NotificationService>(),
-                provider.GetRequiredService<InAppPurchaseService>()
+                provider.GetRequiredService<InAppPurchaseService>(),
+                provider.GetRequiredService<IPaywallService>()
             )
         );
         builder.Services.AddTransient<ViewModels.ProfileViewModel>();
@@ -202,6 +211,12 @@ public static class MauiProgram
         // Register NotificationService
         builder.Services.AddSingleton<MeditationApp.Services.NotificationService>();
         builder.Services.AddSingleton<InAppPurchaseService>();
+        
+        // Register PaywallService
+        builder.Services.AddSingleton<IPaywallService, PaywallService>();
+
+        // Register RevenueCat user service for metadata management
+        builder.Services.AddSingleton<IRevenueCatUserService, RevenueCatUserService>();
 
         // Register Plugin.Maui.Audio
         builder.Services.AddSingleton(AudioManager.Current);

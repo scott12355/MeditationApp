@@ -7,6 +7,7 @@ namespace MeditationApp.ViewModels;
 public class VerificationViewModel : BindableObject
 {
     private readonly CognitoAuthService _cognitoAuthService;
+    private readonly HybridAuthService _hybridAuthService;
     private string _username = string.Empty;
     private string _code = string.Empty;
     private string _status = string.Empty;
@@ -32,9 +33,10 @@ public class VerificationViewModel : BindableObject
     public ICommand ResendCodeCommand { get; }
     public ICommand BackToLoginCommand { get; }
 
-    public VerificationViewModel(CognitoAuthService cognitoAuthService)
+    public VerificationViewModel(CognitoAuthService cognitoAuthService, HybridAuthService hybridAuthService)
     {
         _cognitoAuthService = cognitoAuthService;
+        _hybridAuthService = hybridAuthService;
         VerifyCommand = new Command(async () => await OnVerify());
         ResendCodeCommand = new Command(async () => await OnResendCode());
         BackToLoginCommand = new Command(async () => {
@@ -65,16 +67,73 @@ public class VerificationViewModel : BindableObject
             var result = await _cognitoAuthService.ConfirmSignUpAsync(Username, Code);
             if (result)
             {
-                // Try to auto-login
+                // Try to auto-login using HybridAuthService (this will properly store user profile with UUID)
                 if (!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
                 {
                     LoadingText = "Logging you in...";
-                    var response = await _cognitoAuthService.SignInAsync(Username, Password);
-                    if (response.IsSuccess)
+                    var authResult = await _hybridAuthService.SignInAsync(Username, Password);
+                    if (authResult.IsSuccess)
                     {
-                        await SecureStorage.Default.SetAsync("access_token", response.AccessToken ?? string.Empty);
-                        await SecureStorage.Default.SetAsync("id_token", response.IdToken ?? string.Empty);
-                        await SecureStorage.Default.SetAsync("refresh_token", response.RefreshToken ?? string.Empty);
+                        LoadingText = "Setting up your profile...";
+                        
+                        // Store user info for RevenueCat (same pattern as LoginViewModel)
+                        if (!authResult.IsOfflineMode)
+                        {
+                            _ = Task.Run(async () =>
+                            {
+                                try
+                                {
+                                    // Store email in secure storage for later use during purchases
+                                    await SecureStorage.Default.SetAsync("user_email", Email);
+                                    System.Diagnostics.Debug.WriteLine($"[VerificationViewModel] Stored user email: {Email}");
+                                    
+                                    // Get user profile and store basic info (this will have the UUID now)
+                                    var profile = await _hybridAuthService.GetUserProfileAsync();
+                                    if (profile != null)
+                                    {
+                                        System.Diagnostics.Debug.WriteLine($"[VerificationViewModel] Got user profile - Email: '{profile.Email ?? "NULL"}', FirstName: '{profile.FirstName ?? "NULL"}', LastName: '{profile.LastName ?? "NULL"}', Username: '{profile.Username ?? "NULL"}'");
+                                        
+                                        // Store user ID (username) - should be UUID now
+                                        if (!string.IsNullOrEmpty(profile.Username))
+                                        {
+                                            await SecureStorage.Default.SetAsync("user_id", profile.Username);
+                                            System.Diagnostics.Debug.WriteLine($"[VerificationViewModel] Stored user ID: {profile.Username}");
+                                            
+                                            // Check if it looks like a UUID vs email
+                                            if (profile.Username.Contains("@"))
+                                            {
+                                                System.Diagnostics.Debug.WriteLine("[VerificationViewModel] WARNING: Username looks like an email, not a UUID!");
+                                            }
+                                            else if (profile.Username.Contains("-") && profile.Username.Length > 30)
+                                            {
+                                                System.Diagnostics.Debug.WriteLine("[VerificationViewModel] SUCCESS: Username looks like a UUID!");
+                                            }
+                                        }
+                                        
+                                        if (!string.IsNullOrEmpty(profile.FirstName))
+                                        {
+                                            Preferences.Set("user_first_name", profile.FirstName);
+                                            System.Diagnostics.Debug.WriteLine($"[VerificationViewModel] Stored first name: {profile.FirstName}");
+                                        }
+                                        if (!string.IsNullOrEmpty(profile.LastName))
+                                        {
+                                            Preferences.Set("user_last_name", profile.LastName);
+                                            System.Diagnostics.Debug.WriteLine($"[VerificationViewModel] Stored last name: {profile.LastName}");
+                                        }
+                                        
+                                        System.Diagnostics.Debug.WriteLine($"[VerificationViewModel] Stored user info for RevenueCat: {profile.Email}, {profile.FirstName} {profile.LastName}, ID: {profile.Username}");
+                                    }
+                                    else
+                                    {
+                                        System.Diagnostics.Debug.WriteLine("[VerificationViewModel] No user profile returned from GetUserProfileAsync()");
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"[VerificationViewModel] Error setting up user profile: {ex.Message}");
+                                }
+                            });
+                        }
 
                         LoadingText = "Redirecting...";
                         await Task.Delay(500); // Brief delay to show success state
@@ -99,7 +158,7 @@ public class VerificationViewModel : BindableObject
                     }
                     else
                     {
-                        Status = response.ErrorMessage ?? "Login failed after verification";
+                        Status = authResult.Message ?? "Login failed after verification";
                     }
                 }
                 // Fallback: show alert and go to login

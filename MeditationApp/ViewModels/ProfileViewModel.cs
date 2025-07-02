@@ -212,6 +212,16 @@ public class ProfileViewModel : INotifyPropertyChanged
             // Store the updated profile locally
             var localService = new LocalAuthService();
             await localService.StoreUserProfileAsync(profile);
+
+            // Store user info in preferences for RevenueCat (used during purchases)
+            if (!string.IsNullOrEmpty(email))
+            {
+                await SecureStorage.Default.SetAsync("user_email", email);
+                if (!string.IsNullOrEmpty(firstName))
+                    Preferences.Set("user_first_name", firstName);
+                if (!string.IsNullOrEmpty(lastName))
+                    Preferences.Set("user_last_name", lastName);
+            }
         }
         catch (Amazon.CognitoIdentityProvider.Model.NotAuthorizedException)
         {

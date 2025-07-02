@@ -252,11 +252,43 @@ public class CognitoAuthService
             };
 
             var response = await _provider.GetUserAsync(getUserRequest);
+            
+            // Debug: Log all available user data
+            Console.WriteLine($"[CognitoAuthService] GetUser response Username (UUID): {response.Username}");
+            Console.WriteLine($"[CognitoAuthService] UserAttributes count: {response.UserAttributes.Count}");
+            foreach (var attr in response.UserAttributes)
+            {
+                Console.WriteLine($"[CognitoAuthService] Attribute: {attr.Name} = {attr.Value}");
+            }
+            
             return response.UserAttributes;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error getting user attributes: {ex.Message}");
+            throw;
+        }
+    }
+
+    public async Task<(string UserId, List<AttributeType> Attributes)> GetUserInfoAsync(string accessToken)
+    {
+        try
+        {
+            var getUserRequest = new GetUserRequest
+            {
+                AccessToken = accessToken
+            };
+
+            var response = await _provider.GetUserAsync(getUserRequest);
+            
+            Console.WriteLine($"[CognitoAuthService] GetUser response Username (UUID): {response.Username}");
+            Console.WriteLine($"[CognitoAuthService] UserAttributes count: {response.UserAttributes.Count}");
+            
+            return (response.Username, response.UserAttributes);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting user info: {ex.Message}");
             throw;
         }
     }

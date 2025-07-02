@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
+             xmlns:converters="clr-namespace:MeditationApp.Converters"
+             xmlns:viewmodels="clr-namespace:MeditationApp.ViewModels"
+             x:Class="MeditationApp.Views.PaywallModal"
+             x:DataType="viewmodels:PaywallViewModel"
+             Title="">
+
+    <ContentPage.Resources>
+        <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+        <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+    </ContentPage.Resources>
+
+    <ContentPage.Background>
+        <SolidColorBrush Color="#EFEBD3"/>
+    </ContentPage.Background>
+
+    <Grid>
+        <!-- Decorative background elements matching app style -->
+        <Ellipse x:Name="Orb1"
+                 WidthRequest="300"
+                 HeightRequest="300"
+                 Fill="#15BBDEFB"
+                 HorizontalOptions="Start"
+                 VerticalOptions="Start"
+                 Margin="-150,-150,0,0"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="20"
+                                                     FloatRangeY="15"
+                                                     Duration="10000"
+                                                     Delay="0"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <Ellipse x:Name="Orb2"
+                 WidthRequest="200"
+                 HeightRequest="200"
+                 Fill="#1BE1BEE7"
+                 HorizontalOptions="End"
+                 VerticalOptions="End"
+                 Margin="0,0,-100,-100"
+                 InputTransparent="True">
+            <Ellipse.Behaviors>
+                <behaviors:FloatingAnimationBehavior FloatRangeX="25"
+                                                     FloatRangeY="20"
+                                                     Duration="12000"
+                                                     Delay="2000"/>
+            </Ellipse.Behaviors>
+        </Ellipse>
+
+        <!-- Main Content -->
+        <ScrollView>
+            <VerticalStackLayout Padding="20,60,20,40" Spacing="30">
+                
+                <!-- Header Section -->
+                <VerticalStackLayout Spacing="15" HorizontalOptions="Center">
+                    <!-- Close Button -->
+                    <Button Text="✕"
+                            Command="{Binding CloseCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource Primary}"
+                            FontSize="20"
+                            WidthRequest="40"
+                            HeightRequest="40"
+                            CornerRadius="20"
+                            HorizontalOptions="End"
+                            Margin="0,-20,0,0"/>
+                    
+                    <!-- Lucen Logo -->
+                    <Image Source="logo.png"
+                           WidthRequest="100"
+                           HeightRequest="100"
+                           Aspect="AspectFit"
+                           HorizontalOptions="Center"
+                           Margin="0,-60,0,0"/>
+                    
+                    <!-- Title -->
+                    <Label Text="Unlock all features"
+                           FontSize="28"
+                           FontAttributes="Bold"
+                           TextColor="Black"
+                           HorizontalOptions="Center"/>
+                    
+                    <!-- Subtitle -->
+                    <Label Text="Get personalised daily meditation sessions and unlock all breathing exercises"
+                           FontSize="16"
+                           TextColor="{StaticResource toneGray}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
+                </VerticalStackLayout>
+
+                <!-- Features Section -->
+                <VerticalStackLayout Spacing="15" Padding="0,0" >
+                    <StackLayout Orientation="Horizontal" Spacing="15" HorizontalOptions="Center">
+                        <Label Text="🧘‍♀️" FontSize="20" VerticalOptions="Center"/>
+                        <Label Text="️Personalised daily meditation sessions generated just for you"
+                               MaximumWidthRequest="300"
+                               FontSize="16"
+                               TextColor="Black"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Start"
+                               HorizontalTextAlignment="Start"
+                               />
+                    </StackLayout>
+                    
+                    <StackLayout Orientation="Horizontal" Spacing="15" HorizontalOptions="Center">
+                        <Label Text="🫁" FontSize="20" VerticalOptions="Center"/>
+                        <Label Text="Access to all breathing exercises Lucen has to offer"
+                               FontSize="16"
+                               MaximumWidthRequest="300"
+                               TextColor="Black"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Start"
+                               HorizontalTextAlignment="Start"
+                            />
+                    </StackLayout>
+                    
+                <!-- Loading Indicator -->
+                <ActivityIndicator IsVisible="{Binding IsLoading}"
+                                   IsRunning="{Binding IsLoading}"
+                                   Color="{StaticResource Primary}"
+                                   HeightRequest="50"/>
+
+                <!-- Error State -->
+                <VerticalStackLayout IsVisible="{Binding HasError}" Spacing="15">
+                    <Label Text="😔"
+                           FontSize="40"
+                           HorizontalOptions="Center"/>
+                    <Label Text="{Binding ErrorMessage}"
+                           FontSize="16"
+                           TextColor="{StaticResource Danger}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
+                    <Button Text="Try Again"
+                            Command="{Binding RetryCommand}"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="White"
+                            CornerRadius="25"
+                            Padding="30,12"
+                            HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+
+                <!-- Subscription Packages -->
+                <VerticalStackLayout IsVisible="{Binding IsContentVisible}" Spacing="15">
+                    <StackLayout BindableLayout.ItemsSource="{Binding AvailablePackages}" Spacing="10">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="viewmodels:SubscriptionPackage">
+                                <Border BackgroundColor="{StaticResource GlassyWhite}"
+                                        StrokeThickness="2"
+                                        StrokeShape="RoundRectangle 15"
+                                        Padding="20,15"
+                                        Margin="0,5">
+                                    <Border.Stroke>
+                                        <SolidColorBrush Color="{StaticResource GlassyBorder}"/>
+                                    </Border.Stroke>
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border"
+                                                     Binding="{Binding IsPopular}"
+                                                     Value="True">
+                                            <Setter Property="Stroke">
+                                                <Setter.Value>
+                                                    <SolidColorBrush Color="{StaticResource Primary}"/>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:PaywallViewModel}}, Path=SelectPackageCommand}"
+                                                              CommandParameter="{Binding}"/>
+                                    </Border.GestureRecognizers>
+                                    
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Popular Badge -->
+                                        <Border Grid.Row="0" Grid.Column="1"
+                                                BackgroundColor="{StaticResource Primary}"
+                                                StrokeShape="RoundRectangle 10"
+                                                Padding="8,4"
+                                                IsVisible="{Binding IsPopular}"
+                                                Margin="0,-5,0,5">
+                                            <Label Text="MOST POPULAR"
+                                                   FontSize="10"
+                                                   FontAttributes="Bold"
+                                                   TextColor="White"/>
+                                        </Border>
+
+                                        <!-- Package Title -->
+                                        <Label Grid.Row="0" Grid.Column="0"
+                                               Text="{Binding Title}"
+                                               FontSize="18"
+                                               FontAttributes="Bold"
+                                               TextColor="Black"
+                                               VerticalOptions="Center"/>
+
+                                        <!-- Package Description -->
+                                        <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                               Text="{Binding Description}"
+                                               FontSize="14"
+                                               TextColor="{StaticResource toneGray}"
+                                               Margin="0,5,0,10"/>
+
+                                        <!-- Price -->
+                                        <StackLayout Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                                                     Orientation="Horizontal"
+                                                     Spacing="5">
+                                            <Label Text="{Binding PriceString}"
+                                                   FontSize="24"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource Primary}"
+                                                   VerticalOptions="Center"/>
+                                            <Label Text="{Binding PeriodString}"
+                                                   FontSize="16"
+                                                   TextColor="{StaticResource toneGray}"
+                                                   VerticalOptions="End"/>
+                                            <Label Text="- Tap to Subscribe"
+                                                   FontSize="12"
+                                                   TextColor="{StaticResource toneGray}"
+                                                   VerticalOptions="End"
+                                                   Margin="10,0,0,0"/>
+                                        </StackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </StackLayout>
+
+                    <!-- Restore Purchases Button -->
+                    <Button Text="Restore Purchases"
+                            Command="{Binding RestorePurchasesCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource Primary}"
+                            FontSize="14"
+                            BorderWidth="1"
+                            BorderColor="{StaticResource Primary}"
+                            CornerRadius="20"
+                            Padding="0,10"
+                            Margin="0,10,0,0"/>
+
+                    <!-- Terms and Privacy -->
+                    <StackLayout Orientation="Horizontal" 
+                                 HorizontalOptions="Center"
+                                 Spacing="10"
+                                 Margin="0,20,0,0">
+                        <Label Text="Terms of Service"
+                               FontSize="12"
+                               TextColor="{StaticResource toneGray}"
+                               TextDecorations="Underline">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnTermsTapped"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Text="•" 
+                               FontSize="12" 
+                               TextColor="{StaticResource toneGray}"/>
+                        <Label Text="Privacy Policy"
+                               FontSize="12"
+                               TextColor="{StaticResource toneGray}"
+                               TextDecorations="Underline">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPrivacyTapped"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </StackLayout>
+                </VerticalStackLayout>
+            </VerticalStackLayout></VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

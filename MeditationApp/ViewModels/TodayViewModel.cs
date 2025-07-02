@@ -489,6 +489,14 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
     [RelayCommand]
     private async Task RequestNewSession()
     {
+        // Check for premium access first
+        var hasPremium = await PremiumFeatureHelper.CheckPremiumAccessAsync("Personalized Meditation Sessions");
+        if (!hasPremium)
+        {
+            // User doesn't have premium or cancelled upgrade
+            return;
+        }
+
         if (string.IsNullOrEmpty(SessionNotes))
         {
             var page = Application.Current?.Windows?.FirstOrDefault()?.Page;

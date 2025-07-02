@@ -36,7 +36,8 @@ public partial class SignUpPage : UraniumContentPage
                 { "Email", _viewModel.Email ?? string.Empty },
                 { "FirstName", _viewModel.FirstName ?? string.Empty }
             };
-            var verificationPage = new MeditationApp.Views.VerificationPage();
+            // Use DI to get the VerificationPage
+            var verificationPage = ((App)Microsoft.Maui.Controls.Application.Current).Services.GetRequiredService<Views.VerificationPage>();
             verificationPage.ApplyQueryAttributes(navigationParameter);
             await Microsoft.Maui.ApplicationModel.MainThread.InvokeOnMainThreadAsync(() =>
             {
