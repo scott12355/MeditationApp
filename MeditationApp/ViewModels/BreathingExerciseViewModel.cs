@@ -12,7 +12,6 @@ namespace MeditationApp.ViewModels
 {
     public partial class BreathingExerciseViewModel : ObservableObject
     {
-        private readonly INotificationService? _notificationService;
         private readonly BreathingDatabaseService? _databaseService;
         private Timer? _breathingTimer;
         private DateTime _phaseStartTime;
@@ -71,25 +70,7 @@ namespace MeditationApp.ViewModels
         }
 
         [ObservableProperty]
-        private BreathingSettings _settings = new();
-
-        [ObservableProperty]
         private bool _showTechniqueSelector = true;
-
-        [ObservableProperty]
-        private bool _showMoodSelector = false;
-
-        [ObservableProperty]
-        private int? _preMoodRating;
-
-        [ObservableProperty]
-        private int? _postMoodRating;
-
-        [ObservableProperty]
-        private string _sessionNotes = string.Empty;
-
-        [ObservableProperty]
-        private bool _showSessionSummary = false;
 
         [ObservableProperty]
         private TimeSpan _sessionDuration = TimeSpan.Zero;
@@ -97,12 +78,10 @@ namespace MeditationApp.ViewModels
         [ObservableProperty]
         private bool _isLoading = true;
 
-        public BreathingExerciseViewModel(INotificationService? notificationService = null, BreathingDatabaseService? databaseService = null)
+        public BreathingExerciseViewModel(BreathingDatabaseService? databaseService = null)
         {
-            _notificationService = notificationService;
             _databaseService = databaseService;
             LoadTechniques();
-            LoadSettings();
             LoadStats();
             IsLoading = false;
         }
@@ -150,26 +129,6 @@ namespace MeditationApp.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error loading custom techniques: {ex.Message}");
-            }
-        }
-
-        private async void LoadSettings()
-        {
-            try
-            {
-                var settingsJson = await SecureStorage.GetAsync("breathing_settings");
-                if (!string.IsNullOrEmpty(settingsJson))
-                {
-                    var settings = JsonSerializer.Deserialize<BreathingSettings>(settingsJson);
-                    if (settings != null)
-                    {
-                        Settings = settings;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error loading settings: {ex.Message}");
             }
         }
 
@@ -252,16 +211,6 @@ namespace MeditationApp.ViewModels
                 return;
             }
 
-            Debug.WriteLine($"TrackMoodChanges: {Settings.TrackMoodChanges}");
-            
-            // Show mood selector if enabled
-            if (Settings.TrackMoodChanges)
-            {
-                Debug.WriteLine("Showing mood selector");
-                ShowMoodSelector = true;
-                return;
-            }
-
             Debug.WriteLine("Starting breathing session directly");
             await BeginBreathingSessionAsync();
         }
@@ -283,8 +232,7 @@ namespace MeditationApp.ViewModels
                 StartTime = DateTime.Now,
                 TechniqueId = SelectedTechnique.Id,
                 TechniqueName = SelectedTechnique.Name,
-                TotalCycles = TotalCycles,
-                MoodBefore = PreMoodRating
+                TotalCycles = TotalCycles
             };
 
             // Clean up any existing resources
@@ -301,8 +249,6 @@ namespace MeditationApp.ViewModels
             MainThread.BeginInvokeOnMainThread(() => {
                 ButtonText = "Pause";
             });
-            
-            ShowMoodSelector = false;
 
             Debug.WriteLine("Starting breathing cycle...");
             
@@ -383,14 +329,15 @@ namespace MeditationApp.ViewModels
             PhaseText = text;
             _phaseStartTime = DateTime.Now;
             
-            // Haptic feedback
-            if (Settings.EnableHapticFeedback)
+            // Haptic feedback for breathing phases
+            try
             {
-                try
-                {
-                    HapticFeedback.Default.Perform(HapticFeedbackType.Click);
-                }
-                catch { }
+                Debug.WriteLine($"[ExecutePhase] Triggering haptic feedback for {phase}");
+                HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+            }
+            catch (Exception hapticEx)
+            {
+                Debug.WriteLine($"[ExecutePhase] Haptic feedback failed: {hapticEx.Message}");
             }
 
             // Start circle scale animation
@@ -570,46 +517,7 @@ namespace MeditationApp.ViewModels
             // Update stats
             await UpdateStatsAsync();
 
-            // Show mood selector for post-session rating
-            if (Settings.TrackMoodChanges)
-            {
-                ShowMoodSelector = true;
-            }
-            else if (Settings.EnableSessionSummary)
-            {
-                ShowSessionSummary = true;
-            }
-        }
-
-        [RelayCommand]
-        private void SubmitMoodRating()
-        {
-            if (_currentSession != null)
-            {
-                if (PreMoodRating.HasValue && PostMoodRating == null)
-                {
-                    // This is pre-session mood
-                    _currentSession.MoodBefore = PreMoodRating;
-                    Task.Run(BeginBreathingSessionAsync);
-                }
-                else if (PostMoodRating.HasValue)
-                {
-                    // This is post-session mood
-                    _currentSession.MoodAfter = PostMoodRating;
-                    ShowMoodSelector = false;
-                    if (Settings.EnableSessionSummary)
-                    {
-                        ShowSessionSummary = true;
-                    }
-                }
-            }
-        }
-
-        [RelayCommand]
-        private void DismissSessionSummary()
-        {
-            ShowSessionSummary = false;
-            ResetSession();
+            // Session stays in completed state until user manually starts new session
         }
 
         private void ResetSession()
@@ -624,11 +532,6 @@ namespace MeditationApp.ViewModels
             RemainingTime = 0;
             PhaseProgress = 0;
             ShowTechniqueSelector = true;
-            ShowMoodSelector = false;
-            ShowSessionSummary = false;
-            PreMoodRating = null;
-            PostMoodRating = null;
-            SessionNotes = string.Empty;
             _currentSession = null;
         }
 
@@ -674,13 +577,6 @@ namespace MeditationApp.ViewModels
                     Stats.CurrentStreak = 1;
                 }
 
-                // Update mood improvement
-                if (_currentSession.MoodBefore.HasValue && _currentSession.MoodAfter.HasValue)
-                {
-                    var improvement = _currentSession.MoodAfter.Value - _currentSession.MoodBefore.Value;
-                    Stats.AverageMoodImprovement = (Stats.AverageMoodImprovement + improvement) / 2.0;
-                }
-
                 await SaveStatsAsync();
             }
         }
@@ -698,20 +594,6 @@ namespace MeditationApp.ViewModels
             }
         }
 
-        [RelayCommand]
-        public async Task SaveSettingsAsync()
-        {
-            try
-            {
-                var json = JsonSerializer.Serialize(Settings);
-                await SecureStorage.SetAsync("breathing_settings", json);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error saving settings: {ex.Message}");
-            }
-        }
-
         public void Cleanup()
         {
             _breathingTimer?.Dispose();
@@ -719,32 +601,10 @@ namespace MeditationApp.ViewModels
         }
 
         [RelayCommand]
-        private void SetMood(int rating)
-        {
-            if (_currentSession?.MoodBefore == null)
-            {
-                // This is pre-session mood
-                PreMoodRating = rating;
-            }
-            else
-            {
-                // This is post-session mood
-                PostMoodRating = rating;
-            }
-        }
-
-        [RelayCommand]
         private async Task ShowStats()
         {
             Debug.WriteLine("[ShowStats] Navigating to BreathingStatsPage");
             await Shell.Current.GoToAsync("//BreathingStatsPage");
-        }
-
-        [RelayCommand]
-        private async Task ShowSettings()
-        {
-            // Navigate to the Breathing Settings page
-            await Shell.Current.GoToAsync("//BreathingSettingsPage");
         }
 
         // Calculated properties for UI

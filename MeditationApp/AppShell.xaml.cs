@@ -16,7 +16,6 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("OnboardingPage1", typeof(Views.OnboardingPage1));
         Routing.RegisterRoute("OnboardingPage2", typeof(Views.OnboardingPage2));
         Routing.RegisterRoute("BreathingStatsPage", typeof(Views.BreathingStatsPage));
-        Routing.RegisterRoute("BreathingSettingsPage", typeof(Views.BreathingSettingsPage));
 
         Navigating += OnNavigating;
     }

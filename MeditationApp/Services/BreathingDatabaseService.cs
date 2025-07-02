@@ -121,13 +121,6 @@ namespace MeditationApp.Services
                     .First().Key;
             }
 
-            // Average mood improvement
-            var sessionsWithMood = completedSessions.Where(s => s.MoodBefore.HasValue && s.MoodAfter.HasValue);
-            if (sessionsWithMood.Any())
-            {
-                stats.AverageMoodImprovement = sessionsWithMood.Average(s => s.MoodAfter.Value - s.MoodBefore.Value);
-            }
-
             return stats;
         }
 

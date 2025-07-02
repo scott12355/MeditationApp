@@ -13,9 +13,6 @@ namespace MeditationApp.Models
         public int TotalCycles { get; set; }
         public TimeSpan Duration { get; set; }
         public bool IsCompleted { get; set; }
-        public int? MoodBefore { get; set; } // 1-5 scale
-        public int? MoodAfter { get; set; } // 1-5 scale
-        public string Notes { get; set; } = string.Empty;
         public bool WasInterrupted { get; set; }
         
         // Session quality metrics
@@ -36,7 +33,6 @@ namespace MeditationApp.Models
         public DateTime? LastSessionDate { get; set; }
         public int TotalCyclesCompleted { get; set; }
         public string FavoriteTechnique { get; set; } = string.Empty;
-        public double AverageMoodImprovement { get; set; }
         public int SessionsThisWeek { get; set; }
         public int SessionsThisMonth { get; set; }
         

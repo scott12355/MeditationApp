@@ -18,7 +18,6 @@
                         <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
                         <converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
                         <converters:ProgressConverter x:Key="ProgressConverter"/>
-                        <converters:NullToStringConverter x:Key="NullToStringConverter"/>
                         <converters:StringToColorConverter x:Key="StringToColorConverter"/>
 
                         <!-- App-consistent Glassy Card Style -->
@@ -198,7 +197,7 @@
                                 <ActivityIndicator IsVisible="{Binding IsLoading}"
                                                    IsRunning="{Binding IsLoading}"
                                                    Color="{StaticResource Primary}"
-                                                   VerticalOptions="CenterAndExpand"/>
+                                                   VerticalOptions="Center"/>
 
                                 <!-- Technique Selector -->
                                 <Frame IsVisible="{Binding ShowTechniqueSelector}"
@@ -343,7 +342,9 @@
                                         </Grid>
 
                                         <!-- Control Buttons: use Grid for consistent layout -->
-                                        <Grid Margin="20,0" ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center">
+                                        <Grid Margin="20,0"
+                                              ColumnDefinitions="Auto,*"
+                                              VerticalOptions="Center">
                                                 <!-- Techniques Button -->
                                                 <Button Grid.Column="0"
                                                         Text="Techniques"
@@ -362,142 +363,8 @@
                                                         WidthRequest="200"
                                                         CornerRadius="30"
                                                         Command="{Binding StartStopSessionCommand}"/>
-
-                                                <!-- Settings Button -->
-                                                <Button Grid.Column="2"
-                                                        Text="⚙️"
-                                                        BackgroundColor="{StaticResource Tertiary}"
-                                                        TextColor="White"
-                                                        FontSize="18"
-                                                        CornerRadius="25"
-                                                        WidthRequest="50"
-                                                        HeightRequest="50"
-                                                        Command="{Binding ShowSettingsCommand}"
-                                                        IsVisible="{Binding IsSessionActive, Converter={StaticResource InverseBoolConverter}}"
-                                                        HorizontalOptions="End"/>
                                         </Grid>
                                 </StackLayout>
-
-                                <!-- Mood Selector Modal -->
-                                <Frame IsVisible="{Binding ShowMoodSelector}"
-                                       Style="{StaticResource TechniqueCardStyle}"
-                                       InputTransparent="{Binding ShowMoodSelector, Converter={StaticResource InverseBoolConverter}}"
-                                       ZIndex="100">
-                                        <Grid>
-                                                <!-- Dimmed background overlay -->
-                                                <BoxView Color="Black"
-                                                         Opacity="0.4"
-                                                         HorizontalOptions="Fill"
-                                                         VerticalOptions="Fill"/>
-
-                                                <Frame Style="{StaticResource TechniqueCardStyle}"
-                                                       Padding="20"
-                                                       HorizontalOptions="Center"
-                                                       VerticalOptions="Center">
-                                                        <StackLayout Spacing="25">
-                                                                <Label Text="How do you feel?"
-                                                                       FontSize="24"
-                                                                       FontAttributes="Bold"
-                                                                       TextColor="{StaticResource Primary}"
-                                                                       HorizontalOptions="Center"/>
-
-                                                                <!-- Mood Rating Scale -->
-                                                                <StackLayout Orientation="Horizontal"
-                                                                             HorizontalOptions="Center"
-                                                                             Spacing="20">
-                                                                        <Button Text="😔"
-                                                                                FontSize="36"
-                                                                                BackgroundColor="Transparent"
-                                                                                Command="{Binding SetMoodCommand}">
-                                                                                <Button.CommandParameter>
-                                                                                        <x:Int32>1</x:Int32>
-                                                                                </Button.CommandParameter>
-                                                                        </Button>
-                                                                        <Button Text="😕"
-                                                                                FontSize="36"
-                                                                                BackgroundColor="Transparent"
-                                                                                Command="{Binding SetMoodCommand}">
-                                                                                <Button.CommandParameter>
-                                                                                        <x:Int32>2</x:Int32>
-                                                                                </Button.CommandParameter>
-                                                                        </Button>
-                                                                        <Button Text="😐"
-                                                                                FontSize="36"
-                                                                                BackgroundColor="Transparent"
-                                                                                Command="{Binding SetMoodCommand}">
-                                                                                <Button.CommandParameter>
-                                                                                        <x:Int32>3</x:Int32>
-                                                                                </Button.CommandParameter>
-                                                                        </Button>
-                                                                        <Button Text="😊"
-                                                                                FontSize="36"
-                                                                                BackgroundColor="Transparent"
-                                                                                Command="{Binding SetMoodCommand}">
-                                                                                <Button.CommandParameter>
-                                                                                        <x:Int32>4</x:Int32>
-                                                                                </Button.CommandParameter>
-                                                                        </Button>
-                                                                        <Button Text="😃"
-                                                                                FontSize="36"
-                                                                                BackgroundColor="Transparent"
-                                                                                Command="{Binding SetMoodCommand}">
-                                                                                <Button.CommandParameter>
-                                                                                        <x:Int32>5</x:Int32>
-                                                                                </Button.CommandParameter>
-                                                                        </Button>
-                                                                </StackLayout>
-
-                                                                <Button Text="Next"
-                                                                        Style="{StaticResource PrimaryActionButtonStyle}"
-                                                                        Command="{Binding SubmitMoodRatingCommand}"
-                                                                        IsEnabled="{Binding PreMoodRating, Converter={StaticResource IsNotNullConverter}}"
-                                                                        HeightRequest="50"/>
-                                                        </StackLayout>
-                                                </Frame>
-                                        </Grid>
-                                </Frame>
-
-                                <!-- Session Summary Modal -->
-                                <Frame IsVisible="{Binding ShowSessionSummary}"
-                                       Style="{StaticResource TechniqueCardStyle}"
-                                       InputTransparent="{Binding ShowSessionSummary, Converter={StaticResource InverseBoolConverter}}"
-                                       ZIndex="100">
-                                        <StackLayout Spacing="20">
-                                                <Label Text="🎉 Session Complete!"
-                                                       FontSize="28"
-                                                       FontAttributes="Bold"
-                                                       TextColor="{StaticResource Primary}"
-                                                       FontFamily="OpenSansRegular"
-                                                       HorizontalOptions="Center"/>
-
-                                                <StackLayout Spacing="12">
-                                                        <Label Text="{Binding SessionDuration, StringFormat='Duration: {0:mm\\:ss}'}"
-                                                               FontSize="18"
-                                                               FontFamily="OpenSansRegular"
-                                                               TextColor="{StaticResource Gray700}"/>
-                                                        <Label Text="{Binding CurrentCycle, StringFormat='Cycles Completed: {0}'}"
-                                                               FontSize="18"
-                                                               FontFamily="OpenSansRegular"
-                                                               TextColor="{StaticResource Gray700}"/>
-                                                        <Label Text="{Binding SelectedTechnique.Name, StringFormat='Technique: {0}'}"
-                                                               FontSize="18"
-                                                               FontFamily="OpenSansRegular"
-                                                               TextColor="{StaticResource Gray700}"/>
-                                                </StackLayout>
-
-                                                <!-- Notes Entry -->
-                                                <Entry Placeholder="Add notes about your session..."
-                                                       Text="{Binding SessionNotes}"
-                                                       BackgroundColor="{StaticResource Gray100}"
-                                                       FontFamily="OpenSansRegular"
-                                                       FontSize="16"/>
-
-                                                <Button Text="Done"
-                                                        Style="{StaticResource PrimaryActionButtonStyle}"
-                                                        HeightRequest="50"
-                                                        Command="{Binding DismissSessionSummaryCommand}"/>
-                                        </StackLayout>
-                                </Frame>
 
                         </StackLayout>
                 </ScrollView>

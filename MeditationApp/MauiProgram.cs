@@ -135,10 +135,8 @@ public static class MauiProgram
         builder.Services.AddTransient<Views.OnboardingPage1>();
         builder.Services.AddTransient<Views.OnboardingPage2>();
         builder.Services.AddTransient<Views.ForgotPasswordPage>();
-        builder.Services.AddTransient<BreathingExercisePage>(provider =>
-            new BreathingExercisePage(provider.GetRequiredService<ViewModels.BreathingExerciseViewModel>()));
-        builder.Services.AddTransient<Views.BreathingStatsPage>(provider =>
-            new Views.BreathingStatsPage(provider.GetRequiredService<ViewModels.BreathingExerciseViewModel>()));
+        builder.Services.AddTransient<BreathingExercisePage>();
+        builder.Services.AddTransient<Views.BreathingStatsPage>();
 
         // Register view models
         builder.Services.AddTransient<ViewModels.LoginViewModel>();
@@ -172,7 +170,6 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewModels.ForgotPasswordViewModel>();
         builder.Services.AddTransient<ViewModels.BreathingExerciseViewModel>(provider =>
             new ViewModels.BreathingExerciseViewModel(
-                provider.GetService<NotificationService>(),
                 provider.GetRequiredService<BreathingDatabaseService>()
             ));
 
