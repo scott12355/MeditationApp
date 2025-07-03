@@ -1574,8 +1574,12 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
                             "Your session has expired. Please log in again.",
                             "OK");
 
-                    // Clear the navigation stack and navigate to login
-                    await Shell.Current.GoToAsync("LoginPage", animate: true);
+                    // Clear the navigation stack and navigate to login by setting LoginPage as root
+                    if (Application.Current != null)
+                    {
+                        var loginPage = ((App)Application.Current).Services.GetRequiredService<Views.LoginPage>();
+                        Application.Current.MainPage = loginPage;
+                    }
                 }
                 catch (Exception navEx)
                 {

@@ -80,4 +80,32 @@ public partial class SignUpPage : UraniumContentPage
     {
         await Shell.Current.GoToAsync("..");
     }
+
+    private async void OnTermsOfServiceTapped(object sender, EventArgs e)
+    {
+        // Navigate to Terms of Service page or open in browser
+        try
+        {
+            await Browser.OpenAsync("https://lucen.uk/terms-and-conditions", BrowserLaunchMode.SystemPreferred);
+        }
+        catch (Exception ex)
+        {
+            // Handle error - could show an alert or log the error
+            await DisplayAlert("Error", "Unable to open Terms of Service", "OK");
+        }
+    }
+
+    private async void OnPrivacyPolicyTapped(object sender, EventArgs e)
+    {
+        // Navigate to Privacy Policy page or open in browser
+        try
+        {
+            await Browser.OpenAsync("https://lucen.uk/privacy-policy", BrowserLaunchMode.SystemPreferred);
+        }
+        catch (Exception ex)
+        {
+            // Handle error - could show an alert or log the error
+            await DisplayAlert("Error", "Unable to open Privacy Policy", "OK");
+        }
+    }
 }

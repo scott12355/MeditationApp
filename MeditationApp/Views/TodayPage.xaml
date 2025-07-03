@@ -783,21 +783,42 @@
                                         VerticalOptions="Fill"
                                         BorderColor="Transparent"
                                         IsEnabled="{Binding IsRequestingSession, Converter={StaticResource InverseBoolConverter}}">
+                                        <VisualStateManager.VisualStateGroups>
+                                            <VisualStateGroupList>
+                                                <VisualStateGroup x:Name="CommonStates">
+                                                    <VisualState x:Name="Normal">
+                                                        <VisualState.Setters>
+                                                            <Setter Property="Scale"
+                                                                    Value="1.0"/>
+                                                            <Setter Property="Opacity"
+                                                                    Value="1.0"/>
+                                                        </VisualState.Setters>
+                                                    </VisualState>
+                                                    <VisualState x:Name="Pressed">
+                                                        <VisualState.Setters>
+                                                            <Setter Property="Scale"
+                                                                    Value="0.96"/>
+                                                            <Setter Property="Opacity"
+                                                                    Value="0.85"/>
+                                                        </VisualState.Setters>
+                                                    </VisualState>
+                                                </VisualStateGroup>
+                                            </VisualStateGroupList>
+                                        </VisualStateManager.VisualStateGroups>
                                         <Button.Triggers>
                                             <DataTrigger TargetType="Button" Binding="{Binding IsRequestingSession}" Value="True">
                                                 <Setter Property="Text" Value="Creating…"/>
                                             </DataTrigger>
                                         </Button.Triggers>
+                                        <Button.Behaviors>
+                                            <toolkit:AnimationBehavior>
+                                                <toolkit:AnimationBehavior.AnimationType>
+                                                    <toolkit:FadeAnimation Length="200"/>
+                                                </toolkit:AnimationBehavior.AnimationType>
+                                            </toolkit:AnimationBehavior>
+                                        </Button.Behaviors>
                                     </Button>
                                 </Frame>
-                                <ActivityIndicator
-                                    IsRunning="{Binding IsRequestingSession}"
-                                    IsVisible="{Binding IsRequestingSession}"
-                                    Color="White"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center"
-                                    WidthRequest="24"
-                                    HeightRequest="24"/>
                             </VerticalStackLayout>
                         </Frame>
                     </VerticalStackLayout>

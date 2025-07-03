@@ -95,8 +95,8 @@ public partial class PaywallModal : ContentPage
     {
         try
         {
-            // Navigate to terms of service
-            await Browser.OpenAsync("https://your-app-terms-url.com", BrowserLaunchMode.SystemPreferred);
+            // Navigate to Apple's standard Terms of Service (EULA)
+            await Browser.OpenAsync("https://www.apple.com/legal/internet-services/itunes/dev/stdeula/", BrowserLaunchMode.SystemPreferred);
         }
         catch (Exception ex)
         {
@@ -109,8 +109,9 @@ public partial class PaywallModal : ContentPage
     {
         try
         {
-            // Navigate to privacy policy
-            await Browser.OpenAsync("https://your-app-privacy-url.com", BrowserLaunchMode.SystemPreferred);
+            // TODO: Replace with your actual privacy policy URL
+            // For now, using a placeholder - you need to host your own privacy policy
+            await Browser.OpenAsync("https://lucen.uk/privacy-policy", BrowserLaunchMode.SystemPreferred);
         }
         catch (Exception ex)
         {

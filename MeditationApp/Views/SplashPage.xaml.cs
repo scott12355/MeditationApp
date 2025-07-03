@@ -26,7 +26,7 @@ public partial class SplashPage : ContentPage
         // Reset navigation state to handle logout/login cycles
         _hasNavigated = false;
         
-        await SplashContent.FadeTo(1, 500, Easing.CubicOut);
+        await SplashContent.FadeTo(1, 250, Easing.CubicOut);
         await CheckAuthenticationAndNavigate();
     }
 

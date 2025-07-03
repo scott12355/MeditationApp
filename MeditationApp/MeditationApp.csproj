@@ -27,7 +27,7 @@
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.7</ApplicationDisplayVersion>
-        <ApplicationVersion>1</ApplicationVersion>
+        <ApplicationVersion>4</ApplicationVersion>
         
         
 
@@ -83,11 +83,26 @@
       <PackageReference Include="Tonestro.Maui.RevenueCat.iOS.Extensions" Version="4.39.0.7" />
     </ItemGroup>
 
+    <!-- iOS-specific build properties for dSYM generation -->
+    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+        <!-- Force dSYM generation for all builds -->
+        <MtouchDebugSymbols>true</MtouchDebugSymbols>
+        <!-- Preserve native debugging symbols -->
+        <MtouchExtraArgs>$(MtouchExtraArgs) --dsym=yes</MtouchExtraArgs>
+    </PropertyGroup>
+
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
         <RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
         <CodeSignEntitlements>Entitlements.plist</CodeSignEntitlements>
         <CodeSignKey>Apple Distribution: SCOTT ROBERT TOPPING (AB3X6W384R)</CodeSignKey>
         <CodesignProvision>Lucen Signing</CodesignProvision>
+        <!-- Ensure dSYM generation for App Store distribution -->
+        <MtouchDebug>true</MtouchDebug>
+        <MtouchSymbolsList>true</MtouchSymbolsList>
+        <MtouchLink>SdkOnly</MtouchLink>
+        <!-- Additional dSYM settings -->
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>portable</DebugType>
     </PropertyGroup>
 
 
