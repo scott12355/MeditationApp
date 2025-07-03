@@ -121,7 +121,7 @@
     </FlyoutItem>
 
     <FlyoutItem Title="Breathing Stats"
-                Icon="chart"
+                Icon="stats"
                 Shell.FlyoutBehavior="Flyout">
         <ShellContent
             Title="Breathing Stats"

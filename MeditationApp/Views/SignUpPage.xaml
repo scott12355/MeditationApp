@@ -66,7 +66,7 @@
                 <VerticalStackLayout Spacing="15"
                                      HorizontalOptions="Center"
                                      Margin="0,0,0,20">
-                    
+
                     <!-- Logo Image -->
                     <Image Source="logo.png"
                            HeightRequest="80"
@@ -130,28 +130,28 @@
 
                         <!-- Email -->
                         <material:TextField Title="Email"
-                                           Text="{Binding Email}"
-                                           Keyboard="Email"
-                                           AccentColor="{StaticResource Primary}"
-                                           AllowClear="True"/>
+                                            Text="{Binding Email}"
+                                            Keyboard="Email"
+                                            AccentColor="{StaticResource Primary}"
+                                            AllowClear="True"/>
 
                         <!-- Password -->
                         <material:TextField Title="Password"
-                                           Text="{Binding Password}"
-                                           IsPassword="True"
-                                           AccentColor="{StaticResource Primary}">
+                                            Text="{Binding Password}"
+                                            IsPassword="True"
+                                            AccentColor="{StaticResource Primary}">
                             <material:TextField.Attachments>
-                                <material:TextFieldPasswordShowHideAttachment />
+                                <material:TextFieldPasswordShowHideAttachment/>
                             </material:TextField.Attachments>
                         </material:TextField>
 
                         <!-- Confirm Password -->
                         <material:TextField Title="Confirm Password"
-                                           Text="{Binding ConfirmPassword}"
-                                           IsPassword="True"
-                                           AccentColor="{StaticResource Primary}">
+                                            Text="{Binding ConfirmPassword}"
+                                            IsPassword="True"
+                                            AccentColor="{StaticResource Primary}">
                             <material:TextField.Attachments>
-                                <material:TextFieldPasswordShowHideAttachment />
+                                <material:TextFieldPasswordShowHideAttachment/>
                             </material:TextField.Attachments>
                         </material:TextField>
 
@@ -167,7 +167,8 @@
                                     <DataTrigger TargetType="CheckBox"
                                                  Binding="{Binding HasTermsError}"
                                                  Value="True">
-                                        <Setter Property="Color" Value="Red"/>
+                                        <Setter Property="Color"
+                                                Value="Red"/>
                                     </DataTrigger>
                                 </CheckBox.Triggers>
                             </CheckBox>
@@ -183,7 +184,8 @@
                                         <DataTrigger TargetType="Label"
                                                      Binding="{Binding HasTermsError}"
                                                      Value="True">
-                                            <Setter Property="TextColor" Value="Red"/>
+                                            <Setter Property="TextColor"
+                                                    Value="Red"/>
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
@@ -199,7 +201,8 @@
                                         <DataTrigger TargetType="Label"
                                                      Binding="{Binding HasTermsError}"
                                                      Value="True">
-                                            <Setter Property="TextColor" Value="Red"/>
+                                            <Setter Property="TextColor"
+                                                    Value="Red"/>
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
@@ -210,7 +213,8 @@
                                         <DataTrigger TargetType="Label"
                                                      Binding="{Binding HasTermsError}"
                                                      Value="True">
-                                            <Setter Property="TextColor" Value="Red"/>
+                                            <Setter Property="TextColor"
+                                                    Value="Red"/>
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>
@@ -226,7 +230,8 @@
                                         <DataTrigger TargetType="Label"
                                                      Binding="{Binding HasTermsError}"
                                                      Value="True">
-                                            <Setter Property="TextColor" Value="Red"/>
+                                            <Setter Property="TextColor"
+                                                    Value="Red"/>
                                         </DataTrigger>
                                     </Label.Triggers>
                                 </Label>

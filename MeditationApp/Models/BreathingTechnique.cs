@@ -16,6 +16,7 @@ namespace MeditationApp.Models
         public string Benefits { get; set; } = string.Empty;
         public string IconColor { get; set; } = "#4CAF50";
         public bool IsCustom { get; set; } = false;
+        public bool IsPremium => Id > 2; // Premium for techniques 3, 4, 5
 
         // Pre-defined techniques
         public static BreathingTechnique FourSevenEight => new()

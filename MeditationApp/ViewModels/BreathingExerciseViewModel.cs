@@ -78,15 +78,19 @@ namespace MeditationApp.ViewModels
         [ObservableProperty]
         private bool _isLoading = true;
 
+        [ObservableProperty]
+        private bool _hasPremiumSubscription = false;
+
         public BreathingExerciseViewModel(BreathingDatabaseService? databaseService = null)
         {
             _databaseService = databaseService;
             LoadTechniques();
             LoadStats();
+            LoadSubscriptionStatus();
             IsLoading = false;
         }
 
-        private void LoadTechniques()
+        private async void LoadTechniques()
         {
             var predefinedTechniques = BreathingTechnique.GetPredefinedTechniques();
             Techniques.Clear();
@@ -105,7 +109,7 @@ namespace MeditationApp.ViewModels
                 TotalCycles = SelectedTechnique.Cycles;
                 InstructionText = SelectedTechnique.Instructions;
                 // Auto-select the first technique and hide the selector
-                SelectTechnique(SelectedTechnique);
+                await SelectTechnique(SelectedTechnique);
             }
         }
 
@@ -160,10 +164,42 @@ namespace MeditationApp.ViewModels
             }
         }
 
+        private async void LoadSubscriptionStatus()
+        {
+            try
+            {
+                var paywallService = new PaywallService();
+                HasPremiumSubscription = await paywallService.CheckSubscriptionStatusAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading subscription status: {ex.Message}");
+                HasPremiumSubscription = false;
+            }
+        }
+
         [RelayCommand]
-        private void SelectTechnique(BreathingTechnique technique)
+        private async Task SelectTechnique(BreathingTechnique technique)
         {
             if (IsSessionActive) return;
+            
+            // Check if this technique requires premium access
+            // Free techniques: 4-7-8 Technique (Id=1) and Box Breathing (Id=2)
+            // Premium techniques: Equal Breathing (Id=3), Relaxing Breath (Id=4), Energizing Breath (Id=5)
+            if (technique.Id > 2)
+            {
+                var hasPremium = await MeditationApp.Utils.PremiumFeatureHelper.CheckPremiumAccessAsync($"{technique.Name} Breathing Technique");
+                if (!hasPremium)
+                {
+                    // User doesn't have premium or cancelled upgrade, keep technique selector open
+                    return;
+                }
+                else
+                {
+                    // User has premium access, update subscription status
+                    HasPremiumSubscription = true;
+                }
+            }
             
             SelectedTechnique = technique;
             TotalCycles = technique.Cycles;
