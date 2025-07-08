@@ -34,8 +34,8 @@ public static class PremiumFeatureHelper
                 if (Application.Current?.MainPage != null)
                 {
                     string message = result.IsRestore 
-                        ? "Your subscription has been restored! Enjoy all premium features."
-                        : $"Welcome to Premium! You now have access to {featureName} and all other premium features.";
+                        ? "Your subscription has been restored! Enjoy all Lucen+ features."
+                        : $"Welcome to Lucen+! You now have access to {featureName} and all other Lucen+ features.";
                         
                     await Application.Current.MainPage.DisplayAlert("Success", message, "OK");
                 }
@@ -65,12 +65,12 @@ public static class PremiumFeatureHelper
             if (Application.Current?.MainPage == null) return false;
             
             string message = string.IsNullOrEmpty(description) 
-                ? $"{featureName} is a premium feature."
-                : $"{featureName} is a premium feature. {description}";
+                ? $"{featureName} is a Lucen+ feature."
+                : $"{featureName} is a Lucen+ feature. {description}";
                 
             bool shouldShowPaywall = await Application.Current.MainPage.DisplayAlert(
-                "Premium Feature",
-                $"{message}\n\nWould you like to upgrade to premium?",
+                "Lucen+ Feature",
+                $"{message}\n\nWould you like to upgrade to Lucen+?",
                 "Upgrade Now",
                 "Maybe Later"
             );

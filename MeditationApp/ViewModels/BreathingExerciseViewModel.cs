@@ -7,12 +7,14 @@ using System.Diagnostics;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 using System.Text.Json;
+using Microsoft.Maui.Networking;
 
 namespace MeditationApp.ViewModels
 {
     public partial class BreathingExerciseViewModel : ObservableObject
     {
         private readonly BreathingDatabaseService? _databaseService;
+        private readonly DatabaseSyncService? _syncService;
         private Timer? _breathingTimer;
         private DateTime _phaseStartTime;
         private BreathingSession? _currentSession;
@@ -81,16 +83,19 @@ namespace MeditationApp.ViewModels
         [ObservableProperty]
         private bool _hasPremiumSubscription = false;
 
-        public BreathingExerciseViewModel(BreathingDatabaseService? databaseService = null)
+        public BreathingExerciseViewModel(BreathingDatabaseService? databaseService = null, DatabaseSyncService? syncService = null)
         {
             _databaseService = databaseService;
+            _syncService = syncService;
+            // Explicitly initialize the current session to null to prevent accidental reuse
+            _currentSession = null;
             LoadTechniques();
             LoadStats();
             LoadSubscriptionStatus();
             IsLoading = false;
         }
 
-        private async void LoadTechniques()
+        private void LoadTechniques()
         {
             var predefinedTechniques = BreathingTechnique.GetPredefinedTechniques();
             Techniques.Clear();
@@ -102,14 +107,14 @@ namespace MeditationApp.ViewModels
             // Load custom techniques from storage
             LoadCustomTechniques();
             
-            // Set default technique and auto-select the first one
+            // Set default technique but don't auto-select it
             SelectedTechnique = Techniques.FirstOrDefault();
             if (SelectedTechnique != null)
             {
                 TotalCycles = SelectedTechnique.Cycles;
                 InstructionText = SelectedTechnique.Instructions;
-                // Auto-select the first technique and hide the selector
-                await SelectTechnique(SelectedTechnique);
+                // Don't auto-select the first technique - let the user choose it
+                // await SelectTechnique(SelectedTechnique);
             }
         }
 
@@ -255,6 +260,14 @@ namespace MeditationApp.ViewModels
         private async Task BeginBreathingSessionAsync()
         {
             Debug.WriteLine("BeginBreathingSessionAsync called");
+            
+            // Safety check to prevent accidental session creation
+            if (ShowTechniqueSelector)
+            {
+                Debug.WriteLine("Cannot start session while technique selector is visible");
+                return;
+            }
+            
             if (SelectedTechnique == null) 
             {
                 Debug.WriteLine("No technique selected in BeginBreathingSessionAsync!");
@@ -553,7 +566,26 @@ namespace MeditationApp.ViewModels
             // Update stats
             await UpdateStatsAsync();
 
-            // Session stays in completed state until user manually starts new session
+            // Trigger sync if connected to internet
+            if (_syncService != null && Connectivity.NetworkAccess == NetworkAccess.Internet)
+            {
+                Debug.WriteLine("[BreathingExercise] Triggering immediate breathing sync after session completion");
+                _ = Task.Run(async () => 
+                {
+                    try
+                    {
+                        var result = await _syncService.SyncBreathingSessionsImmediatelyAsync();
+                        Debug.WriteLine($"[BreathingExercise] Immediate breathing sync completed: {result.IsSuccess} - {result.Message}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[BreathingExercise] Immediate breathing sync failed: {ex.Message}");
+                    }
+                });
+            }
+            
+            // Important: Clear the current session to prevent accidental reuse or duplication
+            _currentSession = null;
         }
 
         private void ResetSession()
@@ -568,6 +600,7 @@ namespace MeditationApp.ViewModels
             RemainingTime = 0;
             PhaseProgress = 0;
             ShowTechniqueSelector = true;
+            // Make sure to explicitly set the current session to null to prevent accidental reuse
             _currentSession = null;
         }
 
@@ -584,10 +617,13 @@ namespace MeditationApp.ViewModels
         {
             if (_currentSession == null) return;
 
-            // Save session to database
+            // Save session to database with sync tracking
             if (_databaseService != null)
             {
-                await _databaseService.SaveSessionAsync(_currentSession);
+                Debug.WriteLine($"[BreathingExercise] Saving session {_currentSession.Id} - IsCompleted: {_currentSession.IsCompleted}");
+                await _databaseService.SaveSessionWithSyncTrackingAsync(_currentSession);
+                Debug.WriteLine($"[BreathingExercise] Session saved with IsSynced: {_currentSession.IsSynced}");
+                
                 // Reload stats from database
                 Stats = await _databaseService.GetStatsAsync();
             }
@@ -633,7 +669,12 @@ namespace MeditationApp.ViewModels
         public void Cleanup()
         {
             _breathingTimer?.Dispose();
+            _cancellationTokenSource?.Cancel();
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = null;
             IsSessionActive = false;
+            // Explicitly clear the current session to prevent accidental reuse
+            _currentSession = null;
         }
 
         [RelayCommand]
@@ -643,10 +684,135 @@ namespace MeditationApp.ViewModels
             await Shell.Current.GoToAsync("//BreathingStatsPage");
         }
 
+        [RelayCommand]
+        private async Task TriggerSync()
+        {
+            if (_syncService == null)
+            {
+                Debug.WriteLine("[TriggerSync] Sync service not available");
+                return;
+            }
+
+            if (Connectivity.NetworkAccess != NetworkAccess.Internet)
+            {
+                Debug.WriteLine("[TriggerSync] No internet connection");
+                // You could show a toast or alert here
+                return;
+            }
+
+            Debug.WriteLine("[TriggerSync] Starting manual breathing sync...");
+            try
+            {
+                var result = await _syncService.SyncBreathingSessionsImmediatelyAsync();
+                Debug.WriteLine($"[TriggerSync] Breathing sync result: {result.IsSuccess} - {result.Message}");
+                
+                // Reload stats after successful sync
+                if (result.IsSuccess)
+                {
+                    LoadStats();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[TriggerSync] Breathing sync failed: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private async Task TriggerFullSync()
+        {
+            if (_syncService == null)
+            {
+                Debug.WriteLine("[TriggerFullSync] Sync service not available");
+                return;
+            }
+
+            if (Connectivity.NetworkAccess != NetworkAccess.Internet)
+            {
+                Debug.WriteLine("[TriggerFullSync] No internet connection");
+                return;
+            }
+
+            Debug.WriteLine("[TriggerFullSync] Starting full data sync...");
+            try
+            {
+                var result = await _syncService.SyncAllDataAsync(forceSync: true);
+                Debug.WriteLine($"[TriggerFullSync] Full sync result: {result.IsSuccess} - {result.Message}");
+                
+                // Reload stats after successful sync
+                if (result.IsSuccess)
+                {
+                    LoadStats();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[TriggerFullSync] Full sync failed: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private async Task CheckUnsyncedSessions()
+        {
+            if (_databaseService == null)
+            {
+                Debug.WriteLine("[CheckUnsynced] Database service not available");
+                return;
+            }
+
+            try
+            {
+                var unsyncedSessions = await _databaseService.GetUnsyncedSessionsAsync();
+                Debug.WriteLine($"[CheckUnsynced] Found {unsyncedSessions.Count} unsynced sessions");
+                
+                foreach (var session in unsyncedSessions)
+                {
+                    Debug.WriteLine($"[CheckUnsynced] Session {session.Id}: {session.TechniqueName}, Completed: {session.IsCompleted}, Synced: {session.IsSynced}");
+                }
+
+                var allSessions = await _databaseService.GetSessionsAsync();
+                Debug.WriteLine($"[CheckUnsynced] Total sessions in database: {allSessions.Count}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[CheckUnsynced] Error: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
+        private async Task CheckLocalSessions()
+        {
+            if (_databaseService == null)
+            {
+                Debug.WriteLine("[CheckLocal] Database service not available");
+                return;
+            }
+
+            try
+            {
+                var allSessions = await _databaseService.GetSessionsAsync();
+                Debug.WriteLine($"[CheckLocal] Total sessions in local database: {allSessions.Count}");
+                
+                foreach (var session in allSessions)
+                {
+                    Debug.WriteLine($"[CheckLocal] Session {session.Id}: {session.TechniqueName}, " +
+                                  $"Completed: {session.IsCompleted}, " +
+                                  $"Synced: {session.IsSynced}, " +
+                                  $"BackendId: {session.BackendId ?? "null"}, " +
+                                  $"StartTime: {session.StartTime:yyyy-MM-dd HH:mm:ss}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[CheckLocal] Error: {ex.Message}");
+            }
+        }
+
         // Calculated properties for UI
         public double WeeklyProgress => Math.Min(Stats.SessionsThisWeek / 7.0, 1.0);
         public bool WeekStreakAchievement => Stats.LongestStreak >= 7;
         public bool CenturionAchievement => Stats.TotalSessions >= 100;
+        public bool BreathMillennialAchievement => Stats.TotalBreaths >= 1000;
         public bool TimeMasterAchievement => Stats.TotalDuration.TotalHours >= 10;
 
         [RelayCommand]

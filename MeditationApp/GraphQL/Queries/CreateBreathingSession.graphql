@@ -1,0 +1,18 @@
+mutation CreateBreathingSession($input: CreateBreathingSessionInput!) {
+    createBreathingSession(input: $input) {
+        id
+        userID
+        startTime
+        endTime
+        techniqueId
+        techniqueName
+        completedCycles
+        totalCycles
+        duration
+        isCompleted
+        wasInterrupted
+        streakDay
+        createdAt
+        updatedAt
+    }
+}

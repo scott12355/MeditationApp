@@ -741,7 +741,7 @@
                                     </VerticalStackLayout.GestureRecognizers>
 
 
-                                    <Frame BackgroundColor="{StaticResource GlassyBlue}"
+                                    <Frame BackgroundColor="{StaticResource White}"
                                            BorderColor="{StaticResource GlassyBorder}"
                                            CornerRadius="18"
                                            Padding="5"
@@ -750,7 +750,7 @@
                                         <Editor x:Name="SessionNotesEditor"
                                                 Text="{Binding SessionNotes}"
                                                 Placeholder="Share your thoughts and feelings as if writing in a diary. How are you today, and what's been happening in your life?"                                                PlaceholderColor="#A0A0A0"
-                                                HeightRequest="100"
+                                                HeightRequest="120"
                                                 BackgroundColor="Transparent"
                                                 FontSize="16"
                                                 VerticalOptions="Start"/>

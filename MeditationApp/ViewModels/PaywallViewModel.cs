@@ -163,7 +163,7 @@ public class PaywallViewModel : INotifyPropertyChanged
                     PurchaseCompleted?.Invoke(this, new PurchaseResult 
                     { 
                         IsSuccess = false, 
-                        ErrorMessage = "No active subscriptions found to restore." 
+                        ErrorMessage = "No active Lucen+ subscriptions found to restore." 
                     });
                     tcs.SetResult(false);
                 }
@@ -222,7 +222,7 @@ public class PaywallViewModel : INotifyPropertyChanged
             if (offerings?.Current == null)
             {
                 HasError = true;
-                ErrorMessage = "No subscription plans available at this time.";
+                ErrorMessage = "No Lucen+ subscription plans available at this time.";
                 return;
             }
 
@@ -264,14 +264,14 @@ public class PaywallViewModel : INotifyPropertyChanged
             // Placeholder for other platforms
             await Task.Delay(1000);
             HasError = true;
-            ErrorMessage = "Subscriptions are not available on this platform.";
+            ErrorMessage = "Lucen+ subscriptions are not available on this platform.";
 #endif
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error loading offerings: {ex.Message}");
             HasError = true;
-            ErrorMessage = $"Failed to load subscription plans: {ex.Message}";
+            ErrorMessage = $"Failed to load Lucen+ subscription plans: {ex.Message}";
         }
         finally
         {
@@ -488,21 +488,21 @@ public class PaywallViewModel : INotifyPropertyChanged
     private static string GetPackageTitle(string packageId)
     {
         if (packageId.Contains("monthly") || packageId.Contains("month"))
-            return "Monthly Premium";
+            return "Lucen+ Monthly";
         if (packageId.Contains("yearly") || packageId.Contains("year") || packageId.Contains("annual"))
-            return "Annual Premium";
+            return "Lucen+ Annual";
         
-        return "Premium Subscription";
+        return "Lucen+ Subscription";
     }
 
     private static string GetPackageDescription(string packageId)
     {
         if (packageId.Contains("monthly") || packageId.Contains("month"))
-            return "Full access to all meditation content, renewed monthly";
+            return "Full access to all Lucen+ content, renewed monthly";
         if (packageId.Contains("yearly") || packageId.Contains("year") || packageId.Contains("annual"))
-            return "Full access to all meditation content, best value";
+            return "Full access to all Lucen+ content, best value";
         
-        return "Full access to all premium meditation content";
+        return "Full access to all Lucen+ premium content";
     }
 
     private static string GetPackagePeriod(string packageId)

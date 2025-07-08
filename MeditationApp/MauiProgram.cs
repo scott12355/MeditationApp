@@ -179,7 +179,8 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewModels.ForgotPasswordViewModel>();
         builder.Services.AddTransient<ViewModels.BreathingExerciseViewModel>(provider =>
             new ViewModels.BreathingExerciseViewModel(
-                provider.GetRequiredService<BreathingDatabaseService>()
+                provider.GetRequiredService<BreathingDatabaseService>(),
+                provider.GetRequiredService<DatabaseSyncService>()
             ));
 
         // Register MeditationSessionDatabase
@@ -197,7 +198,8 @@ public static class MauiProgram
             var localAuthService = provider.GetRequiredService<LocalAuthService>();
             var calendarDataService = provider.GetRequiredService<CalendarDataService>();
             var cognitoAuthService = provider.GetRequiredService<CognitoAuthService>();
-            return new DatabaseSyncService(database, graphQLService, localAuthService, calendarDataService, cognitoAuthService);
+            var breathingDatabase = provider.GetRequiredService<BreathingDatabaseService>();
+            return new DatabaseSyncService(database, graphQLService, localAuthService, calendarDataService, cognitoAuthService, breathingDatabase);
         });
 
         // Register MoodChartService

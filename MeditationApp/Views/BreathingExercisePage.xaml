@@ -12,14 +12,14 @@
                             Title="Breathing Exercises"
                             Shell.NavBarIsVisible="False">
 
-    <ContentPage.Padding>
-        <OnPlatform x:TypeArguments="Thickness">
-            <On Platform="iOS"
-                    Value="0,0,0,-30"/>
-            <On Platform="Android"
-                    Value="0,0,0,20"/>
-        </OnPlatform>
-    </ContentPage.Padding>
+        <ContentPage.Padding>
+                <OnPlatform x:TypeArguments="Thickness">
+                        <On Platform="iOS"
+                            Value="0,0,0,-30"/>
+                        <On Platform="Android"
+                            Value="0,0,0,20"/>
+                </OnPlatform>
+        </ContentPage.Padding>
 
         <uranium:UraniumContentPage.Resources>
                 <ResourceDictionary>
@@ -29,6 +29,7 @@
                         <converters:ProgressConverter x:Key="ProgressConverter"/>
                         <converters:StringToColorConverter x:Key="StringToColorConverter"/>
                         <converters:PremiumLockVisibilityConverter x:Key="PremiumLockVisibilityConverter"/>
+                        <converters:BreathingCircleScaleClampConverter x:Key="BreathingCircleScaleClampConverter"/>
                 </ResourceDictionary>
         </uranium:UraniumContentPage.Resources>
 
@@ -74,16 +75,7 @@
                                HorizontalOptions="Center"
                                VerticalOptions="Center"/>
 
-                        <!-- Stats Button -->
-                        <Button Text="📊"
-                                FontSize="20"
-                                BackgroundColor="Transparent"
-                                TextColor="Black"
-                                WidthRequest="44"
-                                HeightRequest="44"
-                                HorizontalOptions="End"
-                                VerticalOptions="Start"
-                                Command="{Binding ShowStatsCommand}"/>
+
                 </Grid>
 
                 <!-- Main Content -->
@@ -165,10 +157,11 @@
                                                                                                         <Frame.IsVisible>
                                                                                                                 <MultiBinding Converter="{StaticResource PremiumLockVisibilityConverter}">
                                                                                                                         <Binding Path="IsPremium"/>
-                                                                                                                        <Binding Path="HasPremiumSubscription" Source="{RelativeSource AncestorType={x:Type viewmodels:BreathingExerciseViewModel}}"/>
+                                                                                                                        <Binding Path="HasPremiumSubscription"
+                                                                                                                                 Source="{RelativeSource AncestorType={x:Type viewmodels:BreathingExerciseViewModel}}"/>
                                                                                                                 </MultiBinding>
                                                                                                         </Frame.IsVisible>
-                                                                                                        <Label Text="🔒 PREMIUM"
+                                                                                                        <Label Text="🔒 Lucen+"
                                                                                                                FontSize="10"
                                                                                                                FontAttributes="Bold"
                                                                                                                TextColor="White"
@@ -288,7 +281,7 @@
                                                                  HeightRequest="220"
                                                                  Fill="{Binding CircleColor}"
                                                                  Opacity="0.8"
-                                                                 Scale="{Binding CircleScale}"
+                                                                 Scale="{Binding CircleScale, Converter={StaticResource BreathingCircleScaleClampConverter}}"
                                                                  HorizontalOptions="Center"
                                                                  VerticalOptions="Center"/>
 
@@ -315,33 +308,7 @@
                                         <Grid Margin="20,0"
                                               ColumnDefinitions="Auto,*"
                                               VerticalOptions="Center">
-                                                <!-- Techniques Button -->
-                                                <Frame Grid.Column="0"
-                                                       Padding="0"
-                                                       CornerRadius="20"
-                                                       HasShadow="True"
-                                                       HorizontalOptions="Start"
-                                                       HeightRequest="50"
-                                                       WidthRequest="120"
-                                                       BackgroundColor="{StaticResource ActionBlue}"
-                                                       BorderColor="Transparent"
-                                                       IsVisible="{Binding IsSessionActive, Converter={StaticResource InverseBoolConverter}}">
-                                                        <Frame.Shadow>
-                                                                <Shadow Brush="{StaticResource ActionBlue}"
-                                                                        Offset="0,4"
-                                                                        Radius="12"
-                                                                        Opacity="0.25"/>
-                                                        </Frame.Shadow>
-                                                        <Button Text="Techniques"
-                                                                Command="{Binding ShowTechniquesCommand}"
-                                                                BackgroundColor="Transparent"
-                                                                TextColor="White"
-                                                                FontSize="16"
-                                                                FontFamily="OpenSansRegular"
-                                                                HorizontalOptions="Fill"
-                                                                VerticalOptions="Fill"
-                                                                BorderColor="Transparent"/>
-                                                </Frame>
+
 
                                                 <!-- Main Action Button -->
                                                 <Frame Grid.Column="1"

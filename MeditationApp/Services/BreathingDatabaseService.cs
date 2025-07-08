@@ -93,11 +93,15 @@ namespace MeditationApp.Services
             var sessions = await GetSessionsAsync();
             var completedSessions = sessions.Where(s => s.IsCompleted).ToList();
             
+            // Calculate total breaths (each cycle is one full breath)
+            int totalBreaths = completedSessions.Sum(s => s.CompletedCycles);
+            
             var stats = new BreathingStats
             {
                 TotalSessions = completedSessions.Count,
                 TotalDuration = TimeSpan.FromTicks(completedSessions.Sum(s => s.Duration.Ticks)),
                 TotalCyclesCompleted = completedSessions.Sum(s => s.CompletedCycles),
+                TotalBreaths = totalBreaths,
                 LastSessionDate = completedSessions.LastOrDefault()?.StartTime.Date
             };
 
@@ -188,6 +192,59 @@ namespace MeditationApp.Services
             }
 
             return Math.Max(longestStreak, currentStreak);
+        }
+
+        /// <summary>
+        /// Get sessions that haven't been synced to the backend yet
+        /// </summary>
+        public Task<List<BreathingSession>> GetUnsyncedSessionsAsync()
+        {
+            return _database.Table<BreathingSession>()
+                            .Where(s => !s.IsSynced && s.IsCompleted)
+                            .OrderBy(s => s.StartTime)
+                            .ToListAsync();
+        }
+
+        /// <summary>
+        /// Mark sessions as synced after successful backend upload
+        /// </summary>
+        public async Task MarkSessionsAsSyncedAsync(List<int> sessionIds)
+        {
+            foreach (var id in sessionIds)
+            {
+                var session = await GetSessionAsync(id);
+                if (session != null)
+                {
+                    session.IsSynced = true;
+                    session.BackendId = $"backend_id_{id}"; // This would be the actual backend ID
+                    await _database.UpdateAsync(session);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Save session with sync tracking
+        /// </summary>
+        public async Task<int> SaveSessionWithSyncTrackingAsync(BreathingSession session)
+        {
+            // New sessions are marked as unsynced
+            if (session.Id == 0)
+            {
+                session.IsSynced = false;
+                session.LastModified = DateTime.UtcNow;
+            }
+            
+            return await SaveSessionAsync(session);
+        }
+
+        /// <summary>
+        /// Clear all sessions that have been successfully synced (for testing/cleanup)
+        /// </summary>
+        public Task<int> ClearSyncedSessionsAsync()
+        {
+            return _database.Table<BreathingSession>()
+                            .Where(s => s.IsSynced)
+                            .DeleteAsync();
         }
     }
 }

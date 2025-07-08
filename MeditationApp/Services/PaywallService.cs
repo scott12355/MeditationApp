@@ -79,8 +79,8 @@ public static class PaywallExtensions
             
             if (result.WasPurchased)
             {
-                await page.DisplayAlert("Welcome to Premium!", 
-                    $"You now have access to all premium features. Enjoy your {featureName}!", 
+                await page.DisplayAlert("Welcome to Lucen+!", 
+                    $"You now have access to all Lucen+ features. Enjoy your {featureName}!", 
                     "OK");
                 return true;
             }

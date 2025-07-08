@@ -45,7 +45,7 @@ public partial class SettingsPage : ContentPage
         }
         else
         {
-            await DisplayAlert("Error", "Subscription feature is not available.", "OK");
+            await DisplayAlert("Error", "Lucen+ subscription feature is not available.", "OK");
         }
     }
 }

@@ -1,6 +1,6 @@
 # Custom Paywall Implementation
 
-This document explains how to use the custom paywall system built for the Meditation App. The paywall integrates with RevenueCat to provide a seamless premium subscription experience.
+This document explains how to use the custom paywall system built for the Meditation App. The paywall integrates with RevenueCat to provide a seamless Lucen+ subscription experience.
 
 ## Overview
 

@@ -1,0 +1,21 @@
+query ListUserBreathingSessions($userID: ID!, $limit: Int, $nextToken: String) {
+    listUserBreathingSessions(userID: $userID, limit: $limit, nextToken: $nextToken) {
+        items {
+            id
+            userID
+            startTime
+            endTime
+            techniqueId
+            techniqueName
+            completedCycles
+            totalCycles
+            duration
+            isCompleted
+            wasInterrupted
+            streakDay
+            createdAt
+            updatedAt
+        }
+        nextToken
+    }
+}

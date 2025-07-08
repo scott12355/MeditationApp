@@ -25,8 +25,18 @@ namespace MeditationApp.Views
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            // Always start by showing the technique list
+            
+            // Always clean up any existing session state to prevent duplicates
+            ViewModel.Cleanup();
+            
+            // Always start by showing the technique list and ensure no session is active
             ViewModel.ShowTechniqueSelector = true;
+            
+            // Belt and suspenders: also call CancelSessionCommand if needed
+            if (ViewModel.IsSessionActive)
+            {
+                ViewModel.CancelSessionCommand.Execute(null);
+            }
         }
 
         protected override void OnDisappearing()

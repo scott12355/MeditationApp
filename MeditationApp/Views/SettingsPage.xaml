@@ -256,7 +256,7 @@
                                                          Radius="15"
                                                          Opacity="0.18"/>
                                           </Frame.Shadow>
-                                          <Button Text="Go Premium"
+                                          <Button Text="Get Lucen+"
                                                   Clicked="OnSubscribeClicked"
                                                   BackgroundColor="Transparent"
                                                   TextColor="Black"
@@ -338,7 +338,7 @@
                                                  </VisualStateManager.VisualStateGroups>
                                           </Button>
                                    </Frame>
-                            </VerticalStackLayout>     
+                            </VerticalStackLayout>
                      </VerticalStackLayout>
               </ScrollView>
        </Grid>
