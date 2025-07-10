@@ -26,6 +26,14 @@ namespace MeditationApp.Views
         {
             base.OnAppearing();
             
+            // Don't reset session if user is returning from paywall flow
+            if (ViewModel.IsInPaywallFlow)
+            {
+                // But ensure UI is properly restored
+                ViewModel.RestoreSessionUI();
+                return;
+            }
+            
             // Always clean up any existing session state to prevent duplicates
             ViewModel.Cleanup();
             

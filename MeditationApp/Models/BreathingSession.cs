@@ -1,9 +1,11 @@
 using System;
+using SQLite;
 
 namespace MeditationApp.Models
 {
     public class BreathingSession
     {
+        [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime? EndTime { get; set; }

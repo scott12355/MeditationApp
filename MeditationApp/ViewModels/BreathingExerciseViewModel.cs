@@ -8,6 +8,8 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Storage;
 using System.Text.Json;
 using Microsoft.Maui.Networking;
+using Plugin.Maui.Audio;
+using MeditationApp.Utils;
 
 namespace MeditationApp.ViewModels
 {
@@ -16,7 +18,6 @@ namespace MeditationApp.ViewModels
         private readonly BreathingDatabaseService? _databaseService;
         private readonly DatabaseSyncService? _syncService;
         private Timer? _breathingTimer;
-        private DateTime _phaseStartTime;
         private BreathingSession? _currentSession;
         private CancellationTokenSource? _cancellationTokenSource;
 
@@ -37,6 +38,9 @@ namespace MeditationApp.ViewModels
 
         [ObservableProperty]
         private int _totalCycles = 10;
+
+        // Computed progress fraction of current cycle over total cycles
+        public double CycleProgress => TotalCycles > 0 ? (double)CurrentCycle / TotalCycles : 0.0;
 
         [ObservableProperty]
         private int _remainingTime = 0;
@@ -82,6 +86,20 @@ namespace MeditationApp.ViewModels
 
         [ObservableProperty]
         private bool _hasPremiumSubscription = false;
+        
+        [ObservableProperty]
+        private ObservableCollection<MusicOption> _musicOptions = new();
+        
+        [ObservableProperty]
+        private MusicOption? _selectedMusic;
+        
+        [ObservableProperty]
+        private bool _isMusicPopupVisible = false;
+        
+        private Plugin.Maui.Audio.IAudioManager? _audioManager;
+        private Plugin.Maui.Audio.IAudioPlayer? _backgroundMusicPlayer;
+
+        private DateTime _phaseStartTime;
 
         public BreathingExerciseViewModel(BreathingDatabaseService? databaseService = null, DatabaseSyncService? syncService = null)
         {
@@ -92,7 +110,148 @@ namespace MeditationApp.ViewModels
             LoadTechniques();
             LoadStats();
             LoadSubscriptionStatus();
+            InitializeMusicOptions();
             IsLoading = false;
+        }
+        
+        partial void OnHasPremiumSubscriptionChanged(bool value)
+        {
+            UpdateMusicLockStates();
+        }
+
+        private void UpdateMusicLockStates()
+        {
+            Debug.WriteLine($"[UpdateMusicLockStates] HasPremiumSubscription: {HasPremiumSubscription}");
+            foreach (var option in MusicOptions)
+            {
+                // Lock all except none and ambient when no subscription
+                if (option.Id != "none" && option.Id != "ambient")
+                {
+                    option.IsLocked = !HasPremiumSubscription;
+                    Debug.WriteLine($"[UpdateMusicLockStates] {option.Name}: IsLocked = {option.IsLocked}");
+                }
+                else
+                {
+                    option.IsLocked = false;
+                    Debug.WriteLine($"[UpdateMusicLockStates] {option.Name}: IsLocked = {option.IsLocked} (free)");
+                }
+            }
+        }
+        
+        private void InitializeMusicOptions()
+        {
+            // Initialize background music options
+            MusicOptions.Clear();
+            MusicOptions.Add(new MusicOption { Id = "none", Name = "No Music", Icon = "🔇", AudioPath = "", IsLocked = false });
+            MusicOptions.Add(new MusicOption { Id = "ambient", Name = "Ambient Sounds", Icon = "🎵", AudioPath = "ambient_meditation.mp3", IsLocked = false });
+            MusicOptions.Add(new MusicOption { Id = "nature", Name = "Nature Sounds", Icon = "🌿", AudioPath = "nature_sounds.mp3", IsLocked = true });
+            MusicOptions.Add(new MusicOption { Id = "rain", Name = "Rain Sounds", Icon = "🌧️", AudioPath = "rain_sounds.mp3", IsLocked = true });
+            MusicOptions.Add(new MusicOption { Id = "ocean", Name = "Ocean Waves", Icon = "🌊", AudioPath = "ocean_waves.mp3", IsLocked = true });
+            
+            // Set default selection to "No Music"
+            SelectedMusic = MusicOptions[0];
+            SelectedMusic.IsSelected = true;
+            
+            // Initialize the audio manager
+            _audioManager = Plugin.Maui.Audio.AudioManager.Current;
+
+            // After adding options, set lock states based on subscription
+            UpdateMusicLockStates();
+        }
+        
+        [RelayCommand]
+        private void ShowMusicOptions()
+        {
+            IsMusicPopupVisible = true;
+        }
+        
+        [RelayCommand]
+        private void CloseMusicPopup()
+        {
+            IsMusicPopupVisible = false;
+        }
+        
+        [RelayCommand]
+        private async Task SelectMusic(MusicOption music)
+        {
+            if (music == null) return;
+
+            // Require premium for music choices except 'none' and 'ambient'
+            if (music.Id != "none" && music.Id != "ambient")
+            {
+                // Store session state before paywall
+                var wasSessionActive = IsSessionActive;
+                var breathingState = BreathingState;
+                var wasPopupVisible = IsMusicPopupVisible;
+                
+                IsInPaywallFlow = true;
+                try
+                {
+                    var hasPremium = await MeditationApp.Utils.PremiumFeatureHelper.CheckPremiumAccessAsync($"{music.Name} Music");
+                    if (!hasPremium)
+                    {
+                        // User denied upgrade or not subscribed, do not change selection
+                        // Restore popup visibility
+                        IsMusicPopupVisible = wasPopupVisible;
+                        return;
+                    }
+                    // User has premium, update status
+                    HasPremiumSubscription = true;
+                }
+                finally
+                {
+                    IsInPaywallFlow = false;
+                    
+                    // Restore session state after paywall
+                    if (wasSessionActive)
+                    {
+                        IsSessionActive = true;
+                        BreathingState = breathingState;
+                        RestoreSessionUI();
+                    }
+                }
+            }
+
+            // Deselect all options
+            foreach (var option in MusicOptions)
+            {
+                option.IsSelected = false;
+            }
+            
+            // Select the chosen option
+            music.IsSelected = true;
+            SelectedMusic = music;
+            
+            // Play the selected music or stop if "No Music" is selected
+            if (_backgroundMusicPlayer != null)
+            {
+                _backgroundMusicPlayer.Stop();
+                _backgroundMusicPlayer.Dispose();
+                _backgroundMusicPlayer = null;
+            }
+            
+            if (_audioManager != null && !string.IsNullOrEmpty(music.AudioPath))
+            {
+                try
+                {
+                    // Create a new audio player from the file
+                    var audioFile = await FileSystem.OpenAppPackageFileAsync(music.AudioPath);
+                    _backgroundMusicPlayer = _audioManager.CreatePlayer(audioFile);
+                    
+                    // Configure to loop continuously
+                    _backgroundMusicPlayer.Loop = true;
+                    
+                    // Play the audio
+                    _backgroundMusicPlayer.Play();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error playing background music: {ex.Message}");
+                }
+            }
+            
+            // Close the popup
+            IsMusicPopupVisible = false;
         }
 
         private void LoadTechniques()
@@ -175,11 +334,18 @@ namespace MeditationApp.ViewModels
             {
                 var paywallService = new PaywallService();
                 HasPremiumSubscription = await paywallService.CheckSubscriptionStatusAsync();
+                Debug.WriteLine($"[LoadSubscriptionStatus] Loaded subscription status: {HasPremiumSubscription}");
+                
+                // Update music lock states after loading subscription status
+                UpdateMusicLockStates();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error loading subscription status: {ex.Message}");
                 HasPremiumSubscription = false;
+                
+                // Update music lock states even if loading failed
+                UpdateMusicLockStates();
             }
         }
 
@@ -193,16 +359,35 @@ namespace MeditationApp.ViewModels
             // Premium techniques: Equal Breathing (Id=3), Relaxing Breath (Id=4), Energizing Breath (Id=5)
             if (technique.Id > 2)
             {
-                var hasPremium = await MeditationApp.Utils.PremiumFeatureHelper.CheckPremiumAccessAsync($"{technique.Name} Breathing Technique");
-                if (!hasPremium)
+                // Store session state before paywall (though unlikely to be active here)
+                var wasSessionActive = IsSessionActive;
+                var breathingState = BreathingState;
+                
+                IsInPaywallFlow = true;
+                try
                 {
-                    // User doesn't have premium or cancelled upgrade, keep technique selector open
-                    return;
+                    var hasPremium = await MeditationApp.Utils.PremiumFeatureHelper.CheckPremiumAccessAsync($"{technique.Name} Breathing Technique");
+                    if (!hasPremium)
+                    {
+                        // User doesn't have premium or cancelled upgrade, keep technique selector open
+                        return;
+                    }
+                    else
+                    {
+                        // User has premium access, update subscription status
+                        HasPremiumSubscription = true;
+                    }
                 }
-                else
+                finally
                 {
-                    // User has premium access, update subscription status
-                    HasPremiumSubscription = true;
+                    IsInPaywallFlow = false;
+                    
+                    // Restore session state after paywall (though unlikely to be needed here)
+                    if (wasSessionActive)
+                    {
+                        IsSessionActive = true;
+                        BreathingState = breathingState;
+                    }
                 }
             }
             
@@ -219,9 +404,13 @@ namespace MeditationApp.ViewModels
         [RelayCommand(AllowConcurrentExecutions = true)]
         private async Task StartStopSession()
         {
-            Debug.WriteLine($"StartStopSession called. BreathingState: {BreathingState}");
-            Debug.WriteLine($"SelectedTechnique: {SelectedTechnique?.Name}");
-            
+            if (SelectedTechnique == null)
+            {
+                Debug.WriteLine("No technique selected! Cannot start session.");
+                PhaseText = "Please select a technique to begin.";
+                return;
+            }
+
             switch (BreathingState)
             {
                 case BreathingState.Stopped:
@@ -586,6 +775,14 @@ namespace MeditationApp.ViewModels
             
             // Important: Clear the current session to prevent accidental reuse or duplication
             _currentSession = null;
+            
+            // Stop any playing background music
+            if (_backgroundMusicPlayer != null)
+            {
+                _backgroundMusicPlayer.Stop();
+                _backgroundMusicPlayer.Dispose();
+                _backgroundMusicPlayer = null;
+            }
         }
 
         private void ResetSession()
@@ -600,8 +797,22 @@ namespace MeditationApp.ViewModels
             RemainingTime = 0;
             PhaseProgress = 0;
             ShowTechniqueSelector = true;
-            // Make sure to explicitly set the current session to null to prevent accidental reuse
+
+            // Explicitly reset session-related properties
+            SelectedTechnique = null;
+            TotalCycles = 0;
+            InstructionText = "Select a technique to get started";
+
+            // Clear the current session to prevent reuse
             _currentSession = null;
+
+            // Stop any playing background music
+            if (_backgroundMusicPlayer != null)
+            {
+                _backgroundMusicPlayer.Stop();
+                _backgroundMusicPlayer.Dispose();
+                _backgroundMusicPlayer = null;
+            }
         }
 
         [RelayCommand]
@@ -809,12 +1020,63 @@ namespace MeditationApp.ViewModels
         }
 
         // Calculated properties for UI
-        public double WeeklyProgress => Math.Min(Stats.SessionsThisWeek / 7.0, 1.0);
+        public double WeeklyProgress
+        {
+            get
+            {
+                if (Stats == null || Stats.SessionsThisWeek == 0)
+                {
+                    return 0.0;
+                }
+                return Math.Min((double)Stats.SessionsThisWeek / 7.0, 1.0);
+            }
+        }
+
+        public double BreathingExerciseProgress
+        {
+            get
+            {
+                if (TotalCycles <= 0)
+                {
+                    return 0.0;
+                }
+                return Math.Min((double)CurrentCycle / TotalCycles, 1.0);
+            }
+        }
+
+        partial void OnCurrentCycleChanged(int value)
+        {
+            OnPropertyChanged(nameof(BreathingExerciseProgress));
+            OnPropertyChanged(nameof(CycleProgress));
+        }
+
+        partial void OnTotalCyclesChanged(int value)
+        {
+            OnPropertyChanged(nameof(BreathingExerciseProgress));
+            OnPropertyChanged(nameof(CycleProgress));
+        }
+
+        public void UpdateWeeklyProgress()
+        {
+            OnPropertyChanged(nameof(WeeklyProgress));
+        }
+
+        // Achievement properties for stats page
         public bool WeekStreakAchievement => Stats.LongestStreak >= 7;
         public bool CenturionAchievement => Stats.TotalSessions >= 100;
         public bool BreathMillennialAchievement => Stats.TotalBreaths >= 1000;
         public bool TimeMasterAchievement => Stats.TotalDuration.TotalHours >= 10;
 
+        // Notify UI when derived stats change
+        partial void OnStatsChanged(MeditationApp.Models.BreathingStats value)
+        {
+            OnPropertyChanged(nameof(WeeklyProgress));
+            OnPropertyChanged(nameof(WeekStreakAchievement));
+            OnPropertyChanged(nameof(CenturionAchievement));
+            OnPropertyChanged(nameof(BreathMillennialAchievement));
+            OnPropertyChanged(nameof(TimeMasterAchievement));
+        }
+        
         [RelayCommand]
         private void CancelSession()
         {
@@ -823,6 +1085,39 @@ namespace MeditationApp.ViewModels
                 Debug.WriteLine("Cancelling session...");
                 _cancellationTokenSource?.Cancel();
                 ResetSession();
+            }
+        }
+
+        [ObservableProperty]
+        private bool _isInPaywallFlow = false;
+
+        public void RestoreSessionUI()
+        {
+            Debug.WriteLine($"[RestoreSessionUI] IsSessionActive: {IsSessionActive}, BreathingState: {BreathingState}");
+            
+            if (IsSessionActive)
+            {
+                // Ensure technique selector is hidden
+                ShowTechniqueSelector = false;
+                
+                // Restore button text based on state
+                switch (BreathingState)
+                {
+                    case BreathingState.Playing:
+                        ButtonText = "Pause";
+                        break;
+                    case BreathingState.Paused:
+                        ButtonText = "Resume";
+                        break;
+                    case BreathingState.Completed:
+                        ButtonText = "Start New Session";
+                        break;
+                    default:
+                        ButtonText = "Start";
+                        break;
+                }
+                
+                Debug.WriteLine($"[RestoreSessionUI] Restored ButtonText: {ButtonText}");
             }
         }
     }

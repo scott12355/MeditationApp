@@ -233,7 +233,11 @@ namespace MeditationApp.Services
                 session.IsSynced = false;
                 session.LastModified = DateTime.UtcNow;
             }
-            
+            else
+            {
+                session.LastModified = DateTime.UtcNow;
+            }
+
             return await SaveSessionAsync(session);
         }
 

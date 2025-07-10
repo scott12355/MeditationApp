@@ -6,24 +6,17 @@ namespace MeditationApp.Converters
 {
     public class ProgressConverter : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is int currentCycle && parameter is int totalCycles && totalCycles > 0)
             {
                 return (double)currentCycle / totalCycles;
             }
-            
-            // Try to get total from binding context if parameter not provided
-            if (value is int current)
-            {
-                // Default to showing progress as a fraction of 10
-                return (double)current / 10.0;
-            }
-            
+
             return 0.0;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
@@ -35,12 +28,12 @@ namespace MeditationApp.Converters
         {
             string parameterString = parameter?.ToString() ?? "Default|Alternative";
             string[] options = parameterString.Split('|');
-            
+
             if (value == null)
             {
                 return options.Length > 1 ? options[1] : options[0];
             }
-            
+
             return options[0];
         }
 

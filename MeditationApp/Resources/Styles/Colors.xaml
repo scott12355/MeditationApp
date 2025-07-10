@@ -37,6 +37,7 @@
     <!-- More transparent glassy white -->
     <Color x:Key="GlassyBlue">#B3E3F0FF</Color>
     <Color x:Key="GlassyGray">#99F6F6F6</Color>
+    <Color x:Key="GlassyGrayOpaque">#CCF6F6F6</Color>
     <Color x:Key="GlassyLight">#80F7F7FF</Color>
 
     <!-- Glassy Border for glassy UI elements -->
