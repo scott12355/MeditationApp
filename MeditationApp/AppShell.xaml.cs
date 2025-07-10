@@ -15,6 +15,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("DayDetailPage", typeof(Views.DayDetailPage));
         Routing.RegisterRoute("OnboardingPage1", typeof(Views.OnboardingPage1));
         Routing.RegisterRoute("OnboardingPage2", typeof(Views.OnboardingPage2));
+        Routing.RegisterRoute("BreathingStatsPage", typeof(Views.BreathingStatsPage));
 
         Navigating += OnNavigating;
     }
@@ -25,7 +26,10 @@ public partial class AppShell : Shell
         var targetRoute = e.Target.Location.OriginalString;
         
         if (targetRoute.Contains("TodayPage") || 
-            targetRoute.Contains("CalendarPage"))
+            targetRoute.Contains("CalendarPage") ||
+            targetRoute.Contains("BreathingExercisePage") ||
+            targetRoute.Contains("BreathingStatsPage") || 
+            targetRoute.Contains("SettingsPage"))
         {
             // Enable flyout for main app areas
             FlyoutBehavior = FlyoutBehavior.Flyout;

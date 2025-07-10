@@ -64,14 +64,14 @@
             <!-- Logo and Welcome Section -->
             <VerticalStackLayout Spacing="15"
                                  HorizontalOptions="Center"
-                                 Margin="0,20,0,20">
+                                 Margin="0,10,0,20">
                 
                 <!-- Logo Image -->
                 <Image Source="logo.png"
                        HeightRequest="80"
                        WidthRequest="80"
                        HorizontalOptions="Center"
-                       Opacity="0.9"/>
+                       Opacity="1"/>
 
                 <!-- Welcome Text -->
                 <VerticalStackLayout Spacing="5"
@@ -109,7 +109,7 @@
                                         AccentOpacity="0.1"/>
                 </Frame.Effects>
 
-                <VerticalStackLayout Spacing="20">
+                <VerticalStackLayout Spacing="10">
 
                     <!-- Email TextField -->
                     <material:TextField Title="Email"
@@ -131,7 +131,8 @@
                     <!-- Forgot Password Link -->
                     <Label Text="Forgot Password?"
                            HorizontalOptions="End"
-                           FontSize="14"
+                           Padding="0,0,0,5"
+                           FontSize="10"
                            TextColor="{StaticResource Primary}"
                            FontAttributes="Bold">
                         <Label.GestureRecognizers>
@@ -141,7 +142,7 @@
 
                     <!-- Status and Loading Indicator -->
                     <Grid HorizontalOptions="Center"
-                          Margin="0,5,0,0">
+                          Margin="0,-17,0,0">
                         <Label Text="{Binding Status}"
                                TextColor="Red"
                                FontSize="14"

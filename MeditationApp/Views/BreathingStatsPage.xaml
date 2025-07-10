@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                            xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+                            xmlns:converters="clr-namespace:MeditationApp.Converters"
+                            xmlns:viewmodels="clr-namespace:MeditationApp.ViewModels"
+                            x:Class="MeditationApp.Views.BreathingStatsPage"
+                            x:DataType="viewmodels:BreathingExerciseViewModel"
+                            Title="Breathing Statistics">
+
+       <uranium:UraniumContentPage.Resources>
+              <ResourceDictionary>
+                     <converters:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
+                     <converters:BoolToStringConverter x:Key="BoolToStringConverter"/>
+                     <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
+                     <converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
+                     <converters:IntToBoolConverter x:Key="IntToBoolConverter"/>
+              </ResourceDictionary>
+       </uranium:UraniumContentPage.Resources>
+
+       <ContentPage.Padding>
+              <OnPlatform x:TypeArguments="Thickness">
+                     <On Platform="iOS"
+                         Value="0,0,0,-30"/>
+                     <On Platform="Android"
+                         Value="0,0,0,20"/>
+              </OnPlatform>
+       </ContentPage.Padding>
+
+       <uranium:UraniumContentPage.Background>
+              <SolidColorBrush Color="#EFEBD3"/>
+       </uranium:UraniumContentPage.Background>
+
+       <Grid BackgroundColor="#EFEBD3">
+              <ScrollView Padding="20">
+                     <StackLayout Spacing="20">
+
+                            <!-- Overview Stats -->
+                            <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                                   BorderColor="{StaticResource GlassyBorder}"
+                                   CornerRadius="24"
+                                   HasShadow="True"
+                                   Padding="20">
+                                   <Frame.Shadow>
+                                          <Shadow Brush="Black"
+                                                  Offset="0,8"
+                                                  Radius="20"
+                                                  Opacity="0.12"/>
+                                   </Frame.Shadow>
+                                   <StackLayout Spacing="15">
+                                          <Label Text="📊 Overview"
+                                                 FontSize="22"
+                                                 FontAttributes="Bold"
+                                                 TextColor="Black"/>
+
+                                          <Grid ColumnDefinitions="*,*"
+                                                RowDefinitions="Auto,Auto,Auto,Auto"
+                                                RowSpacing="15"
+                                                ColumnSpacing="20">
+
+                                                 <!-- Total Sessions -->
+                                                 <StackLayout Grid.Row="0"
+                                                              Grid.Column="0">
+                                                        <Label Text="{Binding Stats.TotalSessions}"
+                                                               FontSize="28"
+                                                               FontAttributes="Bold"
+                                                               TextColor="Black"
+                                                               HorizontalOptions="Center"/>
+                                                        <Label Text="Total Sessions"
+                                                               FontSize="14"
+                                                               TextColor="{StaticResource toneGray}"
+                                                               HorizontalOptions="Center"/>
+                                                 </StackLayout>
+
+                                                 <!-- Current Streak -->
+                                                 <StackLayout Grid.Row="0"
+                                                              Grid.Column="1">
+                                                        <Label Text="{Binding Stats.CurrentStreak}"
+                                                               FontSize="28"
+                                                               FontAttributes="Bold"
+                                                               TextColor="Black"
+                                                               HorizontalOptions="Center"/>
+                                                        <Label Text="Current Streak"
+                                                               FontSize="14"
+                                                               TextColor="{StaticResource toneGray}"
+                                                               HorizontalOptions="Center"/>
+                                                 </StackLayout>
+
+                                                 <!-- Total Duration -->
+                                                 <StackLayout Grid.Row="1"
+                                                              Grid.Column="0">
+                                                        <Label Text="{Binding Stats.FormattedTotalDuration}"
+                                                               FontSize="28"
+                                                               FontAttributes="Bold"
+                                                               TextColor="Black"
+                                                               HorizontalOptions="Center"/>
+                                                        <Label Text="Total Duration"
+                                                               FontSize="14"
+                                                               TextColor="{StaticResource toneGray}"
+                                                               HorizontalOptions="Center"/>
+                                                 </StackLayout>
+
+                                                 <!-- Longest Streak -->
+                                                 <StackLayout Grid.Row="1"
+                                                              Grid.Column="1">
+                                                        <Label Text="{Binding Stats.LongestStreak}"
+                                                               FontSize="28"
+                                                               FontAttributes="Bold"
+                                                               TextColor="Black"
+                                                               HorizontalOptions="Center"/>
+                                                        <Label Text="Longest Streak"
+                                                               FontSize="14"
+                                                               TextColor="{StaticResource toneGray}"
+                                                               HorizontalOptions="Center"/>
+                                                 </StackLayout>
+
+                                                 <!-- Total Breaths -->
+                                                 <StackLayout Grid.Row="2"
+                                                              Grid.Column="0"
+                                                              Grid.ColumnSpan="2"
+                                                              HorizontalOptions="Center">
+                                                        <Label Text="{Binding Stats.TotalBreaths}"
+                                                               FontSize="28"
+                                                               FontAttributes="Bold"
+                                                               TextColor="Black"
+                                                               HorizontalOptions="Center"/>
+                                                        <Label Text="Total Breaths"
+                                                               FontSize="14"
+                                                               TextColor="{StaticResource toneGray}"
+                                                               HorizontalOptions="Center"/>
+                                                 </StackLayout>
+                                          </Grid>
+                                   </StackLayout>
+                            </Frame>
+
+                            <!-- Weekly Progress -->
+                            <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                                   BorderColor="{StaticResource GlassyBorder}"
+                                   CornerRadius="24"
+                                   HasShadow="True"
+                                   Padding="20">
+                                   <Frame.Shadow>
+                                          <Shadow Brush="Black"
+                                                  Offset="0,8"
+                                                  Radius="20"
+                                                  Opacity="0.12"/>
+                                   </Frame.Shadow>
+                                   <StackLayout Spacing="15">
+                                          <Label Text="📅 This Week"
+                                                 FontSize="20"
+                                                 FontAttributes="Bold"
+                                                 TextColor="Black"/>
+
+                                          <Grid ColumnDefinitions="*,*"
+                                                RowSpacing="10"
+                                                ColumnSpacing="20">
+                                                 <StackLayout Grid.Column="0">
+                                                        <Label Text="{Binding Stats.SessionsThisWeek}"
+                                                               FontSize="24"
+                                                               FontAttributes="Bold"
+                                                               TextColor="Black"
+                                                               HorizontalOptions="Center"/>
+                                                        <Label Text="Sessions"
+                                                               FontSize="14"
+                                                               TextColor="{StaticResource toneGray}"
+                                                               HorizontalOptions="Center"/>
+                                                 </StackLayout>
+
+                                                 <StackLayout Grid.Column="1">
+                                                        <Label Text="{Binding Stats.SessionsThisMonth}"
+                                                               FontSize="24"
+                                                               FontAttributes="Bold"
+                                                               TextColor="Black"
+                                                               HorizontalOptions="Center"/>
+                                                        <Label Text="This Month"
+                                                               FontSize="14"
+                                                               TextColor="{StaticResource toneGray}"
+                                                               HorizontalOptions="Center"/>
+                                                 </StackLayout>
+                                          </Grid>
+
+                                          <!-- Progress Bar for Weekly Goal (assuming 7 sessions per week) -->
+                                          <StackLayout>
+                                                 <Label Text="Weekly Goal Progress"
+                                                        FontSize="16"
+                                                        FontAttributes="Bold"
+                                                        TextColor="Black"/>
+                                                 <ProgressBar Progress="{Binding WeeklyProgress}"
+                                                              ProgressColor="{StaticResource Primary}"
+                                                              BackgroundColor="{StaticResource GlassyBorder}"/>
+                                                 <Label Text="{Binding Stats.SessionsThisWeek, StringFormat='{0}/7 sessions'}"
+                                                        FontSize="12"
+                                                        TextColor="{StaticResource toneGray}"
+                                                        HorizontalOptions="Center"/>
+                                          </StackLayout>
+                                   </StackLayout>
+                            </Frame>
+
+                            <!-- Favorite Technique -->
+                            <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                                   BorderColor="{StaticResource GlassyBorder}"
+                                   CornerRadius="24"
+                                   HasShadow="True"
+                                   Padding="20"
+                                   IsVisible="{Binding Stats.FavoriteTechnique, Converter={StaticResource IsNotNullConverter}}">
+                                   <Frame.Shadow>
+                                          <Shadow Brush="Black"
+                                                  Offset="0,8"
+                                                  Radius="20"
+                                                  Opacity="0.12"/>
+                                   </Frame.Shadow>
+                                   <StackLayout Spacing="10">
+                                          <Label Text="⭐ Favorite Technique"
+                                                 FontSize="20"
+                                                 FontAttributes="Bold"
+                                                 TextColor="Black"/>
+                                          <Label Text="{Binding Stats.FavoriteTechnique}"
+                                                 FontSize="18"
+                                                 TextColor="Black"
+                                                 HorizontalOptions="Center"/>
+                                   </StackLayout>
+                            </Frame>
+
+                            <!-- Achievements -->
+                            <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                                   BorderColor="{StaticResource GlassyBorder}"
+                                   CornerRadius="24"
+                                   HasShadow="True"
+                                   Padding="20">
+                                   <Frame.Shadow>
+                                          <Shadow Brush="Black"
+                                                  Offset="0,8"
+                                                  Radius="20"
+                                                  Opacity="0.12"/>
+                                   </Frame.Shadow>
+                                   <StackLayout Spacing="15">
+                                          <Label Text="🏆 Achievements"
+                                                 FontSize="20"
+                                                 FontAttributes="Bold"
+                                                 TextColor="Black"/>
+
+                                          <StackLayout Spacing="10">
+                                                 <!-- First Session Achievement -->
+                                                 <Grid ColumnDefinitions="Auto,*,Auto">
+                                                        <Label Grid.Column="0"
+                                                               Text="🌱"
+                                                               FontSize="24"
+                                                               VerticalOptions="Center"/>
+                                                        <StackLayout Grid.Column="1"
+                                                                     Spacing="2">
+                                                               <Label Text="First Breath"
+                                                                      FontSize="16"
+                                                                      FontAttributes="Bold"
+                                                                      TextColor="Black"/>
+                                                               <Label Text="Complete your first breathing session"
+                                                                      FontSize="12"
+                                                                      TextColor="{StaticResource toneGray}"/>
+                                                        </StackLayout>
+                                                        <Label Grid.Column="2"
+                                                               Text="✅"
+                                                               FontSize="20"
+                                                               VerticalOptions="Center"
+                                                               IsVisible="{Binding Stats.TotalSessions, Converter={StaticResource IntToBoolConverter}}"/>
+                                                 </Grid>
+
+                                                 <!-- Week Streak Achievement -->
+                                                 <Grid ColumnDefinitions="Auto,*,Auto">
+                                                        <Label Grid.Column="0"
+                                                               Text="🔥"
+                                                               FontSize="24"
+                                                               VerticalOptions="Center"/>
+                                                        <StackLayout Grid.Column="1"
+                                                                     Spacing="2">
+                                                               <Label Text="Week Warrior"
+                                                                      FontSize="16"
+                                                                      FontAttributes="Bold"
+                                                                      TextColor="Black"/>
+                                                               <Label Text="Maintain a 7-day streak"
+                                                                      FontSize="12"
+                                                                      TextColor="{StaticResource toneGray}"/>
+                                                        </StackLayout>
+                                                        <Label Grid.Column="2"
+                                                               Text="✅"
+                                                               FontSize="20"
+                                                               VerticalOptions="Center"
+                                                               IsVisible="{Binding WeekStreakAchievement}"/>
+                                                 </Grid>
+
+                                                 <!-- 100 Sessions Achievement -->
+                                                 <Grid ColumnDefinitions="Auto,*,Auto">
+                                                        <Label Grid.Column="0"
+                                                               Text="💯"
+                                                               FontSize="24"
+                                                               VerticalOptions="Center"/>
+                                                        <StackLayout Grid.Column="1"
+                                                                     Spacing="2">
+                                                               <Label Text="Centurion"
+                                                                      FontSize="16"
+                                                                      FontAttributes="Bold"
+                                                                      TextColor="Black"/>
+                                                               <Label Text="Complete 100 breathing sessions"
+                                                                      FontSize="12"
+                                                                      TextColor="{StaticResource toneGray}"/>
+                                                        </StackLayout>
+                                                        <Label Grid.Column="2"
+                                                               Text="✅"
+                                                               FontSize="20"
+                                                               VerticalOptions="Center"
+                                                               IsVisible="{Binding CenturionAchievement}"/>
+                                                 </Grid>
+
+                                                 <!-- 10 Hour Achievement -->
+                                                 <Grid ColumnDefinitions="Auto,*,Auto">
+                                                        <Label Grid.Column="0"
+                                                               Text="⏰"
+                                                               FontSize="24"
+                                                               VerticalOptions="Center"/>
+                                                        <StackLayout Grid.Column="1"
+                                                                     Spacing="2">
+                                                               <Label Text="Time Master"
+                                                                      FontSize="16"
+                                                                      FontAttributes="Bold"
+                                                                      TextColor="Black"/>
+                                                               <Label Text="Accumulate 10 hours of breathing"
+                                                                      FontSize="12"
+                                                                      TextColor="{StaticResource toneGray}"/>
+                                                        </StackLayout>
+                                                        <Label Grid.Column="2"
+                                                               Text="✅"
+                                                               FontSize="20"
+                                                               VerticalOptions="Center"
+                                                               IsVisible="{Binding TimeMasterAchievement}"/>
+                                                 </Grid>
+
+                                                 <!-- 1000 Breaths Achievement -->
+                                                 <Grid ColumnDefinitions="Auto,*,Auto">
+                                                        <Label Grid.Column="0"
+                                                               Text="🫁"
+                                                               FontSize="24"
+                                                               VerticalOptions="Center"/>
+                                                        <StackLayout Grid.Column="1"
+                                                                     Spacing="2">
+                                                               <Label Text="Breath Millennial"
+                                                                      FontSize="16"
+                                                                      FontAttributes="Bold"
+                                                                      TextColor="Black"/>
+                                                               <Label Text="Take 1000 mindful breaths"
+                                                                      FontSize="12"
+                                                                      TextColor="{StaticResource toneGray}"/>
+                                                        </StackLayout>
+                                                        <Label Grid.Column="2"
+                                                               Text="✅"
+                                                               FontSize="20"
+                                                               VerticalOptions="Center"
+                                                               IsVisible="{Binding BreathMillennialAchievement}"/>
+                                                 </Grid>
+                                          </StackLayout>
+                                   </StackLayout>
+                            </Frame>
+
+                            <!-- Recent Activity -->
+                            <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                                   BorderColor="{StaticResource GlassyBorder}"
+                                   CornerRadius="24"
+                                   HasShadow="True"
+                                   Padding="20"
+                                   IsVisible="{Binding Stats.LastSessionDate, Converter={StaticResource IsNotNullConverter}}">
+                                   <Frame.Shadow>
+                                          <Shadow Brush="Black"
+                                                  Offset="0,8"
+                                                  Radius="20"
+                                                  Opacity="0.12"/>
+                                   </Frame.Shadow>
+                                   <StackLayout Spacing="10">
+                                          <Label Text="📈 Recent Activity"
+                                                 FontSize="20"
+                                                 FontAttributes="Bold"
+                                                 TextColor="Black"/>
+                                          <Label Text="{Binding Stats.LastSessionDate, StringFormat='Last session: {0:MMM dd, yyyy}'}"
+                                                 FontSize="16"
+                                                 TextColor="{StaticResource toneGray}"/>
+                                          <Label Text="{Binding Stats.HasSessionToday, Converter={StaticResource BoolToStringConverter}, ConverterParameter='You practiced today! 🎉|Ready for today\'s session?'}"
+                                                 FontSize="14"
+                                                 TextColor="{Binding Stats.HasSessionToday, Converter={StaticResource BoolToColorConverter}, ConverterParameter='Black|Black'}"/>
+                                   </StackLayout>
+                            </Frame>
+
+                     </StackLayout>
+              </ScrollView>
+       </Grid>
+</uranium:UraniumContentPage>

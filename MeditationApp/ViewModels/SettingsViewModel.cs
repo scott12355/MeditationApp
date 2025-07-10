@@ -6,6 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using MeditationApp.Services;
 using Microsoft.Maui.Storage;
+#if IOS
+using RevenueCat;
+using Tonestro.Maui.RevenueCat.iOS.Extensions;
+#endif
 
 namespace MeditationApp.ViewModels;
 
@@ -16,6 +20,8 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
 
     private readonly HybridAuthService _hybridAuthService;
     private readonly NotificationService _notificationService;
+    private readonly InAppPurchaseService _inAppPurchaseService;
+    private readonly IPaywallService _paywallService;
     
     private string _userName = "John Doe";
     private string _email = "john.doe@example.com";
@@ -83,13 +89,17 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
 
     public ICommand SaveSettingsCommand { get; }
     public ICommand LogoutCommand { get; }
+    public ICommand SubscribeCommand { get; }
 
-    public SettingsViewModel(HybridAuthService hybridAuthService, NotificationService notificationService)
+    public SettingsViewModel(HybridAuthService hybridAuthService, NotificationService notificationService, InAppPurchaseService inAppPurchaseService, IPaywallService paywallService)
     {
         _hybridAuthService = hybridAuthService;
         _notificationService = notificationService;
+        _inAppPurchaseService = inAppPurchaseService;
+        _paywallService = paywallService;
         SaveSettingsCommand = new Command(OnSaveSettings);
         LogoutCommand = new Command(async () => await OnLogout());
+        SubscribeCommand = new Command(async () => await ShowPaywallAsync());
         LoadUserData();
         LoadSettings();
     }
@@ -255,6 +265,52 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
         // TODO: Load actual user data from service
         // For now using sample data
     }
+
+
+    private async Task ShowPaywallAsync()
+    {
+        try
+        {
+            var result = await _paywallService.ShowPaywallAsync();
+            
+            if (result.WasPurchased)
+            {
+                var mainPage = Application.Current?.Windows?.FirstOrDefault()?.Page;
+                if (mainPage != null)
+                {
+                    await mainPage.DisplayAlert("Welcome to Premium!", 
+                        "You now have access to all premium meditation content. Enjoy your journey!", 
+                        "OK");
+                }
+            }
+            else if (result.IsRestore)
+            {
+                var mainPage = Application.Current?.Windows?.FirstOrDefault()?.Page;
+                if (mainPage != null)
+                {
+                    await mainPage.DisplayAlert("Purchases Restored", 
+                        "Your previous purchases have been restored successfully!", 
+                        "OK");
+                }
+            }
+            // If cancelled, no action needed
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error showing paywall: {ex.Message}");
+            var mainPage = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (mainPage != null)
+            {
+                await mainPage.DisplayAlert("Error", 
+                    "There was an error loading the subscription options. Please try again.", 
+                    "OK");
+            }
+        }
+    }
+
+    // Old RevenueCat implementation replaced with PaywallService
+    // The new PaywallModal provides a better user experience with custom UI
+    // that matches the app's design system
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

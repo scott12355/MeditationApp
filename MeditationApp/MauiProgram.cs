@@ -10,8 +10,10 @@ using CommunityToolkit.Maui;
 using Plugin.Maui.Audio;
 using MediaManager;
 using UraniumUI;
+// using Tonestro.Maui.RevenueCat;
 #if IOS
 using Microsoft.Maui.Handlers;
+using RevenueCat;
 #endif
 #if ANDROID
 using Microsoft.Maui.Handlers;
@@ -50,6 +52,12 @@ public static class MauiProgram
                 textField.BackgroundColor = UIKit.UIColor.Clear;
             }
         });
+
+        // Enable RevenueCat debug logs
+        RCPurchases.DebugLogsEnabled = true;
+        // Initialize RevenueCat SDK for iOS
+        RCPurchases.ConfigureWithAPIKey("appl_jOuHsNSjVHqUMcFuDJjBIqrePRv");
+        Console.WriteLine("RevenueCat SDK initialized with API key.");
 #endif
 
 
@@ -136,12 +144,20 @@ public static class MauiProgram
         builder.Services.AddTransient<Views.OnboardingPage2>();
         builder.Services.AddTransient<Views.ForgotPasswordPage>();
         builder.Services.AddTransient<BreathingExercisePage>();
+        builder.Services.AddTransient<Views.BreathingStatsPage>();
 
         // Register view models
         builder.Services.AddTransient<ViewModels.LoginViewModel>();
         builder.Services.AddTransient<ViewModels.SignUpViewModel>();
         builder.Services.AddTransient<ViewModels.VerificationViewModel>();
-        builder.Services.AddTransient<ViewModels.SettingsViewModel>();
+        builder.Services.AddTransient<ViewModels.SettingsViewModel>(provider =>
+            new ViewModels.SettingsViewModel(
+                provider.GetRequiredService<HybridAuthService>(),
+                provider.GetRequiredService<NotificationService>(),
+                provider.GetRequiredService<InAppPurchaseService>(),
+                provider.GetRequiredService<IPaywallService>()
+            )
+        );
         builder.Services.AddTransient<ViewModels.ProfileViewModel>();
         builder.Services.AddTransient<ViewModels.SimpleCalendarViewModel>(provider =>
             new ViewModels.SimpleCalendarViewModel(
@@ -161,6 +177,11 @@ public static class MauiProgram
             )
         );
         builder.Services.AddTransient<ViewModels.ForgotPasswordViewModel>();
+        builder.Services.AddTransient<ViewModels.BreathingExerciseViewModel>(provider =>
+            new ViewModels.BreathingExerciseViewModel(
+                provider.GetRequiredService<BreathingDatabaseService>(),
+                provider.GetRequiredService<DatabaseSyncService>()
+            ));
 
         // Register MeditationSessionDatabase
         string dbPath = Path.Combine(FileSystem.AppDataDirectory, "meditation_sessions.db3");
@@ -177,7 +198,8 @@ public static class MauiProgram
             var localAuthService = provider.GetRequiredService<LocalAuthService>();
             var calendarDataService = provider.GetRequiredService<CalendarDataService>();
             var cognitoAuthService = provider.GetRequiredService<CognitoAuthService>();
-            return new DatabaseSyncService(database, graphQLService, localAuthService, calendarDataService, cognitoAuthService);
+            var breathingDatabase = provider.GetRequiredService<BreathingDatabaseService>();
+            return new DatabaseSyncService(database, graphQLService, localAuthService, calendarDataService, cognitoAuthService, breathingDatabase);
         });
 
         // Register MoodChartService
@@ -190,6 +212,13 @@ public static class MauiProgram
 
         // Register NotificationService
         builder.Services.AddSingleton<MeditationApp.Services.NotificationService>();
+        builder.Services.AddSingleton<InAppPurchaseService>();
+        
+        // Register PaywallService
+        builder.Services.AddSingleton<IPaywallService, PaywallService>();
+
+        // Register RevenueCat user service for metadata management
+        builder.Services.AddSingleton<IRevenueCatUserService, RevenueCatUserService>();
 
         // Register Plugin.Maui.Audio
         builder.Services.AddSingleton(AudioManager.Current);
@@ -210,6 +239,13 @@ public static class MauiProgram
         {
             var audioManager = provider.GetRequiredService<IAudioManager>();
             return new AudioPlayerService(audioManager);
+        });
+
+        // Register breathing database service
+        builder.Services.AddSingleton<BreathingDatabaseService>(provider =>
+        {
+            var dbPath = Path.Combine(FileSystem.AppDataDirectory, "BreathingDatabase.db3");
+            return new BreathingDatabaseService(dbPath);
         });
 
 #if DEBUG

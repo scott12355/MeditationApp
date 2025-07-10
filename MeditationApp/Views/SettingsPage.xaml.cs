@@ -1,5 +1,9 @@
 using MeditationApp.ViewModels;
 using MeditationApp.Services;
+#if IOS
+using RevenueCat;
+using Tonestro.Maui.RevenueCat.iOS.Extensions;
+#endif
 
 namespace MeditationApp.Views;
 
@@ -31,5 +35,17 @@ public partial class SettingsPage : ContentPage
     private void OnHamburgerClicked(object sender, EventArgs e)
     {
         Shell.Current.FlyoutIsPresented = true;
+    }
+
+    private async void OnSubscribeClicked(object sender, EventArgs e)
+    {
+        if (BindingContext is SettingsViewModel vm && vm.SubscribeCommand != null && vm.SubscribeCommand.CanExecute(null))
+        {
+            vm.SubscribeCommand.Execute(null);
+        }
+        else
+        {
+            await DisplayAlert("Error", "Lucen+ subscription feature is not available.", "OK");
+        }
     }
 }

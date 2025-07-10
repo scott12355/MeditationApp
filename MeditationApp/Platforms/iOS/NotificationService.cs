@@ -30,22 +30,57 @@ public class iOSNotificationService : INotificationService
         }
     }
 
+    private class NotificationData
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Body { get; set; } = string.Empty;
+        public TimeSpan ReminderTime { get; set; }
+    }
+    
+    private NotificationData getNotificationData()
+    {
+        // This method should retrieve the notification data from your settings or configuration
+        // For now, returning a default value for demonstration purposes
+        return new NotificationData
+        {
+            Title = "Time to Meditate",
+            Body = NotificationBodies[new Random().Next(NotificationBodies.Length)],
+            ReminderTime = TimeSpan.FromHours(9) // Default reminder time at 9 AM
+        };
+    }
+    
+    private string[] NotificationBodies => new[]
+    {
+        "Take a moment to find peace and clarity—start your meditation journey with Lucen.",
+        "Breathe deeply and let go of your stress. Lucen is here to guide your meditation.",
+        "Center your mind and focus on your breath with Lucen's calming sessions.",
+        "Remember to take a break. Lucen makes it easy to meditate with your personalised session.",
+        "Find your calm amidst the chaos. Open Lucen and begin your meditation now."
+    };
+
+    private UNNotificationContent MapToNotificationContent(NotificationData data)
+    {
+        var content = new UNMutableNotificationContent
+        {
+            Title = data.Title,
+            Body = data.Body,
+            Sound = UNNotificationSound.Default
+        };
+        return content;
+    }
+
     public async Task ScheduleDailyNotification(TimeSpan reminderTime)
     {
         try
         {
             var center = UNUserNotificationCenter.Current;
-            
+
             // Remove any existing notifications first
             center.RemoveAllPendingNotificationRequests();
-            
-            // Create notification content
-            var content = new UNMutableNotificationContent
-            {
-                Title = "Time to Meditate",
-                Body = "Take a moment to find peace and clarity through meditation.",
-                Sound = UNNotificationSound.Default
-            };
+
+            // Get notification data and map it to UNNotificationContent
+            var notificationData = getNotificationData();
+            UNNotificationContent content = MapToNotificationContent(notificationData);
 
             // Create date components for the trigger
             var now = DateTime.Now;
@@ -71,7 +106,7 @@ public class iOSNotificationService : INotificationService
                 trigger);
 
             // Schedule the notification
-            center.AddNotificationRequest(request, null);
+            await center.AddNotificationRequestAsync(request);
             System.Diagnostics.Debug.WriteLine($"Scheduled notification for {triggerDate}");
         }
         catch (Exception ex)
@@ -95,4 +130,4 @@ public class iOSNotificationService : INotificationService
             return Task.CompletedTask;
         }
     }
-} 
+}

@@ -1,0 +1,18 @@
+mutation SyncBreathingSessions($sessions: [BreathingSessionInput!]!) {
+    syncBreathingSessions(sessions: $sessions) {
+        id
+        userID
+        startTime
+        endTime
+        techniqueId
+        techniqueName
+        completedCycles
+        totalCycles
+        duration
+        isCompleted
+        wasInterrupted
+        streakDay
+        createdAt
+        updatedAt
+    }
+}

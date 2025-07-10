@@ -20,6 +20,8 @@ public class SignUpViewModel : BindableObject
     private bool _hasEmailError = false;
     private bool _hasConfirmPasswordError = false;
     private string _passwordErrorMessage = string.Empty;
+    private bool _agreedToTerms = false;
+    private bool _hasTermsError = false;
 
     public string FirstName { get => _firstName; set { _firstName = value; OnPropertyChanged(); } }
     public string SecondName { get => _secondName; set { _secondName = value; OnPropertyChanged(); } }
@@ -33,6 +35,8 @@ public class SignUpViewModel : BindableObject
     public bool HasEmailError { get => _hasEmailError; set { _hasEmailError = value; OnPropertyChanged(); } }
     public bool HasConfirmPasswordError { get => _hasConfirmPasswordError; set { _hasConfirmPasswordError = value; OnPropertyChanged(); } }
     public string PasswordErrorMessage { get => _passwordErrorMessage; set { _passwordErrorMessage = value; OnPropertyChanged(); } }
+    public bool AgreedToTerms { get => _agreedToTerms; set { _agreedToTerms = value; OnPropertyChanged(); ValidateTermsAgreement(); } }
+    public bool HasTermsError { get => _hasTermsError; set { _hasTermsError = value; OnPropertyChanged(); } }
 
     public ICommand SignUpCommand { get; }
     public ICommand BackToLoginCommand { get; }
@@ -64,6 +68,12 @@ public class SignUpViewModel : BindableObject
             if (Password != ConfirmPassword)
             {
                 Status = "Passwords do not match";
+                return;
+            }
+            if (!AgreedToTerms)
+            {
+                Status = "Please agree to the terms of service and privacy policy";
+                HasTermsError = true;
                 return;
             }
             LoadingText = "Creating your account...";
@@ -154,6 +164,11 @@ public class SignUpViewModel : BindableObject
         HasConfirmPasswordError = !string.IsNullOrEmpty(ConfirmPassword) && Password != ConfirmPassword;
     }
 
+    private void ValidateTermsAgreement()
+    {
+        HasTermsError = false; // Clear error when user interacts with the checkbox
+    }
+
     private bool IsValidEmail(string email)
     {
         try
@@ -191,5 +206,7 @@ public class SignUpViewModel : BindableObject
         HasEmailError = false;
         HasConfirmPasswordError = false;
         PasswordErrorMessage = string.Empty;
+        AgreedToTerms = false;
+        HasTermsError = false;
     }
 }

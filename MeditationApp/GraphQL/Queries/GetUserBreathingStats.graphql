@@ -1,0 +1,15 @@
+query GetUserBreathingStats($userID: ID!) {
+    getUserBreathingStats(userID: $userID) {
+        userID
+        totalSessions
+        totalDuration
+        currentStreak
+        longestStreak
+        lastSessionDate
+        totalCyclesCompleted
+        favoriteTechnique
+        sessionsThisWeek
+        sessionsThisMonth
+        updatedAt
+    }
+}

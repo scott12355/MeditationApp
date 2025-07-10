@@ -36,7 +36,8 @@ public partial class SignUpPage : UraniumContentPage
                 { "Email", _viewModel.Email ?? string.Empty },
                 { "FirstName", _viewModel.FirstName ?? string.Empty }
             };
-            var verificationPage = new MeditationApp.Views.VerificationPage();
+            // Use DI to get the VerificationPage
+            var verificationPage = ((App)Microsoft.Maui.Controls.Application.Current).Services.GetRequiredService<Views.VerificationPage>();
             verificationPage.ApplyQueryAttributes(navigationParameter);
             await Microsoft.Maui.ApplicationModel.MainThread.InvokeOnMainThreadAsync(() =>
             {
@@ -78,5 +79,33 @@ public partial class SignUpPage : UraniumContentPage
     private async void OnBackButtonClicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("..");
+    }
+
+    private async void OnTermsOfServiceTapped(object sender, EventArgs e)
+    {
+        // Navigate to Terms of Service page or open in browser
+        try
+        {
+            await Browser.OpenAsync("https://lucen.uk/terms-and-conditions", BrowserLaunchMode.SystemPreferred);
+        }
+        catch (Exception ex)
+        {
+            // Handle error - could show an alert or log the error
+            await DisplayAlert("Error", "Unable to open Terms of Service", "OK");
+        }
+    }
+
+    private async void OnPrivacyPolicyTapped(object sender, EventArgs e)
+    {
+        // Navigate to Privacy Policy page or open in browser
+        try
+        {
+            await Browser.OpenAsync("https://lucen.uk/privacy-policy", BrowserLaunchMode.SystemPreferred);
+        }
+        catch (Exception ex)
+        {
+            // Handle error - could show an alert or log the error
+            await DisplayAlert("Error", "Unable to open Privacy Policy", "OK");
+        }
     }
 }

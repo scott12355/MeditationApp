@@ -8,15 +8,16 @@ public partial class VerificationPage : UraniumContentPage, IQueryAttributable
 {
     private readonly VerificationViewModel _viewModel;
 
-    public VerificationPage(CognitoAuthService cognitoAuthService)
+    public VerificationPage(CognitoAuthService cognitoAuthService, HybridAuthService hybridAuthService)
     {
         InitializeComponent();
-        _viewModel = new VerificationViewModel(cognitoAuthService);
+        _viewModel = new VerificationViewModel(cognitoAuthService, hybridAuthService);
         BindingContext = _viewModel;
     }
 
     public VerificationPage() : this(
-        Microsoft.Maui.Controls.Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(CognitoAuthService)) as CognitoAuthService
+        Microsoft.Maui.Controls.Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(CognitoAuthService)) as CognitoAuthService ?? throw new InvalidOperationException("CognitoAuthService not found"),
+        Microsoft.Maui.Controls.Application.Current?.Handler?.MauiContext?.Services.GetService(typeof(HybridAuthService)) as HybridAuthService ?? throw new InvalidOperationException("HybridAuthService not found")
     )
     {
     }

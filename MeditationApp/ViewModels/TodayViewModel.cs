@@ -489,6 +489,14 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
     [RelayCommand]
     private async Task RequestNewSession()
     {
+        // Check for premium access first
+        var hasPremium = await PremiumFeatureHelper.CheckPremiumAccessAsync("Personalized Meditation Sessions");
+        if (!hasPremium)
+        {
+            // User doesn't have premium or cancelled upgrade
+            return;
+        }
+
         if (string.IsNullOrEmpty(SessionNotes))
         {
             var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
@@ -1566,8 +1574,12 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
                             "Your session has expired. Please log in again.",
                             "OK");
 
-                    // Clear the navigation stack and navigate to login
-                    await Shell.Current.GoToAsync("LoginPage", animate: true);
+                    // Clear the navigation stack and navigate to login by setting LoginPage as root
+                    if (Application.Current != null)
+                    {
+                        var loginPage = ((App)Application.Current).Services.GetRequiredService<Views.LoginPage>();
+                        Application.Current.MainPage = loginPage;
+                    }
                 }
                 catch (Exception navEx)
                 {

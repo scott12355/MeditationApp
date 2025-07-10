@@ -1,51 +1,72 @@
 using System;
 using Microsoft.Maui.Controls;
 using UraniumUI.Pages;
-using System.Threading.Tasks;
+using MeditationApp.ViewModels;
+using MeditationApp.Services;
 
 namespace MeditationApp.Views
 {
     public partial class BreathingExercisePage : UraniumContentPage
     {
-        private bool _isBreathing;
-        public BreathingExercisePage()
+        public BreathingExerciseViewModel ViewModel { get; }
+
+        public BreathingExercisePage(BreathingExerciseViewModel viewModel)
         {
             InitializeComponent();
+            ViewModel = viewModel;
+            BindingContext = ViewModel;
         }
 
-        private async void OnStartButtonClicked(object sender, EventArgs e)
+        // Fallback constructor for dependency injection
+        public BreathingExercisePage() : this(new BreathingExerciseViewModel())
         {
-            if (_isBreathing) return;
-            _isBreathing = true;
-            StartButton.IsEnabled = false;
-            while (_isBreathing)
+        }
+
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            
+            // Don't reset session if user is returning from paywall flow
+            if (ViewModel.IsInPaywallFlow)
             {
-                // Breathe In
-                BreathingPhaseLabel.Text = "Breathe In";
-                await BreathingCircle.ScaleTo(1.4, 4000, Easing.CubicInOut);
-                // Hold
-                BreathingPhaseLabel.Text = "Hold";
-                await Task.Delay(2000);
-                // Breathe Out
-                BreathingPhaseLabel.Text = "Breathe Out";
-                await BreathingCircle.ScaleTo(1.0, 4000, Easing.CubicInOut);
-                // Hold
-                BreathingPhaseLabel.Text = "Hold";
-                await Task.Delay(2000);
+                // But ensure UI is properly restored
+                ViewModel.RestoreSessionUI();
+                return;
             }
-            StartButton.IsEnabled = true;
-            BreathingPhaseLabel.Text = "Ready to begin?";
+            
+            // Always clean up any existing session state to prevent duplicates
+            ViewModel.Cleanup();
+            
+            // Always start by showing the technique list and ensure no session is active
+            ViewModel.ShowTechniqueSelector = true;
+            
+            // Belt and suspenders: also call CancelSessionCommand if needed
+            if (ViewModel.IsSessionActive)
+            {
+                ViewModel.CancelSessionCommand.Execute(null);
+            }
         }
 
         protected override void OnDisappearing()
         {
             base.OnDisappearing();
-            _isBreathing = false;
+            // Clean up any active sessions
+            ViewModel?.Cleanup();
         }
 
         private void OnHamburgerClicked(object sender, EventArgs e)
         {
             Shell.Current.FlyoutIsPresented = true;
+        }
+
+        private void OnBackClicked(object sender, EventArgs e)
+        {
+            // Cancel any active breathing session and return to technique selection
+            if (ViewModel.IsSessionActive)
+            {
+                ViewModel.CancelSessionCommand.Execute(null);
+            }
+            ViewModel.ShowTechniqueSelector = true;
         }
     }
 }

@@ -4,95 +4,473 @@
                             xmlns:controls="clr-namespace:MeditationApp.Controls"
                             xmlns:behaviors="clr-namespace:MeditationApp.Behaviors"
                             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+                            xmlns:converters="clr-namespace:MeditationApp.Converters"
+                            xmlns:viewmodels="clr-namespace:MeditationApp.ViewModels"
+                            xmlns:models="clr-namespace:MeditationApp.Models"
                             x:Class="MeditationApp.Views.BreathingExercisePage"
+                            x:DataType="viewmodels:BreathingExerciseViewModel"
                             Title="Breathing Exercises"
                             Shell.NavBarIsVisible="False">
-    <uranium:UraniumContentPage.Background>
-        <SolidColorBrush Color="#EFEBD3"/>
-    </uranium:UraniumContentPage.Background>
 
-<Grid RowDefinitions="Auto,*" BackgroundColor="#EFEBD3">        <!-- Header with Hamburger Menu -->
-        <!-- Header with Hamburger Menu -->
+        <ContentPage.Padding>
+                <OnPlatform x:TypeArguments="Thickness">
+                        <On Platform="iOS"
+                            Value="0,0,0,-30"/>
+                        <On Platform="Android"
+                            Value="0,0,0,20"/>
+                </OnPlatform>
+        </ContentPage.Padding>
+
+        <uranium:UraniumContentPage.Resources>
+                <ResourceDictionary>
+                        <converters:BoolToOpacityConverter x:Key="BoolToOpacityConverter"/>
+                        <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+                        <converters:IsNotNullConverter x:Key="IsNotNullConverter"/>
+                        <converters:ProgressConverter x:Key="ProgressConverter"/>
+                        <converters:StringToColorConverter x:Key="StringToColorConverter"/>
+                        <converters:PremiumLockVisibilityConverter x:Key="PremiumLockVisibilityConverter"/>
+                        <converters:BreathingCircleScaleClampConverter x:Key="BreathingCircleScaleClampConverter"/>
+                        <converters:BoolToColorConverter x:Key="BoolToColorConverter"/>
+                </ResourceDictionary>
+        </uranium:UraniumContentPage.Resources>
+
+        <uranium:UraniumContentPage.Background>
+                <SolidColorBrush Color="#EFEBD3"/>
+        </uranium:UraniumContentPage.Background>
+
+        <Grid RowDefinitions="Auto,*"
+              BackgroundColor="#EFEBD3">
+
+                <!-- Header -->
                 <Grid Padding="20,20,20,0">
-                    <Button x:Name="HamburgerButton"
-                            Text="☰"
-                            FontSize="24"
-                            BackgroundColor="Transparent"
-                            TextColor="Black"
-                            WidthRequest="44"
-                            HeightRequest="44"
-                            HorizontalOptions="Start"
-                            VerticalOptions="Start"
-                            Clicked="OnHamburgerClicked"/>
+                        <!-- Hamburger Button visible on selector -->
+                        <Button x:Name="HamburgerButton"
+                                Text="☰"
+                                FontSize="24"
+                                BackgroundColor="Transparent"
+                                TextColor="Black"
+                                WidthRequest="44"
+                                HeightRequest="44"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Start"
+                                IsVisible="{Binding ShowTechniqueSelector}"
+                                Clicked="OnHamburgerClicked"/>
+                        <!-- Back Button visible during session -->
+                        <Button x:Name="BackButton"
+                                Text="←"
+                                FontSize="24"
+                                BackgroundColor="Transparent"
+                                TextColor="Black"
+                                WidthRequest="44"
+                                HeightRequest="44"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Start"
+                                IsVisible="{Binding ShowTechniqueSelector, Converter={StaticResource InverseBoolConverter}}"
+                                Clicked="OnBackClicked"/>
 
-                    <Label Text="Breath"
-                           FontSize="28"
-                           FontAttributes="Bold"
-                           TextColor="Black"
-                           HorizontalOptions="Center"
-                           VerticalOptions="Center"/>
+                        <Label Text="Breath"
+                               FontSize="28"
+                               FontAttributes="Bold"
+                               TextColor="Black"
+                               FontFamily="OpenSansRegular"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+
+
                 </Grid>
-        <VerticalStackLayout Grid.Row="1" Padding="20,40,20,40" Spacing="30" VerticalOptions="CenterAndExpand" HorizontalOptions="CenterAndExpand">
-            <Label x:Name="BreathingPhaseLabel"
-                   Text="Ready to begin?"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   TextColor="#2E7D32"
-                   HorizontalOptions="Center"/>
-            <Grid HeightRequest="240" WidthRequest="240" HorizontalOptions="Center" VerticalOptions="Center">
-                <Ellipse x:Name="BreathingCircle"
-                         WidthRequest="200"
-                         HeightRequest="200"
-                         Fill="#A7D7C5"
-                         Stroke="#4CAF50"
-                         StrokeThickness="6"
-                         HorizontalOptions="Center"
-                         VerticalOptions="Center"/>
-            </Grid>
-            <Frame Padding="0"
-                   CornerRadius="25"
-                   HasShadow="True"
-                   HorizontalOptions="Center"
-                   HeightRequest="56"
-                   WidthRequest="200"
-                   BackgroundColor="#4CAF50"
-                   BorderColor="Transparent">
-                <Frame.Shadow>
-                    <Shadow Brush="#4CAF50"
-                            Offset="0,6"
-                            Radius="15"
-                            Opacity="0.25"/>
-                </Frame.Shadow>
-                <Button Text="Start"
-                        x:Name="StartButton"
-                        BackgroundColor="Transparent"
-                        TextColor="White"
-                        FontSize="18"
-                        FontAttributes="Bold"
-                        Clicked="OnStartButtonClicked"
-                        HorizontalOptions="Fill"
-                        VerticalOptions="Fill"
-                        BorderColor="Transparent">
-                    <VisualStateManager.VisualStateGroups>
-                        <VisualStateGroupList>
-                            <VisualStateGroup x:Name="CommonStates">
-                                <VisualState x:Name="Normal">
-                                    <VisualState.Setters>
-                                        <Setter Property="Scale" Value="1.0"/>
-                                        <Setter Property="Opacity" Value="1.0"/>
-                                    </VisualState.Setters>
-                                </VisualState>
-                                <VisualState x:Name="Pressed">
-                                    <VisualState.Setters>
-                                        <Setter Property="Scale" Value="0.95"/>
-                                        <Setter Property="Opacity" Value="0.8"/>
-                                    </VisualState.Setters>
-                                </VisualState>
-                            </VisualStateGroup>
-                        </VisualStateGroupList>
-                    </VisualStateManager.VisualStateGroups>
-                </Button>
-            </Frame>
-        </VerticalStackLayout>
-    </Grid>
-</uranium:UraniumContentPage> 
+
+                <!-- Main Content -->
+                <ScrollView Grid.Row="1"
+                            x:Name="MainScrollView"
+                            Padding="20,0,20,30">
+                        <VerticalStackLayout Padding="0,0,0,90"
+                                             Spacing="20">
+
+                                <!-- Loading Indicator -->
+                                <ActivityIndicator IsVisible="{Binding IsLoading}"
+                                                   IsRunning="{Binding IsLoading}"
+                                                   Color="{StaticResource Primary}"
+                                                   VerticalOptions="Center"/>
+
+                                <!-- Technique Selector -->
+                                <Frame IsVisible="{Binding ShowTechniqueSelector}"
+                                       BackgroundColor="{StaticResource GlassyWhite}"
+                                       BorderColor="{StaticResource GlassyBorder}"
+                                       CornerRadius="24"
+                                       HasShadow="True"
+                                       Padding="24"
+                                       Margin="0,10">
+                                        <Frame.Shadow>
+                                                <Shadow Brush="Black"
+                                                        Offset="0,8"
+                                                        Radius="20"
+                                                        Opacity="0.12"/>
+                                        </Frame.Shadow>
+                                        <StackLayout Spacing="20">
+                                                <Label Text="Choose Your Technique"
+                                                       FontSize="24"
+                                                       FontAttributes="Bold"
+                                                       TextColor="Black"
+                                                       FontFamily="OpenSansRegular"
+                                                       HorizontalOptions="Center"/>
+
+                                                <CollectionView ItemsSource="{Binding Techniques}">
+                                                        <CollectionView.ItemsLayout>
+                                                                <LinearItemsLayout Orientation="Vertical"
+                                                                                   ItemSpacing="15"/>
+                                                        </CollectionView.ItemsLayout>
+                                                        <CollectionView.ItemTemplate>
+                                                                <DataTemplate x:DataType="models:BreathingTechnique">
+                                                                        <Frame BackgroundColor="{Binding IconColor, Converter={StaticResource StringToColorConverter}}"
+                                                                               CornerRadius="20"
+                                                                               HasShadow="True"
+                                                                               Padding="20,15"
+                                                                               Margin="0,5">
+                                                                                <Frame.Shadow>
+                                                                                        <Shadow Brush="Black"
+                                                                                                Offset="0,4"
+                                                                                                Radius="12"
+                                                                                                Opacity="0.15"/>
+                                                                                </Frame.Shadow>
+                                                                                <Frame.GestureRecognizers>
+                                                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:BreathingExerciseViewModel}}, Path=SelectTechniqueCommand}"
+                                                                                                              CommandParameter="{Binding}"/>
+                                                                                </Frame.GestureRecognizers>
+                                                                                <StackLayout Spacing="8">
+                                                                                        <Grid>
+                                                                                                <Grid.ColumnDefinitions>
+                                                                                                        <ColumnDefinition Width="*"/>
+                                                                                                        <ColumnDefinition Width="Auto"/>
+                                                                                                </Grid.ColumnDefinitions>
+                                                                                                <Label Grid.Column="0"
+                                                                                                       Text="{Binding Name}"
+                                                                                                       FontSize="18"
+                                                                                                       FontAttributes="Bold"
+                                                                                                       FontFamily="OpenSansRegular"
+                                                                                                       TextColor="White"/>
+                                                                                                <!-- Premium Lock Icon -->
+                                                                                                <Frame Grid.Column="1"
+                                                                                                       Padding="8,4"
+                                                                                                       CornerRadius="12"
+                                                                                                       BackgroundColor="#80000000"
+                                                                                                       BorderColor="Transparent"
+                                                                                                       HasShadow="False">
+                                                                                                        <Frame.IsVisible>
+                                                                                                                <MultiBinding Converter="{StaticResource PremiumLockVisibilityConverter}">
+                                                                                                                        <Binding Path="IsPremium"/>
+                                                                                                                        <Binding Path="HasPremiumSubscription"
+                                                                                                                                 Source="{RelativeSource AncestorType={x:Type viewmodels:BreathingExerciseViewModel}}"/>
+                                                                                                                </MultiBinding>
+                                                                                                        </Frame.IsVisible>
+                                                                                                        <Label Text="🔒 Lucen+"
+                                                                                                               FontSize="10"
+                                                                                                               FontAttributes="Bold"
+                                                                                                               TextColor="White"
+                                                                                                               HorizontalOptions="Center"
+                                                                                                               VerticalOptions="Center"/>
+                                                                                                </Frame>
+                                                                                        </Grid>
+                                                                                        <Label Text="{Binding Description}"
+                                                                                               FontSize="14"
+                                                                                               FontFamily="OpenSansRegular"
+                                                                                               TextColor="White"
+                                                                                               Opacity="0.9"/>
+                                                                                        <Label Text="{Binding Benefits}"
+                                                                                               FontSize="12"
+                                                                                               FontFamily="OpenSansRegular"
+                                                                                               TextColor="White"
+                                                                                               Opacity="0.8"/>
+                                                                                </StackLayout>
+                                                                        </Frame>
+                                                                </DataTemplate>
+                                                        </CollectionView.ItemTemplate>
+                                                </CollectionView>
+                                        </StackLayout>
+                                </Frame>
+
+                                <!-- Breathing Session Interface -->
+                                <StackLayout IsVisible="{Binding ShowTechniqueSelector, Converter={StaticResource InverseBoolConverter}}"
+                                             Spacing="30"
+                                             VerticalOptions="Center">
+
+                                        <!-- Current Technique Info -->
+                                        <Frame IsVisible="{Binding SelectedTechnique, Converter={StaticResource IsNotNullConverter}}"
+                                               BackgroundColor="{StaticResource GlassyWhite}"
+                                               BorderColor="{StaticResource GlassyBorder}"
+                                               CornerRadius="24"
+                                               HasShadow="True"
+                                               Padding="24"
+                                               Margin="0,0">
+                                                <Frame.Shadow>
+                                                        <Shadow Brush="Black"
+                                                                Offset="0,8"
+                                                                Radius="20"
+                                                                Opacity="0.12"/>
+                                                </Frame.Shadow>
+                                                <StackLayout Spacing="15">
+                                                        <Label Text="{Binding SelectedTechnique.Name}"
+                                                               FontSize="22"
+                                                               FontAttributes="Bold"
+                                                               TextColor="Black"
+                                                               FontFamily="OpenSansRegular"
+                                                               HorizontalOptions="Center"/>
+                                                        <Label Text="{Binding InstructionText}"
+                                                               FontSize="16"
+                                                               TextColor="{StaticResource Gray600}"
+                                                               FontFamily="OpenSansRegular"
+                                                               HorizontalOptions="Center"
+                                                               HorizontalTextAlignment="Center"/>
+
+                                                        <!-- Session Progress -->
+                                                        <StackLayout IsVisible="{Binding IsSessionActive}"
+                                                                     Spacing="10">
+                                                                <Label Text="{Binding CurrentCycle, StringFormat='Cycle {0} of {1}'}"
+                                                                       FontSize="18"
+                                                                       TextColor="Black"
+                                                                       FontFamily="OpenSansRegular"
+                                                                       FontAttributes="Bold"
+                                                                       HorizontalOptions="Center"/>
+                                                                <ProgressBar Progress="{Binding CycleProgress}"
+                                                                             ProgressColor="{StaticResource Primary}"
+                                                                             BackgroundColor="{StaticResource Gray200}"
+                                                                             HeightRequest="8"/>
+                                                        </StackLayout>
+                                                </StackLayout>
+                                        </Frame>
+
+                                        <!-- Breathing Circle with phase and timer centered -->
+                                        <Frame BackgroundColor="{StaticResource GlassyWhite}"
+                                               BorderColor="{StaticResource GlassyBorder}"
+                                               CornerRadius="24"
+                                               HasShadow="True"
+                                               Padding="0"
+                                               Margin="0,0">
+                                                <Frame.Shadow>
+                                                        <Shadow Brush="Black"
+                                                                Offset="0,8"
+                                                                Radius="20"
+                                                                Opacity="0.12"/>
+                                                </Frame.Shadow>
+                                                <Grid HeightRequest="300"
+                                                      WidthRequest="300"
+                                                      HorizontalOptions="Center"
+                                                      VerticalOptions="Center">
+
+                                                        <!-- Outer Ring -->
+                                                        <Ellipse WidthRequest="280"
+                                                                 HeightRequest="280"
+                                                                 Fill="Transparent"
+                                                                 Stroke="{StaticResource Gray200}"
+                                                                 StrokeThickness="3"
+                                                                 HorizontalOptions="Center"
+                                                                 VerticalOptions="Center"/>
+
+                                                        <!-- Progress Ring -->
+                                                        <Ellipse WidthRequest="280"
+                                                                 HeightRequest="280"
+                                                                 Fill="Transparent"
+                                                                 Stroke="{Binding CircleColor}"
+                                                                 StrokeThickness="6"
+                                                                 HorizontalOptions="Center"
+                                                                 VerticalOptions="Center"
+                                                                 StrokeDashArray="4,2"
+                                                                 IsVisible="{Binding IsSessionActive}"/>
+
+                                                        <!-- Main Breathing Circle -->
+                                                        <Ellipse x:Name="BreathingCircle"
+                                                                 WidthRequest="220"
+                                                                 HeightRequest="220"
+                                                                 Fill="{Binding CircleColor}"
+                                                                 Opacity="0.8"
+                                                                 Scale="{Binding CircleScale, Converter={StaticResource BreathingCircleScaleClampConverter}}"
+                                                                 HorizontalOptions="Center"
+                                                                 VerticalOptions="Center"/>
+
+                                                        <!-- Phase and Timer -->
+                                                        <StackLayout VerticalOptions="Center"
+                                                                     HorizontalOptions="Center"
+                                                                     Spacing="8">
+                                                                <Label Text="{Binding PhaseText}"
+                                                                       FontSize="20"
+                                                                       FontAttributes="Bold"
+                                                                       TextColor="White"
+                                                                       HorizontalOptions="Center"/>
+                                                                <Label Text="{Binding RemainingTime, StringFormat='{0:D2}'}"
+                                                                       FontSize="48"
+                                                                       FontAttributes="Bold"
+                                                                       TextColor="White"
+                                                                       HorizontalOptions="Center"
+                                                                       IsVisible="{Binding IsSessionActive}"/>
+                                                        </StackLayout>
+                                                </Grid>
+                                        </Frame>
+
+                                        <!-- Control Buttons: use Grid for consistent layout -->
+                                        <Grid Margin="20,0"
+                                              ColumnDefinitions="Auto,*,Auto"
+                                              VerticalOptions="Center">
+
+
+                                                <!-- Music Button -->
+                                                <Frame Grid.Column="0"
+                                                       Padding="0"
+                                                       CornerRadius="30"
+                                                       HasShadow="True"
+                                                       HorizontalOptions="Start"
+                                                       HeightRequest="60"
+                                                       WidthRequest="60"
+                                                       BackgroundColor="{StaticResource GlassyWhite}"
+                                                       BorderColor="{StaticResource GlassyBorder}"
+                                                       IsVisible="{Binding IsSessionActive}">
+                                                        <Frame.Shadow>
+                                                                <Shadow Brush="Black"
+                                                                        Offset="0,6"
+                                                                        Radius="15"
+                                                                        Opacity="0.15"/>
+                                                        </Frame.Shadow>
+                                                        <Button Text="🎵"
+                                                                Command="{Binding ShowMusicOptionsCommand}"
+                                                                BackgroundColor="Transparent"
+                                                                TextColor="{StaticResource Primary}"
+                                                                FontSize="22"
+                                                                FontAttributes="Bold"
+                                                                HorizontalOptions="Fill"
+                                                                VerticalOptions="Fill"
+                                                                BorderColor="Transparent"/>
+                                                </Frame>
+
+                                                <!-- Main Action Button -->
+                                                <Frame Grid.Column="1"
+                                                       Padding="0"
+                                                       CornerRadius="30"
+                                                       HasShadow="True"
+                                                       HorizontalOptions="Center"
+                                                       HeightRequest="60"
+                                                       WidthRequest="200"
+                                                       BackgroundColor="{StaticResource Primary}"
+                                                       BorderColor="Transparent">
+                                                        <Frame.Shadow>
+                                                                <Shadow Brush="{StaticResource Primary}"
+                                                                        Offset="0,6"
+                                                                        Radius="15"
+                                                                        Opacity="0.25"/>
+                                                        </Frame.Shadow>
+                                                        <Button Text="{Binding ButtonText}"
+                                                                Command="{Binding StartStopSessionCommand}"
+                                                                BackgroundColor="Transparent"
+                                                                TextColor="White"
+                                                                FontSize="18"
+                                                                FontAttributes="Bold"
+                                                                FontFamily="OpenSansRegular"
+                                                                HorizontalOptions="Fill"
+                                                                VerticalOptions="Fill"
+                                                                BorderColor="Transparent"/>
+                                                </Frame>
+                                        </Grid>
+                                </StackLayout>
+
+                        </VerticalStackLayout>
+                </ScrollView>
+
+                <!-- Music Selection Popup -->
+                <Frame x:Name="MusicSelectionPopup"
+                       IsVisible="{Binding IsMusicPopupVisible}"
+                       BackgroundColor="{StaticResource GlassyGrayOpaque}"
+                       BorderColor="{StaticResource GlassyBorder}"
+                       CornerRadius="24"
+                       Padding="10"
+                       HasShadow="True"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Center"
+                       MaximumWidthRequest="350"
+                       MaximumHeightRequest="400"
+                       Grid.Row="1">
+                        <Frame.Shadow>
+                                <Shadow Brush="Black"
+                                        Offset="0,8"
+                                        Radius="20"
+                                        Opacity="0.12"/>
+                        </Frame.Shadow>
+                        <StackLayout Spacing="15">
+                                <Label Text="Background Music"
+                                       FontSize="22"
+                                       FontAttributes="Bold"
+                                       TextColor="Black"
+                                       FontFamily="OpenSansRegular"
+                                       HorizontalOptions="Center"/>
+
+                                <CollectionView ItemsSource="{Binding MusicOptions}"
+                                                SelectionMode="None"
+                                                HeightRequest="250">
+                                        <CollectionView.ItemsLayout>
+                                                <LinearItemsLayout Orientation="Vertical"
+                                                                   ItemSpacing="10"/>
+                                        </CollectionView.ItemsLayout>
+                                        <CollectionView.ItemTemplate>
+                                                <DataTemplate x:DataType="models:MusicOption">
+                                                        <Frame Padding="15,10"
+                                                               CornerRadius="15"
+                                                               BorderColor="{StaticResource Gray200}"
+                                                               BackgroundColor="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, ConverterParameter='#EFEBD3|#FFFFFF'}">
+                                                                <!-- Dim when locked but keep clickable -->
+                                                                <Frame.Triggers>
+                                                                        <DataTrigger TargetType="Frame"
+                                                                                     Binding="{Binding IsLocked}"
+                                                                                     Value="True">
+                                                                                <Setter Property="Opacity"
+                                                                                        Value="0.6"/>
+                                                                        </DataTrigger>
+                                                                </Frame.Triggers>
+                                                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                                                        <Label Grid.Column="0"
+                                                                               Text="{Binding Icon}"
+                                                                               FontSize="18"
+                                                                               TextColor="{StaticResource Primary}"
+                                                                               VerticalOptions="Center"
+                                                                               Margin="0,0,10,0"/>
+                                                                        <Label Grid.Column="1"
+                                                                               Text="{Binding Name}"
+                                                                               FontSize="16"
+                                                                               TextColor="Black"
+                                                                               VerticalOptions="Center"/>
+
+                                                                        <!-- Lucen+ badge for locked items -->
+                                                                        <Frame Grid.Column="2"
+                                                                               Padding="8,4"
+                                                                               CornerRadius="12"
+                                                                               BackgroundColor="Orange"
+                                                                               BorderColor="Transparent"
+                                                                               IsVisible="{Binding IsLocked}"
+                                                                               VerticalOptions="Center">
+                                                                                <Frame.GestureRecognizers>
+                                                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:BreathingExerciseViewModel}}, Path=SelectMusicCommand}"
+                                                                                                              CommandParameter="{Binding}"/>
+                                                                                </Frame.GestureRecognizers>
+                                                                                <Label Text="Lucen+"
+                                                                                       FontSize="10"
+                                                                                       TextColor="White"
+                                                                                       FontAttributes="Bold"
+                                                                                       HorizontalOptions="Center"
+                                                                                       VerticalOptions="Center"/>
+                                                                        </Frame>
+                                                                </Grid>
+                                                                <Frame.GestureRecognizers>
+                                                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:BreathingExerciseViewModel}}, Path=SelectMusicCommand}"
+                                                                                              CommandParameter="{Binding}"/>
+                                                                </Frame.GestureRecognizers>
+                                                        </Frame>
+                                                </DataTemplate>
+                                        </CollectionView.ItemTemplate>
+                                </CollectionView>
+
+                                <Button Text="Close"
+                                        Command="{Binding CloseMusicPopupCommand}"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        TextColor="White"
+                                        CornerRadius="20"
+                                        Margin="0,10,0,0"
+                                        HeightRequest="50"/>
+                        </StackLayout>
+                </Frame>
+        </Grid>
+</uranium:UraniumContentPage>
