@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MeditationApp.Services;
 using Microsoft.Maui.Storage;
+using System.Diagnostics;
 #if IOS
 using RevenueCat;
 using Tonestro.Maui.RevenueCat.iOS.Extensions;
@@ -19,7 +20,7 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
     private const string ReminderTimeKey = "reminder_time";
 
     private readonly HybridAuthService _hybridAuthService;
-    private readonly NotificationService _notificationService;
+    private readonly INotificationService _notificationService;
     private readonly InAppPurchaseService _inAppPurchaseService;
     private readonly IPaywallService _paywallService;
     
@@ -90,8 +91,13 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
     public ICommand SaveSettingsCommand { get; }
     public ICommand LogoutCommand { get; }
     public ICommand SubscribeCommand { get; }
+    public ICommand TestNotificationCommand { get; }
+    public ICommand TestDelayedNotificationCommand { get; }
+    public ICommand CheckNotificationPermissionsCommand { get; }
+    public ICommand ViewNotificationLogsCommand { get; }
+    public ICommand ClearNotificationLogsCommand { get; }
 
-    public SettingsViewModel(HybridAuthService hybridAuthService, NotificationService notificationService, InAppPurchaseService inAppPurchaseService, IPaywallService paywallService)
+    public SettingsViewModel(HybridAuthService hybridAuthService, INotificationService notificationService, InAppPurchaseService inAppPurchaseService, IPaywallService paywallService)
     {
         _hybridAuthService = hybridAuthService;
         _notificationService = notificationService;
@@ -100,6 +106,11 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
         SaveSettingsCommand = new Command(OnSaveSettings);
         LogoutCommand = new Command(async () => await OnLogout());
         SubscribeCommand = new Command(async () => await ShowPaywallAsync());
+        TestNotificationCommand = new Command(async () => await OnTestNotification());
+        TestDelayedNotificationCommand = new Command(async () => await OnTestDelayedNotification());
+        CheckNotificationPermissionsCommand = new Command(async () => await CheckNotificationPermissions());
+        ViewNotificationLogsCommand = new Command(async () => await OnViewNotificationLogs());
+        ClearNotificationLogsCommand = new Command(OnClearNotificationLogs);
         LoadUserData();
         LoadSettings();
     }
@@ -324,5 +335,119 @@ public class SettingsViewModel : INotifyPropertyChanged, IDisposable
         _autoSaveCts?.Cancel();
         _autoSaveCts?.Dispose();
         _autoSaveCts = null;
+    }
+
+    private async Task OnTestNotification()
+    {
+        try
+        {
+            Debug.WriteLine("[SettingsViewModel] Testing notification service");
+            NotificationLogger.Log("[SettingsViewModel] Testing notification service from settings");
+            await _notificationService.ShowNotification("Test Notification", "This is a test notification from Settings - if you see this, notifications are working!");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[SettingsViewModel] Error sending test notification: {ex.Message}");
+            NotificationLogger.Log($"[SettingsViewModel] Error sending test notification: {ex.Message}");
+        }
+    }
+
+    private async Task OnTestDelayedNotification()
+    {
+        try
+        {
+            Debug.WriteLine("[SettingsViewModel] Testing delayed notification");
+            NotificationLogger.Log("[SettingsViewModel] Testing delayed notification from settings - will trigger in 10 seconds");
+
+            // Use the proper delayed notification method instead of Task.Run
+            await _notificationService.ShowDelayedNotification(
+                "Background Test", 
+                "This notification was sent after 10 seconds delay from Settings",
+                10);
+
+            // Show immediate feedback to user
+            var mainPage = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (mainPage != null)
+            {
+                await mainPage.DisplayAlert("Delayed Notification", 
+                    "Delayed notification scheduled for 10 seconds from now. Put the app in background to test background notifications.", 
+                    "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[SettingsViewModel] Error sending delayed notification: {ex.Message}");
+            NotificationLogger.Log($"[SettingsViewModel] Error sending delayed notification: {ex.Message}");
+        }
+    }
+
+    private async Task CheckNotificationPermissions()
+    {
+        try
+        {
+            Debug.WriteLine("[SettingsViewModel] Checking notification permissions");
+            NotificationLogger.Log("[SettingsViewModel] Checking notification permissions");
+            
+            var hasPermission = await _notificationService.RequestNotificationPermission();
+            var permissionResult = hasPermission ? "GRANTED" : "DENIED";
+            
+            Debug.WriteLine($"[SettingsViewModel] Permission result: {permissionResult}");
+            NotificationLogger.Log($"[SettingsViewModel] Permission result: {permissionResult}");
+            
+            var mainPage = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (mainPage != null)
+            {
+                await mainPage.DisplayAlert("Notification Permissions", 
+                    $"Notification Permission: {permissionResult}\n\nIf denied, please enable notifications in Settings > [App Name] > Notifications", 
+                    "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[SettingsViewModel] Error checking notification permissions: {ex.Message}");
+            NotificationLogger.Log($"[SettingsViewModel] Error checking notification permissions: {ex.Message}");
+        }
+    }
+
+    private async Task OnViewNotificationLogs()
+    {
+        try
+        {
+            var logs = NotificationLogger.GetLogsAsString();
+            var persistentLogs = NotificationLogger.GetPersistentLogs();
+            
+            var allLogs = $"=== Current Session Logs ===\n{logs}\n\n=== Persistent Logs ===\n{persistentLogs}";
+            
+            var mainPage = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (mainPage != null)
+            {
+                await mainPage.DisplayAlert("Notification Logs", 
+                    string.IsNullOrEmpty(allLogs) ? "No logs available" : allLogs, 
+                    "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[SettingsViewModel] Error viewing notification logs: {ex.Message}");
+        }
+    }
+
+    private void OnClearNotificationLogs()
+    {
+        try
+        {
+            NotificationLogger.ClearLogs();
+            Debug.WriteLine("[SettingsViewModel] Notification logs cleared");
+            
+            var mainPage = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (mainPage != null)
+            {
+                mainPage.DisplayAlert("Logs Cleared", "Notification logs have been cleared.", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[SettingsViewModel] Error clearing notification logs: {ex.Message}");
+        }
     }
 }

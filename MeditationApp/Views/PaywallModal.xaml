@@ -18,6 +18,11 @@
     </ContentPage.Background>
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
         <!-- Decorative background elements matching app style -->
         <Ellipse x:Name="Orb1"
                  WidthRequest="300"
@@ -52,7 +57,7 @@
         </Ellipse>
 
         <!-- Main Content -->
-        <ScrollView>
+        <ScrollView Grid.Row="0">
             <VerticalStackLayout Padding="20,60,20,40"
                                  Spacing="30">
 
@@ -162,9 +167,9 @@
                                 <DataTemplate x:DataType="viewmodels:SubscriptionPackage">
                                     <Border BackgroundColor="{StaticResource GlassyWhite}"
                                             StrokeThickness="2"
-                                            StrokeShape="RoundRectangle 15"
-                                            Padding="20,15"
-                                            Margin="0,5">
+                                            StrokeShape="RoundRectangle 20"
+                                            Padding="25,20"
+                                            Margin="0,8">
                                         <Border.Stroke>
                                             <SolidColorBrush Color="{StaticResource GlassyBorder}"/>
                                         </Border.Stroke>
@@ -199,12 +204,18 @@
                                             <Border Grid.Row="0"
                                                     Grid.Column="1"
                                                     BackgroundColor="{StaticResource Primary}"
-                                                    StrokeShape="RoundRectangle 10"
-                                                    Padding="8,4"
+                                                    StrokeShape="RoundRectangle 12"
+                                                    Padding="12,6"
                                                     IsVisible="{Binding IsPopular}"
-                                                    Margin="0,-5,0,5">
+                                                    Margin="0,-8,0,8">
+                                                <Border.Shadow>
+                                                    <Shadow Brush="Black"
+                                                            Opacity="0.3"
+                                                            Radius="6"
+                                                            Offset="0,3"/>
+                                                </Border.Shadow>
                                                 <Label Text="MOST POPULAR"
-                                                       FontSize="10"
+                                                       FontSize="11"
                                                        FontAttributes="Bold"
                                                        TextColor="White"/>
                                             </Border>
@@ -213,7 +224,7 @@
                                             <Label Grid.Row="0"
                                                    Grid.Column="0"
                                                    Text="{Binding Title}"
-                                                   FontSize="18"
+                                                   FontSize="20"
                                                    FontAttributes="Bold"
                                                    TextColor="Black"
                                                    VerticalOptions="Center"/>
@@ -223,31 +234,42 @@
                                                    Grid.Column="0"
                                                    Grid.ColumnSpan="2"
                                                    Text="{Binding Description}"
-                                                   FontSize="14"
+                                                   FontSize="15"
                                                    TextColor="{StaticResource toneGray}"
-                                                   Margin="0,5,0,10"/>
+                                                   Margin="0,8,0,15"/>
 
-                                            <!-- Price -->
-                                            <StackLayout Grid.Row="2"
-                                                         Grid.Column="0"
-                                                         Grid.ColumnSpan="2"
-                                                         Orientation="Horizontal"
-                                                         Spacing="5">
-                                                <Label Text="{Binding PriceString}"
-                                                       FontSize="24"
-                                                       FontAttributes="Bold"
-                                                       TextColor="{StaticResource Primary}"
-                                                       VerticalOptions="Center"/>
-                                                <Label Text="{Binding PeriodString}"
-                                                       FontSize="16"
-                                                       TextColor="{StaticResource toneGray}"
-                                                       VerticalOptions="End"/>
-                                                <Label Text="- Tap to Subscribe"
-                                                       FontSize="12"
-                                                       TextColor="{StaticResource toneGray}"
-                                                       VerticalOptions="End"
-                                                       Margin="10,0,0,0"/>
-                                            </StackLayout>
+
+                                            <!-- Price and CTA -->
+                                            <Grid Grid.Row="3"
+                                                  Grid.Column="0"
+                                                  Grid.ColumnSpan="2"
+                                                  Margin="0,8,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Price Info -->
+                                                <StackLayout Grid.Column="0"
+                                                             Orientation="Horizontal"
+                                                             Spacing="6"
+                                                             HorizontalOptions="Start"
+                                                             VerticalOptions="Center">
+                                                    <Label Text="Then "
+                                                           FontSize="15"
+                                                           TextColor="{StaticResource toneGray}"
+                                                           VerticalOptions="Center"/>
+                                                    <Label Text="{Binding PriceString}"
+                                                           FontSize="22"
+                                                           FontAttributes="Bold"
+                                                           TextColor="{StaticResource Primary}"
+                                                           VerticalOptions="Center"/>
+                                                    <Label Text="{Binding PeriodString}"
+                                                           FontSize="15"
+                                                           TextColor="{StaticResource toneGray}"
+                                                           VerticalOptions="Center"/>
+                                                </StackLayout>
+                                            </Grid>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -293,7 +315,21 @@
                         </StackLayout>
                     </VerticalStackLayout>
                 </VerticalStackLayout>
+                <!-- Close Features Section -->
             </VerticalStackLayout>
+            <!-- Close Main Content root -->
         </ScrollView>
+        <!-- Persistent Free Trial Button fixed at bottom -->
+        <Button Grid.Row="1"
+                Text="START FREE TRIAL"
+                Command="{Binding SelectPackageCommand}"
+                CommandParameter="{Binding SelectedPackage}"
+                BackgroundColor="{StaticResource Primary}"
+                TextColor="White"
+                FontAttributes="Bold"
+                CornerRadius="25"
+                HeightRequest="50"
+                HorizontalOptions="Fill"
+                Margin="20,10"/>
     </Grid>
 </ContentPage>

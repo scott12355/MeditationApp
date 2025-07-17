@@ -189,7 +189,7 @@ public partial class TodayPage : UraniumContentPage
         }
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
         if (_viewModel != null)
@@ -203,6 +203,11 @@ public partial class TodayPage : UraniumContentPage
         // Animations are now managed by ViewModel PropertyChanged and UpdateAnimations
         // We can call UpdateAnimations here on appearing just in case the status was set before the page appeared
         UpdateAnimations(_viewModel?.TodaySession?.Status);
+        // Start polling session status if a request is in progress
+        if (_viewModel != null)
+        {
+            await _viewModel.PollCurrentSessionStatusAsync();
+        }
     }
 
     protected override void OnDisappearing()

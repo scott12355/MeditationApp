@@ -17,6 +17,7 @@ public class AndroidNotificationService : INotificationService
     private const int NotificationId = 100;
     private const string ActionScheduleNotification = "com.meditationapp.SCHEDULE_NOTIFICATION";
     private const string ActionCancelNotification = "com.meditationapp.CANCEL_NOTIFICATION";
+    private const string ActionSessionReminder = "com.meditationapp.SESSION_REMINDER";
 
     private Context? _context;
     private AlarmManager? _alarmManager;
@@ -135,6 +136,115 @@ public class AndroidNotificationService : INotificationService
             notificationManager?.CreateNotificationChannel(channel);
         }
     }
+
+    public Task ShowNotification(string title, string message)
+    {
+        System.Diagnostics.Debug.WriteLine($"[AndroidNotificationService] ShowNotification called with title: '{title}', message: '{message}'");
+        try
+        {
+            CreateNotificationChannel();
+            var builder = new NotificationCompat.Builder(Context, ChannelId)
+                .SetSmallIcon(Resource.Mipmap.appicon)
+                .SetContentTitle(title)
+                .SetContentText(message)
+                .SetPriority(NotificationCompat.PriorityHigh)
+                .SetAutoCancel(true);
+            var manager = NotificationManagerCompat.From(Context);
+            manager.Notify(NotificationId + 1, builder.Build());
+            System.Diagnostics.Debug.WriteLine($"[AndroidNotificationService] Notification sent successfully");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error showing notification: {ex.Message}");
+        }
+        return Task.CompletedTask;
+    }
+
+    public async Task ShowDelayedNotification(string title, string message, int delayInSeconds)
+    {
+        var initialLog = $"ShowDelayedNotification called with title: '{title}', message: '{message}', delay: {delayInSeconds}s";
+        System.Diagnostics.Debug.WriteLine($"[AndroidNotificationService] {initialLog}");
+        NotificationLogger.Log($"[AndroidNotificationService] {initialLog}");
+        
+        try
+        {
+            // Create notification channel if needed
+            CreateNotificationChannel();
+            
+            var stateLog = $"Creating delayed notification for {delayInSeconds} seconds";
+            System.Diagnostics.Debug.WriteLine($"[AndroidNotificationService] {stateLog}");
+            NotificationLogger.Log($"[AndroidNotificationService] {stateLog}");
+            
+            // For Android, we'll use a simple Task.Delay approach since we're not in a background service
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(delayInSeconds * 1000);
+                
+                var delayedLog = $"Delayed notification firing now after {delayInSeconds}s";
+                System.Diagnostics.Debug.WriteLine($"[AndroidNotificationService] {delayedLog}");
+                NotificationLogger.Log($"[AndroidNotificationService] {delayedLog}");
+                
+                await ShowNotification(title, message);
+            });
+            
+            var successLog = $"Delayed notification scheduled successfully";
+            System.Diagnostics.Debug.WriteLine($"[AndroidNotificationService] {successLog}");
+            NotificationLogger.Log($"[AndroidNotificationService] {successLog}");
+        }
+        catch (Exception ex)
+        {
+            var errorLog = $"Error showing delayed notification: {ex.Message}";
+            System.Diagnostics.Debug.WriteLine($"[AndroidNotificationService] {errorLog}");
+            NotificationLogger.Log($"[AndroidNotificationService] {errorLog}");
+            
+            var stackLog = $"Stack trace: {ex.StackTrace}";
+            System.Diagnostics.Debug.WriteLine($"[AndroidNotificationService] {stackLog}");
+            NotificationLogger.Log($"[AndroidNotificationService] {stackLog}");
+        }
+    }
+
+    public Task ScheduleSessionReminder(int delayInSeconds)
+    {
+        CreateNotificationChannel();
+        var now = DateTime.Now;
+        var triggerTimeMillis = DateTimeOffset.UtcNow.AddSeconds(delayInSeconds).ToUnixTimeMilliseconds();
+        var intent = new Intent(Context, typeof(NotificationReceiver));
+        intent.SetAction(ActionSessionReminder);
+        var pending = PendingIntent.GetBroadcast(
+            Context,
+            NotificationId + 2,
+            intent,
+            PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
+
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.M)
+        {
+            AlarmManager.SetExactAndAllowWhileIdle(
+                AlarmType.RtcWakeup,
+                triggerTimeMillis,
+                pending);
+        }
+        else
+        {
+            AlarmManager.SetExact(
+                AlarmType.RtcWakeup,
+                triggerTimeMillis,
+                pending);
+        }
+    }
+
+    public Task CancelSessionReminder()
+    {
+        CreateNotificationChannel();
+        var intent = new Intent(Context, typeof(NotificationReceiver));
+        intent.SetAction(ActionSessionReminder);
+        var pending = PendingIntent.GetBroadcast(
+            Context,
+            NotificationId + 2,
+            intent,
+            PendingIntentFlags.UpdateCurrent | PendingIntentFlags.Immutable);
+        AlarmManager.Cancel(pending);
+        return Task.CompletedTask;
+    }
 }
 
 [BroadcastReceiver(Enabled = true, Exported = false)]
@@ -192,4 +302,4 @@ public class NotificationReceiver : BroadcastReceiver
                 pendingIntent);
         }
     }
-} 
+}

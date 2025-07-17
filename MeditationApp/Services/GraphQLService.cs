@@ -13,8 +13,11 @@ namespace MeditationApp.Services
     {
         private readonly HttpClient _httpClient;
         private readonly CognitoAuthService _cognitoAuthService;
+        #if DEBUG
         private const string Endpoint = "https://lhr6w6nilbfovmfs5lt77v7bx4.appsync-api.eu-west-1.amazonaws.com/graphql";
-
+        #elif RELEASE
+        private const string Endpoint = "https://f4dh5bnocvhj7p4vxdd3hol4ci.appsync-api.eu-west-1.amazonaws.com/graphql";
+        #endif
         public GraphQLService(HttpClient httpClient, CognitoAuthService cognitoAuthService)
         {
             _httpClient = httpClient;

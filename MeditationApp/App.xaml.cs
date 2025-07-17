@@ -10,10 +10,10 @@ namespace MeditationApp;
 
 public partial class App : Application
 {
-    private readonly NotificationService _notificationService;
+    private readonly MeditationApp.Services.INotificationService _notificationService;
     private readonly IServiceProvider _serviceProvider;
 
-    public App(NotificationService notificationService, IServiceProvider serviceProvider)
+    public App(MeditationApp.Services.INotificationService notificationService, IServiceProvider serviceProvider)
     {
         InitializeComponent();
         _notificationService = notificationService;
@@ -73,41 +73,14 @@ public partial class App : Application
 
         try
         {
-            // Get services from the service provider
+            // Ensure session polling and data resume
             var todayViewModel = _serviceProvider.GetRequiredService<TodayViewModel>();
-            var databaseSyncService = _serviceProvider.GetRequiredService<DatabaseSyncService>();
-            
-            // Trigger sync when app becomes active (fire and forget)
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    var syncResult = await databaseSyncService.TriggerSyncIfNeededAsync();
-                    if (syncResult.IsSuccess)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"[App Resume] Sync completed: {syncResult.SessionsUpdated} sessions, {syncResult.InsightsUpdated} insights updated");
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine($"[App Resume] Sync skipped: {syncResult.Message}");
-                    }
-                }
-                catch (Exception syncEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"[App Resume] Sync failed: {syncEx.Message}");
-                }
-            });
-            
-            // Check if we need to refresh (if the date has changed)
-            if (todayViewModel.CurrentDate.Date != DateTime.Now.Date)
-            {
-                System.Diagnostics.Debug.WriteLine("Date changed while app was in background, refreshing data");
-                await todayViewModel.LoadTodayData();
-            }
+            await todayViewModel.EnsureDataLoaded();
+            System.Diagnostics.Debug.WriteLine("Resumed TodayViewModel data and polling");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Error refreshing data on resume: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"Error resuming TodayViewModel: {ex.Message}");
         }
     }
 

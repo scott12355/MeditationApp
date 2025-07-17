@@ -62,11 +62,20 @@ public static class MauiProgram
 
 
         // Register Cognito authentication service
+#if DEBUG
         var cognitoSettings = new CognitoSettings(
-            userPoolId: "eu-west-1_FDo9Q79jx", // Replace with your actual User Pool ID
-            appClientId: "1s3rs9l9ajae05vtkt656m2eog", // Replace with your actual App Client ID
-            region: "eu-west-1" // e.g., "us-east-1"
+            userPoolId: "eu-west-1_FDo9Q79jx", // Debug User Pool ID
+            appClientId: "1s3rs9l9ajae05vtkt656m2eog", // Debug App Client ID
+            region: "eu-west-1"
         );
+#endif
+#if RELEASE   // Production settings
+        var cognitoSettings = new CognitoSettings(
+            userPoolId: "eu-west-1_fhIlkXCTT", // Production User Pool ID
+            appClientId: "2j5r5bt2qp3ft6hm6cksb8ioe2", // Production App Client ID
+            region: "eu-west-1" 
+        );
+#endif
 
         builder.Services.AddSingleton(cognitoSettings);
         builder.Services.AddSingleton<IAmazonCognitoIdentityProvider>(provider =>
@@ -126,7 +135,8 @@ public static class MauiProgram
                 provider.GetRequiredService<SessionStatusPoller>(),
                 provider.GetRequiredService<AudioPlayerService>(),
                 provider.GetRequiredService<DatabaseSyncService>(),
-                provider.GetRequiredService<MoodChartService>()
+                provider.GetRequiredService<MoodChartService>(),
+                provider.GetRequiredService<INotificationService>()
             )
         );
 
@@ -153,7 +163,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ViewModels.SettingsViewModel>(provider =>
             new ViewModels.SettingsViewModel(
                 provider.GetRequiredService<HybridAuthService>(),
-                provider.GetRequiredService<NotificationService>(),
+                provider.GetRequiredService<INotificationService>(),
                 provider.GetRequiredService<InAppPurchaseService>(),
                 provider.GetRequiredService<IPaywallService>()
             )
@@ -211,7 +221,7 @@ public static class MauiProgram
         });
 
         // Register NotificationService
-        builder.Services.AddSingleton<MeditationApp.Services.NotificationService>();
+        builder.Services.AddSingleton<MeditationApp.Services.INotificationService, MeditationApp.Services.NotificationService>();
         builder.Services.AddSingleton<InAppPurchaseService>();
         
         // Register PaywallService

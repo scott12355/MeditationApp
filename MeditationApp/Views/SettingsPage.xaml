@@ -290,6 +290,209 @@
                                           </Button>
                                    </Frame>
 
+                                   <!-- Test Notification Button -->
+                                   <!-- <Frame Padding="0"
+                                          CornerRadius="25"
+                                          HasShadow="True"
+                                          HorizontalOptions="Center"
+                                          HeightRequest="50"
+                                          WidthRequest="200"
+                                          BackgroundColor="#4CAF50"
+                                          BorderColor="Transparent">
+                                          <Frame.Shadow>
+                                                 <Shadow Brush="#4CAF50"
+                                                         Offset="0,6"
+                                                         Radius="15"
+                                                         Opacity="0.25"/>
+                                          </Frame.Shadow>
+                                          <Button Text="Test Notification"
+                                                  Command="{Binding TestNotificationCommand}"
+                                                  BackgroundColor="Transparent"
+                                                  TextColor="White"
+                                                  FontSize="16"
+                                                  FontAttributes="Bold"
+                                                  HorizontalOptions="Fill"
+                                                  VerticalOptions="Fill"
+                                                  BorderColor="Transparent">
+                                                 <VisualStateManager.VisualStateGroups>
+                                                        <VisualStateGroupList>
+                                                               <VisualStateGroup x:Name="CommonStates">
+                                                                      <VisualState x:Name="Normal">
+                                                                             <VisualState.Setters>
+                                                                                    <Setter Property="Scale"
+                                                                                            Value="1.0"/>
+                                                                                    <Setter Property="Opacity"
+                                                                                            Value="1.0"/>
+                                                                             </VisualState.Setters>
+                                                                      </VisualState>
+                                                                      <VisualState x:Name="Pressed">
+                                                                             <VisualState.Setters>
+                                                                                    <Setter Property="Scale"
+                                                                                            Value="0.95"/>
+                                                                                    <Setter Property="Opacity"
+                                                                                            Value="0.8"/>
+                                                                             </VisualState.Setters>
+                                                                      </VisualState>
+                                                               </VisualStateGroup>
+                                                        </VisualStateGroupList>
+                                                 </VisualStateManager.VisualStateGroups>
+                                          </Button>
+                                   </Frame> -->
+
+                                   <!-- View Notification Logs Button -->
+                                   <!-- <Frame Padding="0"
+                                          CornerRadius="25"
+                                          HasShadow="True"
+                                          HorizontalOptions="Center"
+                                          HeightRequest="50"
+                                          WidthRequest="200"
+                                          BackgroundColor="#2196F3"
+                                          BorderColor="Transparent">
+                                          <Frame.Shadow>
+                                                 <Shadow Brush="#2196F3"
+                                                         Offset="0,6"
+                                                         Radius="15"
+                                                         Opacity="0.25"/>
+                                          </Frame.Shadow>
+                                          <Button Text="View Notification Logs"
+                                                  Command="{Binding ViewNotificationLogsCommand}"
+                                                  BackgroundColor="Transparent"
+                                                  TextColor="White"
+                                                  FontSize="16"
+                                                  FontAttributes="Bold"
+                                                  HorizontalOptions="Fill"
+                                                  VerticalOptions="Fill"
+                                                  BorderColor="Transparent">
+                                                 <VisualStateManager.VisualStateGroups>
+                                                        <VisualStateGroupList>
+                                                               <VisualStateGroup x:Name="CommonStates">
+                                                                      <VisualState x:Name="Normal">
+                                                                             <VisualState.Setters>
+                                                                                    <Setter Property="Scale"
+                                                                                            Value="1.0"/>
+                                                                                    <Setter Property="Opacity"
+                                                                                            Value="1.0"/>
+                                                                             </VisualState.Setters>
+                                                                      </VisualState>
+                                                                      <VisualState x:Name="Pressed">
+                                                                             <VisualState.Setters>
+                                                                                    <Setter Property="Scale"
+                                                                                            Value="0.95"/>
+                                                                                    <Setter Property="Opacity"
+                                                                                            Value="0.8"/>
+                                                                             </VisualState.Setters>
+                                                                      </VisualState>
+                                                               </VisualStateGroup>
+                                                        </VisualStateGroupList>
+                                                 </VisualStateManager.VisualStateGroups>
+                                          </Button>
+                                   </Frame> -->
+
+                                   <!-- Delayed Test Notification Button -->
+                                   <!-- <Frame Padding="0"
+                                          CornerRadius="25"
+                                          HasShadow="True"
+                                          HorizontalOptions="Center"
+                                          HeightRequest="50"
+                                          WidthRequest="250"
+                                          BackgroundColor="#FF9800"
+                                          BorderColor="Transparent"
+                                          Margin="0,10,0,0">
+                                          <Frame.Shadow>
+                                                 <Shadow Brush="#FF9800"
+                                                         Offset="0,6"
+                                                         Radius="15"
+                                                         Opacity="0.25"/>
+                                          </Frame.Shadow>
+                                          <Button Text="Test Delayed Notification (10s)"
+                                                  Command="{Binding TestDelayedNotificationCommand}"
+                                                  BackgroundColor="Transparent"
+                                                  TextColor="White"
+                                                  FontSize="14"
+                                                  FontAttributes="Bold"
+                                                  HorizontalOptions="Fill"
+                                                  VerticalOptions="Fill"
+                                                  BorderColor="Transparent">
+                                          </Button>
+                                   </Frame> -->
+
+                                   <!-- Check Notification Permissions Button -->
+                                   <!-- <Frame Padding="0"
+                                          CornerRadius="25"
+                                          HasShadow="True"
+                                          HorizontalOptions="Center"
+                                          HeightRequest="50"
+                                          WidthRequest="250"
+                                          BackgroundColor="#9C27B0"
+                                          BorderColor="Transparent"
+                                          Margin="0,10,0,0">
+                                          <Frame.Shadow>
+                                                 <Shadow Brush="#9C27B0"
+                                                         Offset="0,6"
+                                                         Radius="15"
+                                                         Opacity="0.25"/>
+                                          </Frame.Shadow>
+                                          <Button Text="Check Notification Permissions"
+                                                  Command="{Binding CheckNotificationPermissionsCommand}"
+                                                  BackgroundColor="Transparent"
+                                                  TextColor="White"
+                                                  FontSize="14"
+                                                  FontAttributes="Bold"
+                                                  HorizontalOptions="Fill"
+                                                  VerticalOptions="Fill"
+                                                  BorderColor="Transparent">
+                                          </Button>
+                                   </Frame> -->
+
+                                   <!-- Clear Notification Logs Button -->
+                                   <!-- <Frame Padding="0"
+                                          CornerRadius="25"
+                                          HasShadow="True"
+                                          HorizontalOptions="Center"
+                                          HeightRequest="50"
+                                          WidthRequest="200"
+                                          BackgroundColor="#FF9800"
+                                          BorderColor="Transparent">
+                                          <Frame.Shadow>
+                                                 <Shadow Brush="#FF9800"
+                                                         Offset="0,6"
+                                                         Radius="15"
+                                                         Opacity="0.25"/>
+                                          </Frame.Shadow>
+                                          <Button Text="Clear Logs"
+                                                  Command="{Binding ClearNotificationLogsCommand}"
+                                                  BackgroundColor="Transparent"
+                                                  TextColor="White"
+                                                  FontSize="16"
+                                                  FontAttributes="Bold"
+                                                  HorizontalOptions="Fill"
+                                                  VerticalOptions="Fill"
+                                                  BorderColor="Transparent">
+                                                 <VisualStateManager.VisualStateGroups>
+                                                        <VisualStateGroupList>
+                                                               <VisualStateGroup x:Name="CommonStates">
+                                                                      <VisualState x:Name="Normal">
+                                                                             <VisualState.Setters>
+                                                                                    <Setter Property="Scale"
+                                                                                            Value="1.0"/>
+                                                                                    <Setter Property="Opacity"
+                                                                                            Value="1.0"/>
+                                                                             </VisualState.Setters>
+                                                                      </VisualState>
+                                                                      <VisualState x:Name="Pressed">
+                                                                             <VisualState.Setters>
+                                                                                    <Setter Property="Scale"
+                                                                                            Value="0.95"/>
+                                                                                    <Setter Property="Opacity"
+                                                                                            Value="0.8"/>
+                                                                             </VisualState.Setters>
+                                                                      </VisualState>
+                                                               </VisualStateGroup>
+                                                        </VisualStateGroupList>
+                                                 </VisualStateManager.VisualStateGroups>
+                                          </Button>
+                                   </Frame> -->
+
                                    <!-- Logout Button -->
                                    <Frame Padding="0"
                                           CornerRadius="25"
@@ -338,6 +541,57 @@
                                                  </VisualStateManager.VisualStateGroups>
                                           </Button>
                                    </Frame>
+
+                                   <!-- Delayed Test Notification Button -->
+                                   <!-- <Frame Padding="0"
+                                          CornerRadius="25"
+                                          HasShadow="True"
+                                          HorizontalOptions="Center"
+                                          HeightRequest="50"
+                                          WidthRequest="250"
+                                          BackgroundColor="#FF9800"
+                                          BorderColor="Transparent"
+                                          Margin="0,10,0,0">
+                                          <Frame.Shadow>
+                                                 <Shadow Brush="#FF9800"
+                                                         Offset="0,6"
+                                                         Radius="15"
+                                                         Opacity="0.25"/>
+                                          </Frame.Shadow>
+                                          <Button Text="Test Delayed Notification (10s)"
+                                                  Command="{Binding TestDelayedNotificationCommand}"
+                                                  BackgroundColor="Transparent"
+                                                  TextColor="White"
+                                                  FontSize="14"
+                                                  FontAttributes="Bold"
+                                                  HorizontalOptions="Fill"
+                                                  VerticalOptions="Fill"
+                                                  BorderColor="Transparent">
+                                                 <VisualStateManager.VisualStateGroups>
+                                                        <VisualStateGroupList>
+                                                               <VisualStateGroup x:Name="CommonStates">
+                                                                      <VisualState x:Name="Normal">
+                                                                             <VisualState.Setters>
+                                                                                    <Setter Property="Scale"
+                                                                                            Value="1.0"/>
+                                                                                    <Setter Property="Opacity"
+                                                                                            Value="1.0"/>
+                                                                             </VisualState.Setters>
+                                                                      </VisualState>
+                                                                      <VisualState x:Name="Pressed">
+                                                                             <VisualState.Setters>
+                                                                                    <Setter Property="Scale"
+                                                                                            Value="0.95"/>
+                                                                                    <Setter Property="Opacity"
+                                                                                            Value="0.8"/>
+                                                                             </VisualState.Setters>
+                                                                      </VisualState>
+                                                               </VisualStateGroup>
+                                                        </VisualStateGroupList>
+                                                 </VisualStateManager.VisualStateGroups>
+                                          </Button>
+                                   </Frame> -->
+
                             </VerticalStackLayout>
                      </VerticalStackLayout>
               </ScrollView>

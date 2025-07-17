@@ -116,6 +116,7 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
     private readonly AudioPlayerService _audioPlayerService;
     private readonly DatabaseSyncService _databaseSyncService;
     private readonly MoodChartService _moodChartService;
+    private readonly INotificationService _notificationService;
 
     private Task? _initializationTask;
     private CancellationTokenSource? _pollingCts;
@@ -129,7 +130,7 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
     // Add a semaphore to serialize mood chart updates
     private readonly SemaphoreSlim _moodChartSemaphore = new(1, 1);
 
-    public TodayViewModel(GraphQLService graphQLService, CognitoAuthService cognitoAuthService, MeditationSessionDatabase sessionDatabase, IAudioDownloadService audioDownloadService, SessionStatusPoller sessionStatusPoller, AudioPlayerService audioPlayerService, DatabaseSyncService databaseSyncService, MoodChartService moodChartService)
+    public TodayViewModel(GraphQLService graphQLService, CognitoAuthService cognitoAuthService, MeditationSessionDatabase sessionDatabase, IAudioDownloadService audioDownloadService, SessionStatusPoller sessionStatusPoller, AudioPlayerService audioPlayerService, DatabaseSyncService databaseSyncService, MoodChartService moodChartService, INotificationService notificationService)
     {
         _graphQLService = graphQLService;
         _cognitoAuthService = cognitoAuthService;
@@ -139,6 +140,7 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
         _audioPlayerService = audioPlayerService;
         _databaseSyncService = databaseSyncService;
         _moodChartService = moodChartService;
+        _notificationService = notificationService;
 
         // Subscribe to events
         _audioPlayerService.MediaOpened += OnMediaOpened;
@@ -293,6 +295,28 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
         }
     }
 
+    private async Task LoadMoodChartDataAsync()
+    {
+        try
+        {
+            Debug.WriteLine("[LoadMoodChartDataAsync] Starting to load mood chart data...");
+            var moodData = await _moodChartService.GetLastSevenDaysMoodDataAsync();
+
+            Debug.WriteLine($"[LoadMoodChartDataAsync] Loaded {moodData.Count} mood data points.");
+
+            // Always update MoodData on the main thread
+            await MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                MoodData = new ObservableCollection<MoodDataPoint>(moodData);
+                Debug.WriteLine($"[LoadMoodChartDataAsync] Updated MoodData property with {MoodData.Count} items");
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error loading mood chart data: {ex.Message}");
+        }
+    }
+
     [RelayCommand]
     private async Task TogglePlayback()
     {
@@ -311,6 +335,7 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
             {
                 _audioPlayerService.Resume();
                 IsAudioPlayerSheetOpen = true;
+                _ = _notificationService.CancelSessionReminder();
             }
             else
             {
@@ -319,6 +344,7 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
                 if (success)
                 {
                     IsAudioPlayerSheetOpen = true;
+                    _ = _notificationService.CancelSessionReminder();
                 }
             }
         }
@@ -709,6 +735,12 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
 
                 // Start polling for status
                 await StartPollingSessionStatus(newSession.Uuid);
+
+                // Schedule a reminder to come back in 4 minutes if they leave
+                await _notificationService.ScheduleSessionReminder(240);
+
+                // Save current session ID for background fetch
+                Preferences.Default.Set("current_session_id", newSession.Uuid);
 
                 Debug.WriteLine($"[RequestSession] Session created successfully - ID: {newSession.Uuid}, Status: {newSession.Status}");
                 return; // Success! Exit the method
@@ -1706,14 +1738,34 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
             Debug.WriteLine($"[UpdateStatus] UI updated with new status: {newStatus}");
         });
 
-        // Auto-download when status changes to COMPLETED
-        if (newStatus == MeditationSessionStatus.COMPLETED && !updatedSession.IsDownloaded)
+        // Notify user when session is ready
+        if (newStatus == MeditationSessionStatus.COMPLETED)
         {
-            Debug.WriteLine("[UpdateStatus] Session completed, starting auto-download");
-            await DownloadSessionInternal();
+            // Notify user when session is completed
+            Debug.WriteLine("[UpdateStatus] Session completed - sending notification");
+            Services.NotificationLogger.Log("[TodayViewModel] Session COMPLETED - triggering notification");
+            // Use delayed notification to ensure reliable delivery even when app is backgrounded
+            await _notificationService.ShowDelayedNotification("Session Ready", "Your meditation session is ready to listen to.", 1);
+            // Auto-download when status changes to COMPLETED
+            if (!updatedSession.IsDownloaded)
+            {
+                Debug.WriteLine("[UpdateStatus] Session completed, starting auto-download");
+                await DownloadSessionInternal();
 
-            // Notify that new data is available (but don't force refresh to avoid loops)
-            Debug.WriteLine("[UpdateStatus] New session completed - calendar will refresh on next navigation");
+                // Notify that new data is available (but don't force refresh to avoid loops)
+                Debug.WriteLine("[UpdateStatus] New session completed - calendar will refresh on next navigation");
+            }
+        }
+        else if (newStatus == MeditationSessionStatus.FAILED)
+        {
+            // Notify user when session fails
+            Debug.WriteLine("[UpdateStatus] Session failed - sending notification");
+            Services.NotificationLogger.Log("[TodayViewModel] Session FAILED - triggering notification");
+            // Use delayed notification to ensure reliable delivery even when app is backgrounded
+            var failureBody = !string.IsNullOrEmpty(errorMessage)
+                ? errorMessage!
+                : "Your meditation session couldn't be generated. Please try again.";
+            await _notificationService.ShowDelayedNotification("Session Failed", failureBody, 1);
         }
     }
 
@@ -1960,28 +2012,28 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
         await LoadTodayDataAsync();
         await LoadMoodChartDataAsync();
     }
-
-    private async Task LoadMoodChartDataAsync()
+    
+    [RelayCommand]
+    private async Task TestNotification()
     {
-        try
-        {
-            Debug.WriteLine("[LoadMoodChartDataAsync] Starting to load mood chart data...");
-            var moodData = await _moodChartService.GetLastSevenDaysMoodDataAsync();
-
-            Debug.WriteLine($"[LoadMoodChartDataAsync] Loaded {moodData.Count} mood data points.");
-
-            // Always update MoodData on the main thread
-            await MainThread.InvokeOnMainThreadAsync(() =>
-            {
-                MoodData = new ObservableCollection<MoodDataPoint>(moodData);
-                Debug.WriteLine($"[LoadMoodChartDataAsync] Updated MoodData property with {MoodData.Count} items");
-            });
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Error loading mood chart data: {ex.Message}");
-        }
+        Debug.WriteLine("[TestNotification] Testing notification service");
+        Services.NotificationLogger.Log("[TodayViewModel] Test notification triggered");
+        await _notificationService.ShowNotification("Test Notification", "This is a test notification from TodayViewModel");
     }
+
+    [RelayCommand]
+    private async Task TestDelayedNotification()
+    {
+        Debug.WriteLine("[TestDelayedNotification] Testing delayed background notification");
+        Services.NotificationLogger.Log("[TodayViewModel] Delayed test notification triggered - will fire in 10 seconds");
+        
+        // Use the proper delayed notification method instead of Task.Run
+        await _notificationService.ShowDelayedNotification(
+            "Background Test", 
+            "This notification was sent after 10 seconds delay from TodayViewModel",
+            10);
+    }
+    
 
     // Explicit interface implementations for IAudioPlayerViewModel
     ICommand IAudioPlayerViewModel.TogglePlaybackCommand => TogglePlaybackCommand;
@@ -2000,6 +2052,44 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
         {
             // When closing the sheet, collapse it first
             IsBottomSheetExpanded = false;
+        }
+    }
+
+    [RelayCommand]
+    private async Task CheckNotificationPermissions()
+    {
+        Debug.WriteLine("[CheckNotificationPermissions] Checking notification permissions");
+        Services.NotificationLogger.Log("[TodayViewModel] Checking notification permissions");
+        
+        try
+        {
+            var hasPermission = await _notificationService.RequestNotificationPermission();
+            var permissionResult = hasPermission ? "GRANTED" : "DENIED";
+            
+            Debug.WriteLine($"[CheckNotificationPermissions] Permission result: {permissionResult}");
+            Services.NotificationLogger.Log($"[TodayViewModel] Permission result: {permissionResult}");
+            
+            var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
+            if (page != null)
+            {
+                await page.DisplayAlert("Notification Permissions", 
+                    $"Notification Permission: {permissionResult}\n\nIf denied, please enable notifications in Settings > [App Name] > Notifications", 
+                    "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[CheckNotificationPermissions] Error: {ex.Message}");
+            Services.NotificationLogger.Log($"[TodayViewModel] Error checking permissions: {ex.Message}");
+        }
+    }
+
+    // Add method to initiate polling when page appears
+    public async Task PollCurrentSessionStatusAsync()
+    {
+        if (TodaySession != null && TodaySession.Status == MeditationSessionStatus.REQUESTED && !IsPolling)
+        {
+            await StartPollingSessionStatus(TodaySession.Uuid);
         }
     }
 }
