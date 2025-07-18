@@ -232,12 +232,17 @@ namespace MeditationApp.Services
         {
             insights.LastUpdated = DateTime.UtcNow;
             int result;
-            
-            if (insights.ID != 0)
+            // Ensure only one insights entry per user per day: upsert based on existing record
+            var existing = await GetDailyInsightsAsync(insights.UserID, insights.Date);
+            if (existing != null)
+            {
+                insights.ID = existing.ID;
                 result = await _database.UpdateAsync(insights);
+            }
             else
+            {
                 result = await _database.InsertAsync(insights);
-            
+            }
             return result;
         }
 

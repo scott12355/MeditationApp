@@ -217,7 +217,8 @@ public static class MauiProgram
         {
             var database = provider.GetRequiredService<MeditationSessionDatabase>();
             var cognitoAuthService = provider.GetRequiredService<CognitoAuthService>();
-            return new MoodChartService(database, cognitoAuthService);
+            var graphQLService = provider.GetRequiredService<GraphQLService>();
+            return new MoodChartService(database, cognitoAuthService, graphQLService);
         });
 
         // Register NotificationService
