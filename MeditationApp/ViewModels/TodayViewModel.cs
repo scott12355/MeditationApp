@@ -516,7 +516,7 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
     private async Task RequestNewSession()
     {
         // Check for premium access first
-        var hasPremium = await PremiumFeatureHelper.CheckPremiumAccessAsync("Personalized Meditation Sessions");
+        var hasPremium = await PremiumFeatureHelper.CheckPremiumAccessAsync("Personalised Meditation Sessions");
         if (!hasPremium)
         {
             // User doesn't have premium or cancelled upgrade
@@ -1696,6 +1696,17 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
                 }
             }
         );
+    }
+
+    // Add this method to restart polling when app resumes
+    public void ResumeSessionPolling()
+    {
+        Debug.WriteLine("[ResumeSessionPolling] Checking whether to resume polling session status");
+        if (TodaySession != null && TodaySession.Status == MeditationSessionStatus.REQUESTED && !IsPolling)
+        {
+            _ = StartPollingSessionStatus(TodaySession.Uuid);
+            Debug.WriteLine("[ResumeSessionPolling] Polling resumed");
+        }
     }
 
     private async Task UpdateSessionStatus(MeditationSessionStatus newStatus, string? errorMessage)

@@ -24,8 +24,7 @@ public class SessionStatusPoller
     public async Task PollSessionStatusAsync(
         MeditationSession session,
         Func<MeditationSessionStatus, string?, Task>? onStatusChanged = null,
-        int pollingIntervalMs = 3000,
-        int maxPollingDurationMs = 40000) 
+        int pollingIntervalMs = 3000)
     {
         _cts = new CancellationTokenSource();
         var startTime = DateTime.UtcNow;
@@ -36,13 +35,6 @@ public class SessionStatusPoller
             while (!_cts.Token.IsCancellationRequested)
             {
                 pollCount++;
-                var elapsed = (DateTime.UtcNow - startTime).TotalMilliseconds;
-                if (maxPollingDurationMs > 0 && elapsed > maxPollingDurationMs)
-                {
-                    if (onStatusChanged != null)
-                        await onStatusChanged(MeditationSessionStatus.FAILED, "Session generation timed out.");
-                    break;
-                }
 
                 string query = await GraphQLQueryLoader.LoadQueryAsync("GetMeditationSessionStatus.graphql");
                 if (string.IsNullOrWhiteSpace(query))

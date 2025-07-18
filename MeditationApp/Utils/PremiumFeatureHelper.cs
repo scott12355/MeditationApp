@@ -37,7 +37,7 @@ public static class PremiumFeatureHelper
                         ? "Your subscription has been restored! Enjoy all Lucen+ features."
                         : $"Welcome to Lucen+! You now have access to {featureName} and all other Lucen+ features.";
                         
-                    await Application.Current.MainPage.DisplayAlert("Success", message, "OK");
+                    // await Application.Current.MainPage.DisplayAlert("Success", message, "OK");
                 }
                 return true;
             }

@@ -112,7 +112,7 @@ The meditation creation feature in TodayViewModel shows how to integrate premium
 private async Task RequestNewSession()
 {
     // Check for premium access first
-    var hasPremium = await PremiumFeatureHelper.CheckPremiumAccessAsync("Personalized Meditation Sessions");
+    var hasPremium = await PremiumFeatureHelper.CheckPremiumAccessAsync("Personalised Meditation Sessions");
     if (!hasPremium)
     {
         // User doesn't have premium or cancelled upgrade
