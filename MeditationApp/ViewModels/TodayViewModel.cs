@@ -350,13 +350,45 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
         }
         else
         {
-            // Show message that session needs to be downloaded first
+            // Handle different session states
+            if (TodaySession?.Status == MeditationSessionStatus.COMPLETED && !TodaySession.IsDownloaded)
+            {
+                if (IsDownloading)
+                {
+                    // If currently downloading, wait a second and try again
+                    Debug.WriteLine("[TogglePlayback] Session is downloading, waiting 1 second and retrying...");
+                    await Task.Delay(1000);
+                    await TogglePlayback(); // Recursive call to retry
+                    return;
+                }
+                else
+                {
+                    // Session is ready but not downloading yet, start download
+                    Debug.WriteLine("[TogglePlayback] Session ready but not downloaded, starting download...");
+                    await DownloadSessionInternal();
+                    return;
+                }
+            }
+            
+            // Show appropriate message for other states
             var page = Application.Current?.Windows?.FirstOrDefault()?.Page;
             if (page != null)
             {
-                await page.DisplayAlert("Download Required",
-                    "Please download the session first before playing.",
-                    "OK");
+                string title = "Session Not Ready";
+                string message = "Your session is not available yet. Please try again in a moment.";
+
+                if (TodaySession?.Status == MeditationSessionStatus.REQUESTED)
+                {
+                    title = "Session Being Created";
+                    message = "Your personalized meditation session is still being created. You'll receive a notification when it's ready!";
+                }
+                else if (TodaySession?.Status == MeditationSessionStatus.FAILED)
+                {
+                    title = "Session Failed";
+                    message = "There was an issue creating your session. Please try requesting a new one.";
+                }
+
+                await page.DisplayAlert(title, message, "OK");
             }
         }
 
@@ -1706,6 +1738,20 @@ public partial class TodayViewModel : ObservableObject, IAudioPlayerViewModel
         {
             _ = StartPollingSessionStatus(TodaySession.Uuid);
             Debug.WriteLine("[ResumeSessionPolling] Polling resumed");
+        }
+    }
+
+    // Check if session is completed and needs downloading when app resumes
+    public async Task CheckAndDownloadCompletedSession()
+    {
+        Debug.WriteLine("[CheckAndDownloadCompletedSession] Checking if session needs downloading");
+        
+        if (TodaySession != null && 
+            TodaySession.Status == MeditationSessionStatus.COMPLETED && 
+            !TodaySession.IsDownloaded)
+        {
+            Debug.WriteLine($"[CheckAndDownloadCompletedSession] Session {TodaySession.Uuid} is completed but not downloaded, starting download");
+            await DownloadSessionInternal();
         }
     }
 

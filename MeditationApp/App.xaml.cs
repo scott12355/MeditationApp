@@ -77,6 +77,10 @@ public partial class App : Application
             var todayViewModel = _serviceProvider.GetRequiredService<TodayViewModel>();
             await todayViewModel.EnsureDataLoaded();
             System.Diagnostics.Debug.WriteLine("Resumed TodayViewModel data and polling");
+            
+            // Check if session is completed and needs downloading
+            await todayViewModel.CheckAndDownloadCompletedSession();
+            
             // Resume session polling
             todayViewModel.ResumeSessionPolling();
         }
