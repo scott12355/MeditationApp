@@ -9,6 +9,7 @@ using MeditationApp.Models;
 using CommunityToolkit.Maui;
 using Plugin.Maui.Audio;
 using MediaManager;
+using MeditationApp.Utils;
 using UraniumUI;
 // using Tonestro.Maui.RevenueCat;
 #if IOS
@@ -59,6 +60,21 @@ public static class MauiProgram
         RCPurchases.ConfigureWithAPIKey("appl_jOuHsNSjVHqUMcFuDJjBIqrePRv");
         Console.WriteLine("RevenueCat SDK initialized with API key.");
 #endif
+        
+        EntryHandler.Mapper.AppendToMapping("NoSpellCheck", (handler, view) =>
+        {
+            if (view is NoSpellCheckTextField)
+            {
+#if ANDROID
+        handler.PlatformView.InputType |= Android.Text.InputTypes.TextFlagNoSuggestions;
+        handler.PlatformView.SetRawInputType(Android.Text.InputTypes.TextFlagNoSuggestions);
+#elif IOS || MACCATALYST
+                handler.PlatformView.AutocorrectionType = UIKit.UITextAutocorrectionType.No;
+                handler.PlatformView.SpellCheckingType = UIKit.UITextSpellCheckingType.No;
+#endif
+            }
+        });
+
 
 
         // Register Cognito authentication service

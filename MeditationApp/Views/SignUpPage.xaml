@@ -7,6 +7,7 @@
                             xmlns:converters="clr-namespace:MeditationApp.Converters"
                             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+                            xmlns:utils="clr-namespace:MeditationApp.Utils"
                             x:Class="MeditationApp.Views.SignUpPage"
                             Shell.NavBarIsVisible="False"
                             Title="Sign Up"
@@ -136,24 +137,24 @@
                                             AllowClear="True"/>
 
                         <!-- Password -->
-                        <material:TextField Title="Password"
+                        <utils:NoSpellCheckTextField Title="Password"
                                             Text="{Binding Password}"
                                             IsPassword="True"
                                             AccentColor="{StaticResource Primary}">
                             <material:TextField.Attachments>
                                 <material:TextFieldPasswordShowHideAttachment/>
                             </material:TextField.Attachments>
-                        </material:TextField>
+                        </utils:NoSpellCheckTextField>
 
                         <!-- Confirm Password -->
-                        <material:TextField Title="Confirm Password"
-                                            Text="{Binding ConfirmPassword}"
-                                            IsPassword="True"
-                                            AccentColor="{StaticResource Primary}">
+                        <utils:NoSpellCheckTextField Title="Confirm Password"
+                                                     Text="{Binding ConfirmPassword}"
+                                                     IsPassword="True"
+                                                     AccentColor="{StaticResource Primary}">
                             <material:TextField.Attachments>
                                 <material:TextFieldPasswordShowHideAttachment/>
                             </material:TextField.Attachments>
-                        </material:TextField>
+                        </utils:NoSpellCheckTextField>
 
                         <!-- Terms and Conditions Checkbox -->
                         <Grid ColumnDefinitions="Auto,*"

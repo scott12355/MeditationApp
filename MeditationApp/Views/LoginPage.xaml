@@ -7,6 +7,7 @@
                             xmlns:converters="clr-namespace:MeditationApp.Converters"
                             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+                            xmlns:utils="clr-namespace:MeditationApp.Utils"
                             x:Class="MeditationApp.Views.LoginPage"
                             Shell.NavBarIsVisible="False"
                             Title="Login"
@@ -117,16 +118,20 @@
                                        Keyboard="Email"
                                        AccentColor="{StaticResource Primary}"
                                        AllowClear="True"/>
+                    
+                    
+                    
 
                     <!-- Password TextField -->
-                    <material:TextField Title="Password"
-                                       Text="{Binding Password}"
-                                       IsPassword="True"
-                                       AccentColor="{StaticResource Primary}">
+                    <utils:NoSpellCheckTextField Title="Password"
+                            Text="{Binding Password}"
+                            IsPassword="True"
+                            Keyboard="Plain"
+                            AccentColor="{StaticResource Primary}">
                         <material:TextField.Attachments>
                             <material:TextFieldPasswordShowHideAttachment />
                         </material:TextField.Attachments>
-                    </material:TextField>
+                    </utils:NoSpellCheckTextField>
 
                     <!-- Forgot Password Link -->
                     <Label Text="Forgot Password?"
